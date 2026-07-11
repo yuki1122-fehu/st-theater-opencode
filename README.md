@@ -1,8 +1,6 @@
-# 小剧场生成器 / Theater Generator (OpenCode 适配版)
+# 小剧场生成器 / Theater Generator
 
 独立生成小剧场/番外内容的 SillyTavern 扩展插件。在插件面板中调用API生成HTML小剧场，不影响正文剧情。
-
-> **OpenCode 适配**：原版插件在「独立 API」模式下由浏览器直连你的 API 地址，而 OpenCode 等云端端点不返回 CORS 头，会导致「酒馆能连、插件连不上」。本版本改为**经 SillyTavern 后端代理**转发请求，彻底绕开浏览器跨域限制。
 
 ## 功能
 
@@ -18,33 +16,17 @@
 - **悬浮球** — 可选悬浮球快速打开面板，设置中开关
 - **主题跟随** — 面板自动跟随酒馆主题配色
 - **自定义CSS** — 自定义插件面板样式
-- **放大查看（移动端友好）** — 生成结果区提供「放大查看」按钮，打开独立全屏浮层，标题栏可拖动、右下角可缩放，不受酒馆弹窗限宽，手机也能舒服看结果
-- **CORS 修复** — 独立 API 模式经 SillyTavern 后端代理转发，绕过 OpenCode 等云端端点的跨域限制（已修复 `failed to fetch`）
 - **安全更新** — 面板内更新扩展，不刷新页面不影响其他插件
 
 ## 安装
 
 ### 方法一：扩展管理器（推荐）
 
-Extensions → Install Extension → 粘贴仓库地址：
-
-```
-https://github.com/yuki1122-fehu/st-theater-opencode
-```
+Extensions → Install Extension → 粘贴仓库地址
 
 ### 方法二：手动安装
 
-将文件放入 `data/default-user/extensions/third-party/st-theater-opencode/`
-
-### 配置 OpenCode
-
-1. 面板【设置】→ API 模式选「独立 API（推荐）」
-2. API URL 填：`https://opencode.ai/zen/go/v1`
-3. API Key 填你的 OpenCode Key
-4. 点「获取模型列表」选一个模型（如 `qwen3.7-max`），或直接在「模型名称」里手填
-5. 点「测试连接」验证（会经酒馆后端代理，无跨域问题）
-
-> Base 地址只填到 `/v1` 即可，插件会自动补 `/chat/completions`。
+将文件放入 `data/default-user/extensions/third-party/st-theater/`
 
 ## 面板结构
 
@@ -59,6 +41,27 @@ https://github.com/yuki1122-fehu/st-theater-opencode
 
 - SillyTavern 1.12.0+
 - 支持所有 API
+
+## OpenCode 适配说明（本分支）
+
+本分支（OpenCode 适配版）针对「酒馆能连上、但插件连不上」的问题做了修复：
+OpenCode 等云端 OpenAI 兼容端点**不返回 CORS 头**，浏览器直连会被拦截。
+
+修复方式：把「独立 API」模式的生成请求改为走酒馆自己的同域后端代理
+`/api/backends/chat-completions/generate`（服务端转发，无 CORS 限制），
+**不改动全局 `window.fetch`**，不会影响酒馆其他功能。
+
+### OpenCode 配置步骤
+
+1. 扩展管理器安装后，**硬刷新**网页（Ctrl+Shift+R）。
+2. 打开插件面板 → 设置 → API 模式选「**独立 API**」。
+3. 填写：
+   - **API URL**：`https://你的-opencode 地址/zen/go/v1`（即 OpenAI 兼容 base URL，不用带 `/chat/completions`）
+   - **API Key**：OpenCode 给的 key
+   - **模型名称**：对应模型（点「获取模型列表」若因 CORS 失败，直接手填即可）
+4. 保存后直接生成即可，请求会经酒馆后端代理转发到 OpenCode。
+
+> 若想用酒馆主 API，API 模式选「酒馆主 API（实验）」即可，同样无需担心 CORS。
 
 ## 开源协议
 

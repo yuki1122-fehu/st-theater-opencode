@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '3.3.0';
+const VERSION = '3.2.3';
 let latestRemoteVersion = null;
 const cloneDefaultSettings = () => {
     if (typeof structuredClone === 'function') return structuredClone(defaultSettings);
@@ -120,7 +120,6 @@ let settings = {};
 const defaultSettings = Object.freeze({
     contextRange: 10,
     instructionTemplates: [],
-    builtinSeeded: false,             // 内置剧本是否已注入过（只注入一次）
     instructionGroups: [],            // 用户创建的分组名列表
     instructionGroupFilter: '__all__', // 当前筛选：'__all__' | '__none__'(未分组) | 组名
     renderTemplates: [],
@@ -304,108 +303,6 @@ async function recentPersist() {
 // ============================================================
 // Init
 // ============================================================
-// ============================================================
-// 内置剧本（场景生成模板）
-//   首次运行时注入 settings.instructionTemplates，用户可在「指令模板库」直接使用 / 编辑 / 删除。
-//   每条：{ name, content, group }。content 即生成小剧场的指令。
-// ============================================================
-const BUILTIN_INSTRUCTION_TEMPLATES = [
-    {
-        name: '校园·午后的天台',
-        group: '校园青春',
-        content: '请生成一段校园背景的小剧场。场景设定在放学后的天台或空教室，角色们暂时卸下日常伪装，流露出柔软或笨拙的一面。语气轻松带点青涩的悸动，可以有碎碎念的内心戏、欲言又止的对话、或一场笨拙的恶作剧。避免硬核冲突，重在"日常里的小浪花"。'
-    },
-    {
-        name: '校园·运动会风波',
-        group: '校园青春',
-        content: '请生成一段校园运动会主题的小剧场。可以是接力棒掉落的慌乱、拉拉队暗暗较劲、或平时冷淡的角色突然爆发惊人运动神经。突出青春的热血与尴尬并存的真实感，允许幽默与脸红。'
-    },
-    {
-        name: '奇幻·酒馆里的密谈',
-        group: '奇幻冒险',
-        content: '请生成一段奇幻冒险小剧场。场景是冒险者公会或路边酒馆，角色们一边灌着麦酒一边盘算接下来的任务。可以插入神秘委托人的出现、同伴间的互怼、或对某位角色过往的调侃。世界观细节自然带出，不要大段说明。'
-    },
-    {
-        name: '奇幻·迷宫深处的争执',
-        group: '奇幻冒险',
-        content: '请生成一段地下城探险小剧场。队伍在迷宫深处迷路、补给见底，疲惫让平日被压住的脾气冒头。写出各角色面对压力的不同反应：有人逞强、有人崩溃、有人默默兜底。最后留一个意外的转机。'
-    },
-    {
-        name: '日常·一起做饭',
-        group: '日常治愈',
-        content: '请生成一段温馨日常的厨房小剧场。角色们笨手笨脚地合作做一顿饭，有人切到手、有人把盐放成糖、有人偷偷尝味道被抓包。重点是烟火气与松弛感，让角色关系在琐碎互动里自然升温。'
-    },
-    {
-        name: '日常·雨夜的屋檐',
-        group: '日常治愈',
-        content: '请生成一段雨夜治愈小剧场。突如其来的雨把角色们困在同一处屋檐下，没有需要解决的大事，只有借来的外套、共享的耳机、和一句没头没尾的闲聊。氛围安静温柔，允许留白。'
-    },
-    {
-        name: '战斗·绝境的反击',
-        group: '热血战斗',
-        content: '请生成一段高潮战斗小剧场。角色被逼到绝境，劣势明显，但靠彼此配合或某句关键的话撕开转机。写出招式的力度感、伤痕与喘息、以及"相信同伴"的瞬间。节奏紧凑，少解释多呈现。'
-    },
-    {
-        name: '战斗·战后的余温',
-        group: '热血战斗',
-        content: '请生成一段战斗结束后的小剧场。硝烟未散，角色们互相清点伤势、拌嘴逞强，却藏不住劫后余生的庆幸。可以有一个人先绷不住笑出来，或默默替对方包扎的细节。'
-    },
-    {
-        name: '暧昧·指尖的距离',
-        group: '暧昧恋爱',
-        content: '请生成一段暧昧向小剧场。角色之间尚未挑明，却处处是逾矩的靠近：替对方拢好被风吹乱的头发、假装不经意地碰一下、在沉默里听得到心跳。写"差一点"的张力，而不是直接告白。'
-    },
-    {
-        name: '暧昧·吃醋现场',
-        group: '暧昧恋爱',
-        content: '请生成一段带点醋意的小剧场。角色看到同伴对别人笑，表面淡定实则浑身别扭，用阴阳怪气的关心或故意冷落来掩饰在意。允许对方装傻逗弄，把暧昧拉满。'
-    },
-    {
-        name: '悬疑·不在场证明',
-        group: '悬疑推理',
-        content: '请生成一段悬疑推理小剧场。某个线索把怀疑引向了队伍中的某人，众人围着线索各执一词，气氛微妙。写出每个人证词里的破绽与默契，最后留一个让人脊背发凉的反转暗示。'
-    },
-    {
-        name: '末日·最后的篝火',
-        group: '末日废土',
-        content: '请生成一段末日废土小剧场。幸存者们围着快要熄灭的篝火，物资见底、前路茫茫。在绝望里抠出一点人性的微光：分享最后一块饼干、讲一个过时的笑话、或一个不忍说出口的真相。'
-    },
-    {
-        name: '古风·宫墙柳色',
-        group: '古风宫斗',
-        content: '请生成一段古风宫廷小剧场。角色在雕栏画栋间步步留心，一句闲话可能是杀机，一个眼神藏着算计。写出表面恭谨下的暗流，允许一段不动声色的交锋。'
-    },
-    {
-        name: '科幻·休眠舱醒来',
-        group: '科幻未来',
-        content: '请生成一段科幻未来小剧场。角色从漫长休眠中醒来，世界已经天翻地覆，熟悉的人不在了，只剩冰冷的AI与陌生的舱壁。写出失重般的错愕，以及在废墟里重新建立连接的过程。'
-    },
-    {
-        name: '搞笑·翻车现场',
-        group: '搞笑日常',
-        content: '请生成一段纯搞笑小剧场。角色们自信满满地计划一件事，结果连环翻车，越补救越离谱。用夸张的反差和彼此甩锅制造笑点，结尾最好全员鼻青脸肿但乐在其中。'
-    },
-    {
-        name: '群像·跨年倒数',
-        group: '节日特别',
-        content: '请生成一段节日群像小剧场。多个角色聚在一起跨年/过节，有人感怀、有人闹腾、有人默默准备惊喜。让每个人都至少有一句属于自己的高光或软肋，结尾落在"在一起就好"。'
-    },
-];
-
-function seedBuiltinTemplates() {
-    if (settings.builtinSeeded) return;
-    if (!Array.isArray(settings.instructionTemplates)) settings.instructionTemplates = [];
-    if (settings.instructionTemplates.length === 0) {
-        // 内置剧本只注入一次；用户之后增删都尊重其选择
-        settings.instructionTemplates = BUILTIN_INSTRUCTION_TEMPLATES.map(t => ({ ...t }));
-        const groups = new Set(settings.instructionGroups || []);
-        BUILTIN_INSTRUCTION_TEMPLATES.forEach(t => { if (t.group) groups.add(t.group); });
-        settings.instructionGroups = Array.from(groups);
-    }
-    settings.builtinSeeded = true;
-    try { save(); } catch (_) { /* 首启可能尚未就绪，忽略 */ }
-}
-
 async function init() {
     const ctx = SillyTavern.getContext();
     const { extensionSettings, renderExtensionTemplateAsync, eventSource, event_types } = ctx;
@@ -445,11 +342,9 @@ async function init() {
     }
 
     await storageInit();
-    // 首次运行注入内置剧本（场景模板）
-    seedBuiltinTemplates();
     applyUIFontSize();
 
-    const html = await renderExtensionTemplateAsync('third-party/st-theater-opencode', 'settings');
+    const html = await renderExtensionTemplateAsync('third-party/st-theater', 'settings');
     $('#extensions_settings2').append(html);
     $('#theater-open-btn').on('click', openTheaterPopup);
 
@@ -912,13 +807,7 @@ function buildPopupHTML() {
                 <span id="theater-recent-indicator"></span>
                 <span id="theater-recent-next" class="theater-recent-arrow" title="下一条"><i class="fa-solid fa-chevron-right"></i></span>
             </div>
-            <div class="theater-output-head">
-                <label class="theater-label">生成结果</label>
-                <div class="theater-output-actions">
-                    <div id="theater-zen-btn" class="theater-btn theater-btn-sm" title="沉浸阅读：隐藏面板、结果撑满屏幕（Esc 退出）"><i class="fa-solid fa-book-open-reader"></i><span>沉浸阅读</span></div>
-                    <div id="theater-expand-btn" class="theater-btn theater-btn-sm" title="弹出独立窗口（可拖动 / 缩放）"><i class="fa-solid fa-expand"></i><span>独立窗口</span></div>
-                </div>
-            </div>
+            <label class="theater-label">生成结果</label>
             <div id="theater-output-container"><iframe id="theater-output-frame" sandbox="allow-scripts allow-same-origin" class="theater-iframe"></iframe></div>
             <div class="theater-btn-row">
                 <div id="theater-save-history-btn" class="theater-btn"><i class="fa-solid fa-bookmark"></i><span>保存</span></div>
@@ -1178,8 +1067,7 @@ function buildPopupHTML() {
                 <option value="main" ${settings.apiMode === 'main' ? 'selected' : ''}>酒馆主 API（实验）</option>
             </select>
             <div id="theater-custom-api-area" style="${settings.apiMode === 'main' ? 'display:none;' : ''}margin-top:10px;">
-                <input id="theater-api-url" class="theater-input" placeholder="API URL（OpenCode 填 https://opencode.ai/zen/go/v1）" value="${esc(settings.apiUrl || '')}">
-                <p style="margin:6px 0 0;font-size:0.82em;opacity:0.65;">OpenCode 等云端端点走「酒馆后端代理」，无需担心浏览器跨域拦截。Base 只填到 <code>/v1</code> 即可，例如 <code>https://opencode.ai/zen/go/v1</code>。</p>
+                <input id="theater-api-url" class="theater-input" placeholder="API URL" value="${esc(settings.apiUrl || '')}">
                 <input id="theater-api-key" class="theater-input" type="password" placeholder="API Key" value="${esc(settings.apiKey || '')}" style="margin-top:6px;">
                 <div style="margin-top:6px;">
                     <div class="theater-btn-row" style="margin:0 0 6px;">
@@ -1980,9 +1868,6 @@ function bindEvents() {
     // ---- History ----
     $d.off('click.tsh').on('click.tsh', '#theater-save-history-btn', saveToHistory);
     $d.off('click.tch').on('click.tch', '#theater-copy-html-btn', copyHtml);
-    // ---- 沉浸阅读 / 放大查看 ----
-    $d.off('click.tzen').on('click.tzen', '#theater-zen-btn', toggleTheaterZen);
-    $d.off('click.texp').on('click.texp', '#theater-expand-btn', openTheaterViewer);
     // ---- Recent generations nav ----
     $d.off('click.trp').on('click.trp', '#theater-recent-prev', function () {
         if (recentIndex <= 0) return;
@@ -3796,7 +3681,7 @@ async function callCustomAPIStream(sys, user, onChunk) {
     if (!rawUrl) throw new Error('请先在【设置】填写 API URL（如 https://opencode.ai/zen/go/v1）');
     const isAnthropic = /anthropic|claude/i.test(rawUrl);
     const source = isAnthropic ? 'anthropic' : 'openai';
-    // base 只填到「不含 /chat/completions」的地址，例如 https://opencode.ai/zen/go/v1
+    // base 只取到「不含 /chat/completions」的地址，例如 https://opencode.ai/zen/go/v1
     const base = rawUrl
         .replace(/\/chat\/completions\/?$/i, '')
         .replace(/\/messages\/?$/i, '')
@@ -3807,9 +3692,7 @@ async function callCustomAPIStream(sys, user, onChunk) {
 
     // 经酒馆后端代理转发：OpenCode 等云端 OpenAI 兼容端点不返回 CORS 头，
     // 浏览器直连会被拦截（表现为「酒馆能连、插件连不上」）。这里直接打酒馆自己的
-    // /api/backends/chat-completions/generate 同域代理（与「获取模型列表」同一条链路），
-    // 不再走 ChatCompletionService.processRequest —— 它内部对 OpenCode 带 reasoning_content
-    // 的响应解析会报错。改用插件自带的宽松 SSE 解析，且绝不回退到浏览器直连。
+    // /api/backends/chat-completions/generate 同域代理，不再走浏览器直连。
     const ctx = SillyTavern.getContext();
     const headers = ctx.getRequestHeaders ? ctx.getRequestHeaders() : { 'Content-Type': 'application/json' };
     const body = {
@@ -4039,50 +3922,11 @@ function textFallbackHtml(text) {
 
 let currentDisplayHtml = '';   // 当前iframe中显示的内容
 
-// 给生成结果 iframe 注入一套易读排版基础样式（字体 / 行高 / 留白 / 标题引用等），
-// 让 AI 产出的内容更精致、移动端更舒服。仅为兜底样式，不破坏内容自带样式。
-function injectIframeReadStyle(f) {
-    try {
-        const doc = f.contentDocument || (f.contentWindow && f.contentWindow.document);
-        if (!doc || doc.getElementById('theater-read-style')) return;
-        const s = doc.createElement('style');
-        s.id = 'theater-read-style';
-        s.textContent = `
-            html, body { margin: 0 !important; }
-            body {
-                font-family: "Noto Sans SC", "PingFang SC", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-                font-size: 15px; line-height: 1.85; color: #2b2620;
-                background: #fffdf7; padding: 22px 20px !important;
-                -webkit-text-size-adjust: 100%;
-            }
-            h1, h2, h3, h4 { line-height: 1.4; margin: 1.1em 0 .55em; font-weight: 700; }
-            h1 { font-size: 1.55em; } h2 { font-size: 1.32em; } h3 { font-size: 1.15em; }
-            p { margin: 0 0 1em; }
-            a { color: #b07a4a; }
-            img { max-width: 100%; height: auto; border-radius: 10px; }
-            blockquote { margin: 1em 0; padding: .6em 1em; border-left: 3px solid #d9a877; background: rgba(217,168,119,.10); border-radius: 0 8px 8px 0; }
-            hr { border: none; border-top: 1px solid rgba(46,38,32,.12); margin: 1.4em 0; }
-            pre { background: #f6efe0; padding: 12px 14px; border-radius: 10px; overflow: auto; font-family: "JetBrains Mono", Consolas, monospace; }
-            code { font-family: "JetBrains Mono", Consolas, monospace; }
-            table { border-collapse: collapse; width: 100%; }
-            th, td { border: 1px solid rgba(46,38,32,.15); padding: 6px 10px; }
-        `;
-        (doc.head || doc.documentElement).appendChild(s);
-    } catch (_) { /* 跨域 / 沙箱限制时忽略 */ }
-}
-
 function showInIframe(html) {
     const f = document.getElementById('theater-output-frame'); if (!f) return;
     currentDisplayHtml = html;
     f.srcdoc = html;
-    // 同步到「放大查看」浮层（若已打开）
-    const viewerOpen = theaterViewerEl && (theaterViewerEl.open || (theaterViewerEl.style.display && theaterViewerEl.style.display !== 'none'));
-    if (viewerOpen) {
-        const vf = theaterViewerEl.querySelector('#theater-viewer-frame');
-        if (vf) vf.srcdoc = html;
-    }
     f.onload = () => {
-        injectIframeReadStyle(f);
         try {
             const isMobile = window.innerWidth <= 768;
             const scrollH = (f.contentDocument || f.contentWindow.document).documentElement.scrollHeight + 20;
@@ -4093,174 +3937,6 @@ function showInIframe(html) {
             f.style.height = window.innerWidth <= 768 ? '60vh' : '420px';
         }
     };
-}
-
-// ============================================================
-// 放大查看浮层（移动端友好：标题栏可拖动、右下角可缩放）
-//   挂在 document.body 上，不受酒馆弹窗尺寸限制。
-// ============================================================
-let theaterViewerEl = null;
-
-function ensureTheaterViewer() {
-    if (theaterViewerEl && document.body.contains(theaterViewerEl)) return theaterViewerEl;
-    const v = document.createElement('dialog');
-    v.id = 'theater-viewer';
-    v.innerHTML = `
-        <div id="theater-viewer-bar">
-            <span id="theater-viewer-title">小剧场 · 放大查看</span>
-            <span id="theater-viewer-close" title="关闭">✕</span>
-        </div>
-        <iframe id="theater-viewer-frame" sandbox="allow-scripts allow-same-origin"></iframe>
-        <div id="theater-viewer-resize" title="拖我缩放"></div>`;
-    document.body.appendChild(v);
-    v.querySelector('#theater-viewer-frame').addEventListener('load', function () { injectIframeReadStyle(this); });
-    theaterViewerEl = v;
-
-    // 恢复上次的位置/尺寸
-    const r = settings.theaterViewerRect;
-    if (r) {
-        if (r.width) v.style.width = r.width;
-        if (r.height) v.style.height = r.height;
-        if (r.left) v.style.left = r.left;
-        if (r.top) v.style.top = r.top;
-    }
-
-    const bar = v.querySelector('#theater-viewer-bar');
-    const closeBtn = v.querySelector('#theater-viewer-close');
-    const resize = v.querySelector('#theater-viewer-resize');
-    closeBtn.addEventListener('click', closeTheaterViewer);
-
-    const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
-    let mode = null, sx = 0, sy = 0, sl = 0, st = 0, sw = 0, sh = 0;
-
-    function onDown(e, m) {
-        mode = m;
-        const t = e.touches ? e.touches[0] : e;
-        sx = t.clientX; sy = t.clientY;
-        sl = parseInt(v.style.left) || 0;
-        st = parseInt(v.style.top) || 0;
-        sw = v.offsetWidth; sh = v.offsetHeight;
-        try { e.target.setPointerCapture?.(e.pointerId); } catch (_) { }
-        e.preventDefault();
-        window.addEventListener('pointermove', onMove, { passive: false });
-        window.addEventListener('pointerup', onUp);
-    }
-    function onMove(e) {
-        if (!mode) return;
-        const t = e.touches ? e.touches[0] : e;
-        const dx = t.clientX - sx, dy = t.clientY - sy;
-        if (mode === 'move') {
-            v.style.left = clamp(sl + dx, -sw + 64, window.innerWidth - 64) + 'px';
-            v.style.top = clamp(st + dy, 0, window.innerHeight - 44) + 'px';
-        } else if (mode === 'resize') {
-            v.style.width = clamp(sw + dx, 240, window.innerWidth - 8) + 'px';
-            v.style.height = clamp(sh + dy, 200, window.innerHeight - 8) + 'px';
-        }
-        e.preventDefault();
-    }
-    function onUp() {
-        mode = null;
-        window.removeEventListener('pointermove', onMove);
-        window.removeEventListener('pointerup', onUp);
-        settings.theaterViewerRect = { width: v.style.width, height: v.style.height, left: v.style.left, top: v.style.top };
-        save();
-    }
-
-    bar.addEventListener('pointerdown', e => onDown(e, 'move'));
-    resize.addEventListener('pointerdown', e => onDown(e, 'resize'));
-    // 触屏兜底（部分浏览器 pointer 事件不全时）
-    bar.addEventListener('touchstart', e => onDown(e, 'move'), { passive: false });
-    resize.addEventListener('touchstart', e => onDown(e, 'resize'), { passive: false });
-    window.addEventListener('touchmove', e => { if (mode) e.preventDefault(); }, { passive: false });
-    window.addEventListener('touchend', onUp);
-
-    return v;
-}
-
-// ============================================================
-// 沉浸阅读（zen）：隐藏面板 chrome，把生成结果撑满整个弹窗。
-//   面板内就地展开，不受模态弹窗顶层遮挡影响，手机/桌面都稳。
-// ============================================================
-function toggleTheaterZen(forceOff) {
-    const popup = document.querySelector('.theater-popup');
-    if (!popup) return;
-    const willOn = forceOff ? false : !popup.classList.contains('theater-zen');
-    // 进入前先确认有内容可看
-    if (willOn) {
-        const hasContent = currentDisplayHtml || lastGeneratedHtml ||
-            (document.getElementById('theater-output-frame') || {}).srcdoc;
-        if (!hasContent) { toastr.warning('还没有生成结果，先生成一次小剧场再进入沉浸阅读~'); return; }
-    }
-    const on = willOn;
-    popup.classList.toggle('theater-zen', on);
-    const btn = document.getElementById('theater-zen-btn');
-    if (btn) {
-        btn.classList.toggle('theater-zen-active', on);
-        btn.querySelector('span').textContent = on ? '退出沉浸' : '沉浸阅读';
-        btn.querySelector('i').className = on ? 'fa-solid fa-compress' : 'fa-solid fa-book-open-reader';
-    }
-    if (on) {
-        // 确保结果区可见并撑满
-        const out = document.getElementById('theater-output-section');
-        if (out) out.style.display = 'flex';
-        // 把 iframe 高度重算（撑满）
-        setTimeout(() => {
-            const f = document.getElementById('theater-output-frame');
-            if (f && f.srcdoc) { try { f.style.height = '100%'; } catch (_) {} }
-        }, 30);
-    } else {
-        // 退出：清掉内联 display，交还给正常显示逻辑（有内容时仍可见）
-        const out = document.getElementById('theater-output-section');
-        if (out) out.style.display = '';
-        const f = document.getElementById('theater-output-frame');
-        if (f) { try { f.style.height = ''; } catch (_) {} }
-    }
-}
-
-// Esc 退出沉浸阅读
-$(document).on('keydown.theaterzen', function (e) {
-    if (e.key === 'Escape' && document.querySelector('.theater-popup.theater-zen')) {
-        toggleTheaterZen(true);
-    }
-});
-
-function openTheaterViewer() {
-    const src = document.getElementById('theater-output-frame');
-    let html = (src && src.srcdoc) || currentDisplayHtml || lastGeneratedHtml;
-    const v = ensureTheaterViewer();
-    const f = v.querySelector('#theater-viewer-frame');
-    if (!html) {
-        html = '<div style="font-family:sans-serif;padding:40px;text-align:center;color:#888;">还没有生成结果，先生成一次小剧场，再点「放大查看」就能在这里看啦~</div>';
-    }
-    try { f.srcdoc = html; } catch (_) { /* ignore */ }
-    // 优先用模态 dialog 进入顶层（盖住酒馆弹窗）；不支持时退化成 body 级固定层
-    try {
-        if (!v.open && typeof v.showModal === 'function') v.showModal();
-        else if (typeof v.showModal !== 'function') fallbackShowViewer(v);
-    } catch (_) {
-        fallbackShowViewer(v);
-    }
-}
-
-// 兜底：把浮层当普通固定层挂到 body（用于不支持/不允许 showModal 的环境）
-function fallbackShowViewer(v) {
-    if (v.tagName === 'DIALOG') {
-        // 普通 div 化
-        const d = document.createElement('div');
-        d.id = 'theater-viewer';
-        d.innerHTML = v.innerHTML;
-        d.style.cssText = 'position:fixed;z-index:2147483647;left:4vw;top:8vh;width:92vw;height:84vh;background:#fff;border:1px solid rgba(0,0,0,.25);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden;';
-        v.replaceWith(d);
-        theaterViewerEl = d;
-        d.querySelector('#theater-viewer-close').addEventListener('click', () => d.remove());
-    } else {
-        v.style.display = 'block';
-    }
-}
-
-function closeTheaterViewer() {
-    if (theaterViewerEl && theaterViewerEl.open) theaterViewerEl.close();
-    else if (theaterViewerEl) theaterViewerEl.remove();
 }
 
 function updateRecentNav() {
@@ -4275,17 +3951,6 @@ function updateRecentNav() {
 }
 
 // ============================================================
-// OpenCode 等已知服务的模型兜底（代理与直连都取不到时直接给出可选列表）
-const OPENCODE_FALLBACK_MODELS = [
-    'minimax-m3', 'minimax-m2.7', 'minimax-m2.5',
-    'kimi-k2.7-code', 'kimi-k2.6', 'kimi-k2.5',
-    'glm-5.2', 'glm-5.1', 'glm-5',
-    'deepseek-v4-pro', 'deepseek-v4-flash',
-    'qwen3.7-max', 'qwen3.7-plus', 'qwen3.6-plus', 'qwen3.5-plus',
-    'mimo-v2-pro', 'mimo-v2-omni', 'mimo-v2.5-pro', 'mimo-v2.5',
-    'hy3-preview',
-];
-
 // Fetch model list from API
 // ============================================================
 async function fetchModelList() {
@@ -4298,54 +3963,51 @@ async function fetchModelList() {
     $btn.find('span').text('获取中…');
 
     try {
-        const isAnthropic = /anthropic|claude/i.test(url);
-        const source = isAnthropic ? 'anthropic' : 'openai';
-        // base 只填到「不含 /models」的地址；OpenCode 例如 https://opencode.ai/zen/go/v1
-        const base = url
-            .replace(/\/chat\/completions\/?$/i, '')
-            .replace(/\/messages\/?$/i, '')
-            .replace(/\/models\/?$/i, '')
-            .replace(/\/+$/, '');
+        const isAnthropic = url.toLowerCase().includes('anthropic.com') || url.includes('/v1/messages');
+        let data = null;
 
-        // 1) 优先经酒馆后端代理拉模型（绕开浏览器 CORS 拦截）
-        let models = [];
-        try {
-            const ctx = SillyTavern.getContext();
-            const res = await fetch('/api/backends/chat-completions/status', {
-                method: 'POST',
-                headers: ctx.getRequestHeaders ? ctx.getRequestHeaders() : { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_completion_source: source, reverse_proxy: base, proxy_password: key }),
-            });
-            if (res.ok) {
-                const json = await res.json().catch(() => null);
-                const arr = json?.data?.data || json?.data || [];
-                models = (Array.isArray(arr) ? arr : []).map(m => typeof m === 'string' ? m : m?.id).filter(Boolean);
-            }
-        } catch (e) { console.warn('[Theater] 经代理拉模型失败，尝试浏览器兜底', e); }
-
-        // 2) 浏览器直连兜底（允许 CORS 的本地服务等环境）
-        if (!models.length) {
+        if (isAnthropic) {
+            if (!key) throw new Error('Anthropic 接口需要 API Key');
+            // Anthropic: 先清理URL，再拼 /v1/models
+            const base = url.replace(/\/v1\/messages$/, '').replace(/\/v1$/, '').replace(/\/$/, '');
             try {
-                const ep = base.includes('/v1') ? `${base}/models` : `${base}/v1/models`;
-                const headers = key ? { 'Authorization': `Bearer ${key}` } : {};
-                if (isAnthropic) { headers['x-api-key'] = key; headers['anthropic-version'] = '2023-06-01'; }
-                const res = await fetch(ep, { method: 'GET', headers });
-                if (res.ok) {
-                    const data = await res.json().catch(() => null);
-                    const arr = data?.data || data || [];
-                    models = (Array.isArray(arr) ? arr : []).map(m => typeof m === 'string' ? m : m?.id).filter(Boolean);
-                }
+                const res = await fetch(`${base}/v1/models`, {
+                    method: 'GET',
+                    headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01' }
+                });
+                if (res.ok) data = await res.json();
             } catch { }
         }
 
-        // 3) OpenCode 等已知服务的模型兜底（代理与直连都失败时直接给出可选列表）
-        if (!models.length && !isAnthropic) {
-            models = OPENCODE_FALLBACK_MODELS.slice();
+        if (!data) {
+            // OpenAI兼容格式：清理URL尾巴，尝试多个可能的路径
+            const cleanBase = url.replace(/\/chat\/completions$/, '').replace(/\/$/, '');
+            const endpoints = [
+                /\/v\d+$/.test(cleanBase) ? `${cleanBase}/models` : `${cleanBase}/v1/models`,
+                `${cleanBase}/models`
+            ];
+            for (const ep of endpoints) {
+                try {
+                    const headers = key ? { 'Authorization': `Bearer ${key}` } : {};
+                    const res = await fetch(ep, { method: 'GET', headers });
+                    if (res.ok) { data = await res.json(); break; }
+                } catch { }
+            }
         }
 
-        if (!models.length) throw new Error('连接失败或无法获取模型列表');
+        if (!data) throw new Error('连接失败或无法获取模型列表');
 
-        models = [...new Set(models)].sort();
+        // 解析模型列表：兼容 { data: [...] } 和直接数组两种格式
+        const rawList = data.data || data;
+        const models = (Array.isArray(rawList) ? rawList : [])
+            .map(m => typeof m === 'string' ? m : m.id)
+            .filter(Boolean)
+            .sort();
+
+        if (!models.length) {
+            toastr.warning('API返回了数据但没找到可用模型');
+            return;
+        }
 
         // 渲染下拉菜单
         const $select = $('#theater-api-model-select');
@@ -4385,24 +4047,31 @@ async function testAPIConnection() {
     $btn.find('span').text('测试中…');
 
     try {
-        const isAnthropic = /anthropic|claude/i.test(url);
-        const source = isAnthropic ? 'anthropic' : 'openai';
-        // base 只填到「不含 /chat/completions」的地址；OpenCode 例如 https://opencode.ai/zen/go/v1
-        const base = url
-            .replace(/\/chat\/completions\/?$/i, '')
-            .replace(/\/messages\/?$/i, '')
-            .replace(/\/models\/?$/i, '')
-            .replace(/\/+$/, '');
+        const isAnthropic = url.toLowerCase().includes('anthropic.com') || url.includes('/v1/messages');
 
-        // 经酒馆后端代理验证（与真实生成走同一条服务端链路，无 CORS 问题）
-        const ctx = SillyTavern.getContext();
-        const res = await fetch('/api/backends/chat-completions/status', {
-            method: 'POST',
-            headers: ctx.getRequestHeaders ? ctx.getRequestHeaders() : { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_completion_source: source, reverse_proxy: base, proxy_password: key, model }),
-        });
-        if (res.ok) toastr.success('连接成功！（已通过酒馆后端代理验证）');
-        else theaterError(`连接失败 (HTTP ${res.status})`);
+        if (isAnthropic) {
+            if (!key) { toastr.warning('Anthropic 接口需要 API Key'); return; }
+            const base = url.replace(/\/v1\/messages$/, '').replace(/\/v1$/, '').replace(/\/$/, '');
+            const res = await fetch(`${base}/v1/messages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+                body: JSON.stringify({ model, max_tokens: 16, messages: [{ role: 'user', content: 'Hi' }] })
+            });
+            if (res.ok) toastr.success('连接成功！');
+            else theaterError(`连接失败 (${res.status})`);
+        } else {
+            const cleanBase = url.replace(/\/chat\/completions$/, '').replace(/\/$/, '');
+            const ep = /\/v\d+$/.test(cleanBase) ? `${cleanBase}/chat/completions` : `${cleanBase}/v1/chat/completions`;
+            const headers = { 'Content-Type': 'application/json' };
+            if (key) headers.Authorization = `Bearer ${key}`;
+            const res = await fetch(ep, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ model, messages: [{ role: 'user', content: 'Hi' }], max_tokens: 5 })
+            });
+            if (res.ok) toastr.success('连接成功！');
+            else theaterError(`连接失败 (${res.status})`);
+        }
     } catch (e) {
         theaterError('请求发送失败');
     } finally {
@@ -4429,7 +4098,7 @@ async function updateExtension() {
         const tryUpdate = async (global) => fetch('/api/extensions/update', {
             method: 'POST',
             headers,
-            body: JSON.stringify({ extensionName: 'st-theater-opencode', global }),
+            body: JSON.stringify({ extensionName: 'st-theater', global }),
         }).catch(err => ({ ok: false, status: 0, _err: err }));
 
         let resp = await tryUpdate(false);
@@ -4447,7 +4116,7 @@ async function updateExtension() {
         try { detail = await resp.text?.() || ''; } catch (_) {}
         detail = (detail || resp._err?.message || '').slice(0, 220);
         const tip = (resp.status === 409 || /already exists/i.test(detail))
-            ? '插件目录被旧版残留卡住了。请在【扩展管理】卸载本插件，再用 Install from URL 输入 https://github.com/yuki1122-fehu/st-theater-opencode 重新安装（设置不会丢）。'
+            ? '插件目录被旧版残留卡住了。请在【扩展管理】卸载本插件，再用 Install from URL 输入 https://github.com/koichole213-ui/st-theater 重新安装（设置不会丢）。'
             : '如遇 Git 冲突或网络问题，可在【扩展管理】卸载后重新安装。';
         theaterError(`更新失败 (HTTP ${resp.status || 0})\n${detail}\n\n${tip}`, '更新失败');
     } catch (e) {

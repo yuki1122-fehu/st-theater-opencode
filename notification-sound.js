@@ -1,4 +1,4 @@
-const SOUNDS_BASE_URL = '/scripts/extensions/third-party/st-theater-opencode/sounds/';
+const SOUNDS_BASE_URL = '/scripts/extensions/third-party/st-theater/sounds/';
 
 let notifyAudio = null;
 
