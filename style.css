@@ -1253,9 +1253,9 @@
 }
 .theater-iframe {
     width: 100%;
-    min-height: 240px;
-    height: 420px;
-    max-height: 70vh;
+    min-height: 320px;
+    height: 560px;
+    max-height: 80vh;
     border: none;
     background: #fff;
     display: block;
@@ -1907,6 +1907,77 @@ body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="
     min-height: 30px !important;
     font-size: var(--t-text-xs) !important;
 }
+.theater-output-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--t-space-2);
+}
+
+/* ============================================================
+ * 沉浸阅读（zen）：隐藏面板 chrome，把结果撑满整个弹窗。
+ *   用 :has() 把外层酒馆弹窗也顶到接近全屏，保证阅读区够大。
+ * ============================================================ */
+body .popup:has(.theater-popup.theater-zen),
+body dialog.popup:has(.theater-popup.theater-zen) {
+    max-width: 99vw !important;
+    width: 99vw !important;
+    max-height: 99vh !important;
+    height: 99vh !important;
+    padding: 0 !important;
+}
+body .popup:has(.theater-popup.theater-zen) .popup-content,
+body dialog.popup:has(.theater-popup.theater-zen) .popup-content {
+    height: 100% !important;
+    max-height: 100% !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+.theater-popup.theater-zen {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: var(--t-space-2) !important;
+    border-radius: 0;
+}
+.theater-popup.theater-zen .theater-popup-header,
+.theater-popup.theater-zen .theater-tabs,
+.theater-popup.theater-zen .theater-panels-wrapper > .theater-panel:not([data-panel="generate"]),
+.theater-popup.theater-zen #theater-stream-section {
+    display: none !important;
+}
+.theater-popup.theater-zen .theater-panels-wrapper {
+    height: auto !important;
+    min-height: 0 !important;
+    flex: 1;
+    overflow: hidden;
+    padding: 0 !important;
+}
+.theater-popup.theater-zen .theater-panel[data-panel="generate"] {
+    display: flex !important;
+    flex-direction: column;
+    height: 100%;
+}
+.theater-popup.theater-zen #theater-output-section {
+    display: flex !important;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+.theater-popup.theater-zen #theater-output-container {
+    flex: 1;
+    min-height: 0;
+    margin-bottom: var(--t-space-2);
+}
+.theater-popup.theater-zen #theater-output-frame {
+    height: 100% !important;
+    min-height: 0 !important;
+}
+.theater-btn.theater-zen-active {
+    background: var(--t-accent);
+    color: var(--t-on-accent);
+    border-color: transparent;
+}
+.theater-btn.theater-zen-active i { color: var(--t-on-accent); }
 
 #theater-viewer {
     position: fixed;

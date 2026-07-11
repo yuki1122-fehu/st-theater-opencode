@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '3.2.8';
+const VERSION = '3.3.0';
 let latestRemoteVersion = null;
 const cloneDefaultSettings = () => {
     if (typeof structuredClone === 'function') return structuredClone(defaultSettings);
@@ -120,6 +120,7 @@ let settings = {};
 const defaultSettings = Object.freeze({
     contextRange: 10,
     instructionTemplates: [],
+    builtinSeeded: false,             // 内置剧本是否已注入过（只注入一次）
     instructionGroups: [],            // 用户创建的分组名列表
     instructionGroupFilter: '__all__', // 当前筛选：'__all__' | '__none__'(未分组) | 组名
     renderTemplates: [],
@@ -303,6 +304,108 @@ async function recentPersist() {
 // ============================================================
 // Init
 // ============================================================
+// ============================================================
+// 内置剧本（场景生成模板）
+//   首次运行时注入 settings.instructionTemplates，用户可在「指令模板库」直接使用 / 编辑 / 删除。
+//   每条：{ name, content, group }。content 即生成小剧场的指令。
+// ============================================================
+const BUILTIN_INSTRUCTION_TEMPLATES = [
+    {
+        name: '校园·午后的天台',
+        group: '校园青春',
+        content: '请生成一段校园背景的小剧场。场景设定在放学后的天台或空教室，角色们暂时卸下日常伪装，流露出柔软或笨拙的一面。语气轻松带点青涩的悸动，可以有碎碎念的内心戏、欲言又止的对话、或一场笨拙的恶作剧。避免硬核冲突，重在"日常里的小浪花"。'
+    },
+    {
+        name: '校园·运动会风波',
+        group: '校园青春',
+        content: '请生成一段校园运动会主题的小剧场。可以是接力棒掉落的慌乱、拉拉队暗暗较劲、或平时冷淡的角色突然爆发惊人运动神经。突出青春的热血与尴尬并存的真实感，允许幽默与脸红。'
+    },
+    {
+        name: '奇幻·酒馆里的密谈',
+        group: '奇幻冒险',
+        content: '请生成一段奇幻冒险小剧场。场景是冒险者公会或路边酒馆，角色们一边灌着麦酒一边盘算接下来的任务。可以插入神秘委托人的出现、同伴间的互怼、或对某位角色过往的调侃。世界观细节自然带出，不要大段说明。'
+    },
+    {
+        name: '奇幻·迷宫深处的争执',
+        group: '奇幻冒险',
+        content: '请生成一段地下城探险小剧场。队伍在迷宫深处迷路、补给见底，疲惫让平日被压住的脾气冒头。写出各角色面对压力的不同反应：有人逞强、有人崩溃、有人默默兜底。最后留一个意外的转机。'
+    },
+    {
+        name: '日常·一起做饭',
+        group: '日常治愈',
+        content: '请生成一段温馨日常的厨房小剧场。角色们笨手笨脚地合作做一顿饭，有人切到手、有人把盐放成糖、有人偷偷尝味道被抓包。重点是烟火气与松弛感，让角色关系在琐碎互动里自然升温。'
+    },
+    {
+        name: '日常·雨夜的屋檐',
+        group: '日常治愈',
+        content: '请生成一段雨夜治愈小剧场。突如其来的雨把角色们困在同一处屋檐下，没有需要解决的大事，只有借来的外套、共享的耳机、和一句没头没尾的闲聊。氛围安静温柔，允许留白。'
+    },
+    {
+        name: '战斗·绝境的反击',
+        group: '热血战斗',
+        content: '请生成一段高潮战斗小剧场。角色被逼到绝境，劣势明显，但靠彼此配合或某句关键的话撕开转机。写出招式的力度感、伤痕与喘息、以及"相信同伴"的瞬间。节奏紧凑，少解释多呈现。'
+    },
+    {
+        name: '战斗·战后的余温',
+        group: '热血战斗',
+        content: '请生成一段战斗结束后的小剧场。硝烟未散，角色们互相清点伤势、拌嘴逞强，却藏不住劫后余生的庆幸。可以有一个人先绷不住笑出来，或默默替对方包扎的细节。'
+    },
+    {
+        name: '暧昧·指尖的距离',
+        group: '暧昧恋爱',
+        content: '请生成一段暧昧向小剧场。角色之间尚未挑明，却处处是逾矩的靠近：替对方拢好被风吹乱的头发、假装不经意地碰一下、在沉默里听得到心跳。写"差一点"的张力，而不是直接告白。'
+    },
+    {
+        name: '暧昧·吃醋现场',
+        group: '暧昧恋爱',
+        content: '请生成一段带点醋意的小剧场。角色看到同伴对别人笑，表面淡定实则浑身别扭，用阴阳怪气的关心或故意冷落来掩饰在意。允许对方装傻逗弄，把暧昧拉满。'
+    },
+    {
+        name: '悬疑·不在场证明',
+        group: '悬疑推理',
+        content: '请生成一段悬疑推理小剧场。某个线索把怀疑引向了队伍中的某人，众人围着线索各执一词，气氛微妙。写出每个人证词里的破绽与默契，最后留一个让人脊背发凉的反转暗示。'
+    },
+    {
+        name: '末日·最后的篝火',
+        group: '末日废土',
+        content: '请生成一段末日废土小剧场。幸存者们围着快要熄灭的篝火，物资见底、前路茫茫。在绝望里抠出一点人性的微光：分享最后一块饼干、讲一个过时的笑话、或一个不忍说出口的真相。'
+    },
+    {
+        name: '古风·宫墙柳色',
+        group: '古风宫斗',
+        content: '请生成一段古风宫廷小剧场。角色在雕栏画栋间步步留心，一句闲话可能是杀机，一个眼神藏着算计。写出表面恭谨下的暗流，允许一段不动声色的交锋。'
+    },
+    {
+        name: '科幻·休眠舱醒来',
+        group: '科幻未来',
+        content: '请生成一段科幻未来小剧场。角色从漫长休眠中醒来，世界已经天翻地覆，熟悉的人不在了，只剩冰冷的AI与陌生的舱壁。写出失重般的错愕，以及在废墟里重新建立连接的过程。'
+    },
+    {
+        name: '搞笑·翻车现场',
+        group: '搞笑日常',
+        content: '请生成一段纯搞笑小剧场。角色们自信满满地计划一件事，结果连环翻车，越补救越离谱。用夸张的反差和彼此甩锅制造笑点，结尾最好全员鼻青脸肿但乐在其中。'
+    },
+    {
+        name: '群像·跨年倒数',
+        group: '节日特别',
+        content: '请生成一段节日群像小剧场。多个角色聚在一起跨年/过节，有人感怀、有人闹腾、有人默默准备惊喜。让每个人都至少有一句属于自己的高光或软肋，结尾落在"在一起就好"。'
+    },
+];
+
+function seedBuiltinTemplates() {
+    if (settings.builtinSeeded) return;
+    if (!Array.isArray(settings.instructionTemplates)) settings.instructionTemplates = [];
+    if (settings.instructionTemplates.length === 0) {
+        // 内置剧本只注入一次；用户之后增删都尊重其选择
+        settings.instructionTemplates = BUILTIN_INSTRUCTION_TEMPLATES.map(t => ({ ...t }));
+        const groups = new Set(settings.instructionGroups || []);
+        BUILTIN_INSTRUCTION_TEMPLATES.forEach(t => { if (t.group) groups.add(t.group); });
+        settings.instructionGroups = Array.from(groups);
+    }
+    settings.builtinSeeded = true;
+    try { save(); } catch (_) { /* 首启可能尚未就绪，忽略 */ }
+}
+
 async function init() {
     const ctx = SillyTavern.getContext();
     const { extensionSettings, renderExtensionTemplateAsync, eventSource, event_types } = ctx;
@@ -342,6 +445,8 @@ async function init() {
     }
 
     await storageInit();
+    // 首次运行注入内置剧本（场景模板）
+    seedBuiltinTemplates();
     applyUIFontSize();
 
     const html = await renderExtensionTemplateAsync('third-party/st-theater-opencode', 'settings');
@@ -809,7 +914,10 @@ function buildPopupHTML() {
             </div>
             <div class="theater-output-head">
                 <label class="theater-label">生成结果</label>
-                <div id="theater-expand-btn" class="theater-btn theater-btn-sm" title="放大查看（拖动标题栏移动、拖右下角缩放）"><i class="fa-solid fa-expand"></i><span>放大查看</span></div>
+                <div class="theater-output-actions">
+                    <div id="theater-zen-btn" class="theater-btn theater-btn-sm" title="沉浸阅读：隐藏面板、结果撑满屏幕（Esc 退出）"><i class="fa-solid fa-book-open-reader"></i><span>沉浸阅读</span></div>
+                    <div id="theater-expand-btn" class="theater-btn theater-btn-sm" title="弹出独立窗口（可拖动 / 缩放）"><i class="fa-solid fa-expand"></i><span>独立窗口</span></div>
+                </div>
             </div>
             <div id="theater-output-container"><iframe id="theater-output-frame" sandbox="allow-scripts allow-same-origin" class="theater-iframe"></iframe></div>
             <div class="theater-btn-row">
@@ -1872,7 +1980,8 @@ function bindEvents() {
     // ---- History ----
     $d.off('click.tsh').on('click.tsh', '#theater-save-history-btn', saveToHistory);
     $d.off('click.tch').on('click.tch', '#theater-copy-html-btn', copyHtml);
-    // ---- 放大查看（可拖动 / 缩放） ----
+    // ---- 沉浸阅读 / 放大查看 ----
+    $d.off('click.tzen').on('click.tzen', '#theater-zen-btn', toggleTheaterZen);
     $d.off('click.texp').on('click.texp', '#theater-expand-btn', openTheaterViewer);
     // ---- Recent generations nav ----
     $d.off('click.trp').on('click.trp', '#theater-recent-prev', function () {
@@ -3930,6 +4039,38 @@ function textFallbackHtml(text) {
 
 let currentDisplayHtml = '';   // 当前iframe中显示的内容
 
+// 给生成结果 iframe 注入一套易读排版基础样式（字体 / 行高 / 留白 / 标题引用等），
+// 让 AI 产出的内容更精致、移动端更舒服。仅为兜底样式，不破坏内容自带样式。
+function injectIframeReadStyle(f) {
+    try {
+        const doc = f.contentDocument || (f.contentWindow && f.contentWindow.document);
+        if (!doc || doc.getElementById('theater-read-style')) return;
+        const s = doc.createElement('style');
+        s.id = 'theater-read-style';
+        s.textContent = `
+            html, body { margin: 0 !important; }
+            body {
+                font-family: "Noto Sans SC", "PingFang SC", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+                font-size: 15px; line-height: 1.85; color: #2b2620;
+                background: #fffdf7; padding: 22px 20px !important;
+                -webkit-text-size-adjust: 100%;
+            }
+            h1, h2, h3, h4 { line-height: 1.4; margin: 1.1em 0 .55em; font-weight: 700; }
+            h1 { font-size: 1.55em; } h2 { font-size: 1.32em; } h3 { font-size: 1.15em; }
+            p { margin: 0 0 1em; }
+            a { color: #b07a4a; }
+            img { max-width: 100%; height: auto; border-radius: 10px; }
+            blockquote { margin: 1em 0; padding: .6em 1em; border-left: 3px solid #d9a877; background: rgba(217,168,119,.10); border-radius: 0 8px 8px 0; }
+            hr { border: none; border-top: 1px solid rgba(46,38,32,.12); margin: 1.4em 0; }
+            pre { background: #f6efe0; padding: 12px 14px; border-radius: 10px; overflow: auto; font-family: "JetBrains Mono", Consolas, monospace; }
+            code { font-family: "JetBrains Mono", Consolas, monospace; }
+            table { border-collapse: collapse; width: 100%; }
+            th, td { border: 1px solid rgba(46,38,32,.15); padding: 6px 10px; }
+        `;
+        (doc.head || doc.documentElement).appendChild(s);
+    } catch (_) { /* 跨域 / 沙箱限制时忽略 */ }
+}
+
 function showInIframe(html) {
     const f = document.getElementById('theater-output-frame'); if (!f) return;
     currentDisplayHtml = html;
@@ -3941,6 +4082,7 @@ function showInIframe(html) {
         if (vf) vf.srcdoc = html;
     }
     f.onload = () => {
+        injectIframeReadStyle(f);
         try {
             const isMobile = window.innerWidth <= 768;
             const scrollH = (f.contentDocument || f.contentWindow.document).documentElement.scrollHeight + 20;
@@ -3971,6 +4113,7 @@ function ensureTheaterViewer() {
         <iframe id="theater-viewer-frame" sandbox="allow-scripts allow-same-origin"></iframe>
         <div id="theater-viewer-resize" title="拖我缩放"></div>`;
     document.body.appendChild(v);
+    v.querySelector('#theater-viewer-frame').addEventListener('load', function () { injectIframeReadStyle(this); });
     theaterViewerEl = v;
 
     // 恢复上次的位置/尺寸
@@ -4033,6 +4176,53 @@ function ensureTheaterViewer() {
 
     return v;
 }
+
+// ============================================================
+// 沉浸阅读（zen）：隐藏面板 chrome，把生成结果撑满整个弹窗。
+//   面板内就地展开，不受模态弹窗顶层遮挡影响，手机/桌面都稳。
+// ============================================================
+function toggleTheaterZen(forceOff) {
+    const popup = document.querySelector('.theater-popup');
+    if (!popup) return;
+    const willOn = forceOff ? false : !popup.classList.contains('theater-zen');
+    // 进入前先确认有内容可看
+    if (willOn) {
+        const hasContent = currentDisplayHtml || lastGeneratedHtml ||
+            (document.getElementById('theater-output-frame') || {}).srcdoc;
+        if (!hasContent) { toastr.warning('还没有生成结果，先生成一次小剧场再进入沉浸阅读~'); return; }
+    }
+    const on = willOn;
+    popup.classList.toggle('theater-zen', on);
+    const btn = document.getElementById('theater-zen-btn');
+    if (btn) {
+        btn.classList.toggle('theater-zen-active', on);
+        btn.querySelector('span').textContent = on ? '退出沉浸' : '沉浸阅读';
+        btn.querySelector('i').className = on ? 'fa-solid fa-compress' : 'fa-solid fa-book-open-reader';
+    }
+    if (on) {
+        // 确保结果区可见并撑满
+        const out = document.getElementById('theater-output-section');
+        if (out) out.style.display = 'flex';
+        // 把 iframe 高度重算（撑满）
+        setTimeout(() => {
+            const f = document.getElementById('theater-output-frame');
+            if (f && f.srcdoc) { try { f.style.height = '100%'; } catch (_) {} }
+        }, 30);
+    } else {
+        // 退出：清掉内联 display，交还给正常显示逻辑（有内容时仍可见）
+        const out = document.getElementById('theater-output-section');
+        if (out) out.style.display = '';
+        const f = document.getElementById('theater-output-frame');
+        if (f) { try { f.style.height = ''; } catch (_) {} }
+    }
+}
+
+// Esc 退出沉浸阅读
+$(document).on('keydown.theaterzen', function (e) {
+    if (e.key === 'Escape' && document.querySelector('.theater-popup.theater-zen')) {
+        toggleTheaterZen(true);
+    }
+});
 
 function openTheaterViewer() {
     const src = document.getElementById('theater-output-frame');
