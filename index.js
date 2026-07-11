@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '3.2.6';
+const VERSION = '3.2.7';
 let latestRemoteVersion = null;
 const cloneDefaultSettings = () => {
     if (typeof structuredClone === 'function') return structuredClone(defaultSettings);
@@ -3935,7 +3935,7 @@ function showInIframe(html) {
     currentDisplayHtml = html;
     f.srcdoc = html;
     // 同步到「放大查看」浮层（若已打开）
-    if (theaterViewerEl && theaterViewerEl.style.display === 'block') {
+    if (theaterViewerEl && theaterViewerEl.open) {
         const vf = theaterViewerEl.querySelector('#theater-viewer-frame');
         if (vf) vf.srcdoc = html;
     }
@@ -3960,7 +3960,7 @@ let theaterViewerEl = null;
 
 function ensureTheaterViewer() {
     if (theaterViewerEl && document.body.contains(theaterViewerEl)) return theaterViewerEl;
-    const v = document.createElement('div');
+    const v = document.createElement('dialog');
     v.id = 'theater-viewer';
     v.innerHTML = `
         <div id="theater-viewer-bar">
@@ -4040,11 +4040,11 @@ function openTheaterViewer() {
     const v = ensureTheaterViewer();
     const f = v.querySelector('#theater-viewer-frame');
     f.srcdoc = html;
-    v.style.display = 'block';
+    if (!v.open) v.showModal();   // 用模态 dialog 进入顶层，盖住酒馆弹窗
 }
 
 function closeTheaterViewer() {
-    if (theaterViewerEl) theaterViewerEl.style.display = 'none';
+    if (theaterViewerEl && theaterViewerEl.open) theaterViewerEl.close();
 }
 
 function updateRecentNav() {
