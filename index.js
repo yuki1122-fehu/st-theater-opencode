@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '3.2.7';
+const VERSION = '3.2.8';
 let latestRemoteVersion = null;
 const cloneDefaultSettings = () => {
     if (typeof structuredClone === 'function') return structuredClone(defaultSettings);
@@ -3935,7 +3935,8 @@ function showInIframe(html) {
     currentDisplayHtml = html;
     f.srcdoc = html;
     // 同步到「放大查看」浮层（若已打开）
-    if (theaterViewerEl && theaterViewerEl.open) {
+    const viewerOpen = theaterViewerEl && (theaterViewerEl.open || (theaterViewerEl.style.display && theaterViewerEl.style.display !== 'none'));
+    if (viewerOpen) {
         const vf = theaterViewerEl.querySelector('#theater-viewer-frame');
         if (vf) vf.srcdoc = html;
     }
@@ -4035,16 +4036,41 @@ function ensureTheaterViewer() {
 
 function openTheaterViewer() {
     const src = document.getElementById('theater-output-frame');
-    const html = (src && src.srcdoc) || currentDisplayHtml || lastGeneratedHtml;
-    if (!html) { toastr.warning('还没有生成结果，先生成一次再放大查看'); return; }
+    let html = (src && src.srcdoc) || currentDisplayHtml || lastGeneratedHtml;
     const v = ensureTheaterViewer();
     const f = v.querySelector('#theater-viewer-frame');
-    f.srcdoc = html;
-    if (!v.open) v.showModal();   // 用模态 dialog 进入顶层，盖住酒馆弹窗
+    if (!html) {
+        html = '<div style="font-family:sans-serif;padding:40px;text-align:center;color:#888;">还没有生成结果，先生成一次小剧场，再点「放大查看」就能在这里看啦~</div>';
+    }
+    try { f.srcdoc = html; } catch (_) { /* ignore */ }
+    // 优先用模态 dialog 进入顶层（盖住酒馆弹窗）；不支持时退化成 body 级固定层
+    try {
+        if (!v.open && typeof v.showModal === 'function') v.showModal();
+        else if (typeof v.showModal !== 'function') fallbackShowViewer(v);
+    } catch (_) {
+        fallbackShowViewer(v);
+    }
+}
+
+// 兜底：把浮层当普通固定层挂到 body（用于不支持/不允许 showModal 的环境）
+function fallbackShowViewer(v) {
+    if (v.tagName === 'DIALOG') {
+        // 普通 div 化
+        const d = document.createElement('div');
+        d.id = 'theater-viewer';
+        d.innerHTML = v.innerHTML;
+        d.style.cssText = 'position:fixed;z-index:2147483647;left:4vw;top:8vh;width:92vw;height:84vh;background:#fff;border:1px solid rgba(0,0,0,.25);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden;';
+        v.replaceWith(d);
+        theaterViewerEl = d;
+        d.querySelector('#theater-viewer-close').addEventListener('click', () => d.remove());
+    } else {
+        v.style.display = 'block';
+    }
 }
 
 function closeTheaterViewer() {
     if (theaterViewerEl && theaterViewerEl.open) theaterViewerEl.close();
+    else if (theaterViewerEl) theaterViewerEl.remove();
 }
 
 function updateRecentNav() {
