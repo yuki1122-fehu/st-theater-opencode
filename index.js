@@ -814,6 +814,7 @@ function buildPopupHTML() {
                 <div id="theater-copy-html-btn" class="theater-btn"><i class="fa-solid fa-copy"></i><span>复制HTML</span></div>
                 <div id="theater-continue-btn" class="theater-btn"><i class="fa-solid fa-forward"></i><span>续写</span></div>
                 <div id="theater-edit-result-btn" class="theater-btn"><i class="fa-solid fa-pen-to-square"></i><span>编辑文字</span></div>
+                <div id="theater-zen-btn" class="theater-btn"><i class="fa-solid fa-expand"></i><span>沉浸阅读</span></div>
                 <div id="theater-save-edit-btn" class="theater-btn primary" style="display:none;"><i class="fa-solid fa-check"></i><span>完成编辑</span></div>
             </div>
         </div>
@@ -1928,6 +1929,12 @@ function bindEvents() {
         const html = lastGeneratedHtml || currentDisplayHtml;
         if (!html) { toastr.warning('没有可续写的内容'); return; }
         startContinue(html);
+    });
+    // ---- 沉浸阅读（放大） ----
+    $d.off('click.tzen').on('click.tzen', '#theater-zen-btn', function () {
+        const html = lastGeneratedHtml || currentDisplayHtml;
+        if (!html) { toastr.warning('没有可沉浸阅读的内容，请先生成小剧场'); return; }
+        openZenMode(html);
     });
     // 取消续写
     $d.off('click.tcc').on('click.tcc', '#theater-cancel-continue', function () {
@@ -3937,6 +3944,44 @@ function showInIframe(html) {
             f.style.height = window.innerWidth <= 768 ? '60vh' : '420px';
         }
     };
+}
+
+// ============================================================
+// 沉浸阅读（放大）— 全屏顶层 dialog，复用生成结果 HTML
+// ============================================================
+function openZenMode(html) {
+    let dialog = document.getElementById('theater-zen-dialog');
+    if (!dialog) {
+        dialog = document.createElement('dialog');
+        dialog.id = 'theater-zen-dialog';
+        dialog.innerHTML =
+            '<button id="theater-zen-close" class="theater-zen-close" title="关闭 (Esc)" aria-label="关闭">' +
+                '<i class="fa-solid fa-xmark"></i>' +
+            '</button>' +
+            '<iframe id="theater-zen-frame" class="theater-zen-frame" sandbox="allow-scripts allow-same-origin"></iframe>' +
+            '<div class="theater-zen-hint">沉浸阅读 · 按 Esc 或点击空白处退出</div>';
+        document.body.appendChild(dialog);
+        // 关闭按钮
+        dialog.querySelector('#theater-zen-close').addEventListener('click', () => {
+            try { dialog.close(); } catch { dialog.removeAttribute('open'); }
+        });
+        // 点击背景（dialog 边缘留白处）关闭
+        dialog.addEventListener('click', (e) => {
+            const r = dialog.getBoundingClientRect();
+            if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) {
+                try { dialog.close(); } catch { dialog.removeAttribute('open'); }
+            }
+        });
+        // 兜底：Esc 已在 showModal 下自动关闭，这里应对旧浏览器
+        dialog.addEventListener('cancel', (e) => { e.preventDefault(); try { dialog.close(); } catch {} });
+    }
+    const frame = dialog.querySelector('#theater-zen-frame');
+    if (frame) frame.srcdoc = html;
+    // 进入顶层渲染层，避免被酒馆模态框遮挡
+    if (typeof dialog.showModal === 'function') {
+        try { dialog.showModal(); return; } catch { /* 退回非模态 */ }
+    }
+    dialog.setAttribute('open', '');
 }
 
 function updateRecentNav() {
