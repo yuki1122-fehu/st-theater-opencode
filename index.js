@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '3.2.3';
+const VERSION = '3.2.5';
 let latestRemoteVersion = null;
 const cloneDefaultSettings = () => {
     if (typeof structuredClone === 'function') return structuredClone(defaultSettings);
@@ -3681,70 +3681,52 @@ async function callCustomAPIStream(sys, user, onChunk) {
     const rawUrl = (settings.apiUrl || '').trim().replace(/\/+$/, '');
     if (!rawUrl) throw new Error('请先在【设置】填写 API URL（如 https://opencode.ai/zen/go/v1）');
     const isAnthropic = /anthropic|claude/i.test(rawUrl);
-
-    // 经酒馆后端代理转发：OpenCode 等云端 OpenAI 兼容端点通常不返回 CORS 头，
-    // 浏览器直连会被拦截（表现为「酒馆能连、插件连不上」）。走 SillyTavern 的
-    // /api/backends/chat-completions/generate 服务端代理即可彻底绕开 CORS。
+    const source = isAnthropic ? 'anthropic' : 'openai';
     // base 只填到「不含 /chat/completions」的地址，例如 https://opencode.ai/zen/go/v1
     const base = rawUrl
         .replace(/\/chat\/completions\/?$/i, '')
         .replace(/\/messages\/?$/i, '')
         .replace(/\/models\/?$/i, '')
         .replace(/\/+$/, '');
-    const source = isAnthropic ? 'anthropic' : 'openai';
+    const model = settings.apiModel;
+    if (!model) throw new Error('请先在【设置】选择或填写模型名称');
 
-    const CCS = window?.SillyTavern?.getContext?.()?.ChatCompletionService;
-    if (CCS && typeof CCS.processRequest === 'function') {
-        try {
-            const result = await CCS.processRequest(
-                {
-                    messages: [
-                        { role: 'system', content: sys },
-                        { role: 'user', content: user },
-                    ],
-                    model: settings.apiModel,
-                    chat_completion_source: source,
-                    reverse_proxy: base,
-                    proxy_password: settings.apiKey || '',
-                    max_tokens: 8192,
-                    stream: true,
-                },
-                { signal: abortController?.signal },
-                false,
-                abortController?.signal,
-            );
-            if (typeof result === 'function') {
-                return await consumeStreamThunk(result, onChunk);
-            }
-            const txt = typeof result === 'string'
-                ? result
-                : (result?.text || result?.content || result?.choices?.[0]?.message?.content || '');
-            if (!txt) throw new Error('API 返回空内容');
-            onChunk(txt);
-            return txt;
-        } catch (e) {
-            if (e?.name === 'AbortError') throw e;
-            console.warn('[Theater] 经酒馆后端代理调用失败，回退浏览器直连：', e);
-            // 回退到浏览器直连（适用于允许 CORS 的本地 OpenAI 服务等环境）
-        }
+    // 经酒馆后端代理转发：OpenCode 等云端 OpenAI 兼容端点不返回 CORS 头，
+    // 浏览器直连会被拦截（表现为「酒馆能连、插件连不上」）。这里直接打酒馆自己的
+    // /api/backends/chat-completions/generate 同域代理（与「获取模型列表」同一条链路），
+    // 不再走 ChatCompletionService.processRequest —— 它内部对 OpenCode 带 reasoning_content
+    // 的响应解析会报错。改用插件自带的宽松 SSE 解析，且绝不回退到浏览器直连。
+    const ctx = SillyTavern.getContext();
+    const headers = ctx.getRequestHeaders ? ctx.getRequestHeaders() : { 'Content-Type': 'application/json' };
+    const body = {
+        messages: [
+            { role: 'system', content: sys },
+            { role: 'user', content: user },
+        ],
+        model,
+        chat_completion_source: source,
+        reverse_proxy: base,
+        proxy_password: settings.apiKey || '',
+        max_tokens: 8192,
+        stream: true,
+    };
+
+    let r;
+    try {
+        r = await fetch('/api/backends/chat-completions/generate', {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(body),
+            signal: abortController?.signal,
+        });
+    } catch (e) {
+        throw new Error('经酒馆后端代理请求失败（同域 fetch 失败）：' + (e?.message || e) + '\n请确认酒馆服务器在线，或改用「酒馆主 API」模式。');
     }
 
-    // 浏览器直连兜底（保留原行为）
-    let endpoint, body, headers;
-    if (isAnthropic) {
-        if (!settings.apiKey) throw new Error('Anthropic 接口需要 API Key');
-        endpoint = base.includes('/v1') ? base + '/messages' : base + '/v1/messages';
-        headers = { 'Content-Type': 'application/json', 'x-api-key': settings.apiKey, 'anthropic-version': '2023-06-01' };
-        body = JSON.stringify({ model: settings.apiModel, max_tokens: 8192, stream: true, system: sys, messages: [{ role: 'user', content: user }] });
-    } else {
-        endpoint = base.includes('/v1') ? base + '/chat/completions' : base + '/v1/chat/completions';
-        headers = { 'Content-Type': 'application/json' };
-        if (settings.apiKey) headers.Authorization = `Bearer ${settings.apiKey}`;
-        body = JSON.stringify({ model: settings.apiModel, messages: [{ role: 'system', content: sys }, { role: 'user', content: user }], stream: true, max_tokens: 8192 });
+    if (!r.ok) {
+        const txt = await r.text().catch(() => '');
+        throw new Error(`酒馆代理返回 ${r.status}：${txt.slice(0, 400)}`);
     }
-
-    const r = await fetch(endpoint, { method: 'POST', headers, body, signal: abortController?.signal });
-    if (!r.ok) throw new Error(`API ${r.status}: ${(await r.text().catch(() => '')).substring(0, 200)}`);
     return await readSSEStream(r, onChunk, false);
 }
 
