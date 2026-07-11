@@ -1,0 +1,12 @@
+{
+    "display_name": "千夜浮梦 · 小剧场生成器 (OpenCode 适配)",
+    "loading_order": 100,
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "css": "style.css",
+    "author": "Theater Generator",
+    "version": "3.2.4",
+    "homePage": "https://github.com/yuki1122-fehu/st-theater-opencode",
+    "auto_update": true
+}
