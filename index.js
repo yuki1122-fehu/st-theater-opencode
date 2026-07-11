@@ -807,7 +807,10 @@ function buildPopupHTML() {
                 <span id="theater-recent-indicator"></span>
                 <span id="theater-recent-next" class="theater-recent-arrow" title="下一条"><i class="fa-solid fa-chevron-right"></i></span>
             </div>
-            <label class="theater-label">生成结果</label>
+            <div class="theater-output-head">
+                <label class="theater-label">生成结果</label>
+                <div id="theater-expand-btn" class="theater-btn theater-btn-sm" title="放大查看（拖动标题栏移动、拖右下角缩放）"><i class="fa-solid fa-expand"></i><span>放大查看</span></div>
+            </div>
             <div id="theater-output-container"><iframe id="theater-output-frame" sandbox="allow-scripts allow-same-origin" class="theater-iframe"></iframe></div>
             <div class="theater-btn-row">
                 <div id="theater-save-history-btn" class="theater-btn"><i class="fa-solid fa-bookmark"></i><span>保存</span></div>
@@ -1869,6 +1872,8 @@ function bindEvents() {
     // ---- History ----
     $d.off('click.tsh').on('click.tsh', '#theater-save-history-btn', saveToHistory);
     $d.off('click.tch').on('click.tch', '#theater-copy-html-btn', copyHtml);
+    // ---- 放大查看（可拖动 / 缩放） ----
+    $d.off('click.texp').on('click.texp', '#theater-expand-btn', openTheaterViewer);
     // ---- Recent generations nav ----
     $d.off('click.trp').on('click.trp', '#theater-recent-prev', function () {
         if (recentIndex <= 0) return;
@@ -3929,6 +3934,11 @@ function showInIframe(html) {
     const f = document.getElementById('theater-output-frame'); if (!f) return;
     currentDisplayHtml = html;
     f.srcdoc = html;
+    // 同步到「放大查看」浮层（若已打开）
+    if (theaterViewerEl && theaterViewerEl.style.display === 'block') {
+        const vf = theaterViewerEl.querySelector('#theater-viewer-frame');
+        if (vf) vf.srcdoc = html;
+    }
     f.onload = () => {
         try {
             const isMobile = window.innerWidth <= 768;
@@ -3940,6 +3950,101 @@ function showInIframe(html) {
             f.style.height = window.innerWidth <= 768 ? '60vh' : '420px';
         }
     };
+}
+
+// ============================================================
+// 放大查看浮层（移动端友好：标题栏可拖动、右下角可缩放）
+//   挂在 document.body 上，不受酒馆弹窗尺寸限制。
+// ============================================================
+let theaterViewerEl = null;
+
+function ensureTheaterViewer() {
+    if (theaterViewerEl && document.body.contains(theaterViewerEl)) return theaterViewerEl;
+    const v = document.createElement('div');
+    v.id = 'theater-viewer';
+    v.innerHTML = `
+        <div id="theater-viewer-bar">
+            <span id="theater-viewer-title">小剧场 · 放大查看</span>
+            <span id="theater-viewer-close" title="关闭">✕</span>
+        </div>
+        <iframe id="theater-viewer-frame" sandbox="allow-scripts allow-same-origin"></iframe>
+        <div id="theater-viewer-resize" title="拖我缩放"></div>`;
+    document.body.appendChild(v);
+    theaterViewerEl = v;
+
+    // 恢复上次的位置/尺寸
+    const r = settings.theaterViewerRect;
+    if (r) {
+        if (r.width) v.style.width = r.width;
+        if (r.height) v.style.height = r.height;
+        if (r.left) v.style.left = r.left;
+        if (r.top) v.style.top = r.top;
+    }
+
+    const bar = v.querySelector('#theater-viewer-bar');
+    const closeBtn = v.querySelector('#theater-viewer-close');
+    const resize = v.querySelector('#theater-viewer-resize');
+    closeBtn.addEventListener('click', closeTheaterViewer);
+
+    const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+    let mode = null, sx = 0, sy = 0, sl = 0, st = 0, sw = 0, sh = 0;
+
+    function onDown(e, m) {
+        mode = m;
+        const t = e.touches ? e.touches[0] : e;
+        sx = t.clientX; sy = t.clientY;
+        sl = parseInt(v.style.left) || 0;
+        st = parseInt(v.style.top) || 0;
+        sw = v.offsetWidth; sh = v.offsetHeight;
+        try { e.target.setPointerCapture?.(e.pointerId); } catch (_) { }
+        e.preventDefault();
+        window.addEventListener('pointermove', onMove, { passive: false });
+        window.addEventListener('pointerup', onUp);
+    }
+    function onMove(e) {
+        if (!mode) return;
+        const t = e.touches ? e.touches[0] : e;
+        const dx = t.clientX - sx, dy = t.clientY - sy;
+        if (mode === 'move') {
+            v.style.left = clamp(sl + dx, -sw + 64, window.innerWidth - 64) + 'px';
+            v.style.top = clamp(st + dy, 0, window.innerHeight - 44) + 'px';
+        } else if (mode === 'resize') {
+            v.style.width = clamp(sw + dx, 240, window.innerWidth - 8) + 'px';
+            v.style.height = clamp(sh + dy, 200, window.innerHeight - 8) + 'px';
+        }
+        e.preventDefault();
+    }
+    function onUp() {
+        mode = null;
+        window.removeEventListener('pointermove', onMove);
+        window.removeEventListener('pointerup', onUp);
+        settings.theaterViewerRect = { width: v.style.width, height: v.style.height, left: v.style.left, top: v.style.top };
+        save();
+    }
+
+    bar.addEventListener('pointerdown', e => onDown(e, 'move'));
+    resize.addEventListener('pointerdown', e => onDown(e, 'resize'));
+    // 触屏兜底（部分浏览器 pointer 事件不全时）
+    bar.addEventListener('touchstart', e => onDown(e, 'move'), { passive: false });
+    resize.addEventListener('touchstart', e => onDown(e, 'resize'), { passive: false });
+    window.addEventListener('touchmove', e => { if (mode) e.preventDefault(); }, { passive: false });
+    window.addEventListener('touchend', onUp);
+
+    return v;
+}
+
+function openTheaterViewer() {
+    const src = document.getElementById('theater-output-frame');
+    const html = (src && src.srcdoc) || currentDisplayHtml || lastGeneratedHtml;
+    if (!html) { toastr.warning('还没有生成结果，先生成一次再放大查看'); return; }
+    const v = ensureTheaterViewer();
+    const f = v.querySelector('#theater-viewer-frame');
+    f.srcdoc = html;
+    v.style.display = 'block';
+}
+
+function closeTheaterViewer() {
+    if (theaterViewerEl) theaterViewerEl.style.display = 'none';
 }
 
 function updateRecentNav() {

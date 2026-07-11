@@ -1891,3 +1891,102 @@ body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="
 .theater-popup[data-skin="theater"] .theater-wb-group-arrow {
     color: var(--SmartThemeEmColor, var(--SmartThemeBodyColor, #2a2a2a)) !important;
 }
+
+/* ============================================================
+ * 生成结果「放大查看」浮层（移动端友好：标题栏拖动 / 右下角缩放）
+ * ============================================================ */
+.theater-output-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--t-space-2);
+    margin-bottom: var(--t-space-2);
+}
+.theater-btn-sm {
+    padding: 4px 10px !important;
+    min-height: 30px !important;
+    font-size: var(--t-text-xs) !important;
+}
+
+#theater-viewer {
+    position: fixed;
+    z-index: 2147483646;
+    display: none;
+    background: var(--t-surface-1, #fff);
+    border: 1px solid var(--t-border-strong, rgba(0, 0, 0, .25));
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .35);
+    overflow: hidden;
+    min-width: 240px;
+    min-height: 200px;
+    width: 92vw;
+    height: 84vh;
+    left: 4vw;
+    top: 8vh;
+}
+#theater-viewer-bar {
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    background: var(--t-surface-3, #eee);
+    cursor: move;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--t-fg, #222);
+    border-bottom: 1px solid var(--t-border, rgba(0, 0, 0, .1));
+}
+#theater-viewer-title { pointer-events: none; }
+#theater-viewer-close {
+    cursor: pointer;
+    width: 30px; height: 30px; line-height: 30px;
+    text-align: center; border-radius: 8px; font-size: 16px;
+}
+#theater-viewer-close:hover { background: rgba(0, 0, 0, .08); }
+#theater-viewer-frame {
+    width: 100%;
+    height: calc(100% - 42px);
+    border: none;
+    background: #fff;
+    display: block;
+}
+#theater-viewer-resize {
+    position: absolute;
+    right: 0; bottom: 0;
+    width: 26px; height: 26px;
+    cursor: nwse-resize;
+    touch-action: none;
+    background: linear-gradient(135deg, transparent 50%, rgba(0, 0, 0, .28) 50%);
+    border-bottom-right-radius: 14px;
+}
+
+/* 手机端：让酒馆弹窗尽量占满屏幕，结果框更大 */
+@media (max-width: 768px) {
+    body .popup:has(.theater-popup),
+    body dialog.popup:has(.theater-popup) {
+        max-width: 98vw !important;
+        width: 98vw !important;
+        max-height: 96vh !important;
+        height: 96vh !important;
+    }
+    body .popup:has(.theater-popup) .popup-content,
+    body dialog.popup:has(.theater-popup) .popup-content {
+        padding: 6px !important;
+        height: 100%;
+    }
+    .theater-iframe {
+        height: 72vh;
+        min-height: 420px;
+        max-height: 84vh;
+    }
+    #theater-viewer {
+        width: 96vw;
+        height: 88vh;
+        left: 2vw;
+        top: 6vh;
+    }
+}
