@@ -763,57 +763,63 @@ function buildPopupHTML() {
     return `
 <div class="theater-popup" data-skin="${skin}">
     <div class="theater-popup-header">
-        <div class="theater-logo" aria-label="拾光锻匣">
-            <svg viewBox="0 0 32 32" aria-hidden="true">
-                <path d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z" fill="#fff6ec"/>
-                <path d="M16 12 C17.6 15 20 16.6 20 20 A4 4 0 1 1 12 20 C12 17.4 14 16.4 15 14 C15.5 16 16 16.2 16.5 15 C16.3 13.5 16 12.4 16 12 Z" fill="#f3c89a"/>
-                <circle cx="16" cy="21.5" r="2.2" fill="#e8b878"/>
-            </svg>
+        <div class="theater-brand">
+            <div class="theater-logo" aria-label="拾光锻匣">
+                <svg viewBox="0 0 32 32" aria-hidden="true">
+                    <path d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z" fill="#fff6ec"/>
+                    <path d="M16 12 C17.6 15 20 16.6 20 20 A4 4 0 1 1 12 20 C12 17.4 14 16.4 15 14 C15.5 16 16 16.2 16.5 15 C16.3 13.5 16 12.4 16 12 Z" fill="#f3c89a"/>
+                    <circle cx="16" cy="21.5" r="2.2" fill="#e8b878"/>
+                </svg>
+            </div>
+            <div class="theater-brand-text">
+                <p class="theater-title">拾光锻匣</p>
+                <p class="theater-subtitle">小剧场生成 · 独立不影响正文</p>
+            </div>
         </div>
-        <p class="theater-title">拾光锻匣</p>
-        <p class="theater-function">小剧场生成插件</p>
-        <p class="theater-subtitle">独立生成 · 不影响正文</p>
     </div>
     <div class="theater-tabs">
-        <div class="theater-tab active" data-tab="generate">生成</div>
-        <div class="theater-tab" data-tab="setting">设定</div>
-        <div class="theater-tab" data-tab="dialogue">对话</div>
-        <div class="theater-tab" data-tab="rules">规则</div>
-        <div class="theater-tab" data-tab="history">历史</div>
-        <div class="theater-tab" data-tab="diagnostics">诊断</div>
-        <div class="theater-tab" data-tab="config">设置${hasRemoteUpdate() ? updateBadgeHTML() : ''}</div>
+        <div class="theater-tab active" data-tab="generate"><i class="fa-solid fa-wand-sparkles"></i><span>生成</span></div>
+        <div class="theater-tab" data-tab="setting"><i class="fa-solid fa-sliders"></i><span>设定</span></div>
+        <div class="theater-tab" data-tab="dialogue"><i class="fa-solid fa-comments"></i><span>对话</span></div>
+        <div class="theater-tab" data-tab="rules"><i class="fa-solid fa-scroll"></i><span>规则</span></div>
+        <div class="theater-tab" data-tab="history"><i class="fa-solid fa-clock-rotate-left"></i><span>历史</span></div>
+        <div class="theater-tab" data-tab="diagnostics"><i class="fa-solid fa-stethoscope"></i><span>诊断</span></div>
+        <div class="theater-tab" data-tab="config"><i class="fa-solid fa-gear"></i><span>设置</span>${hasRemoteUpdate() ? updateBadgeHTML() : ''}</div>
     </div>
     <div class="theater-panels-wrapper">
 
     <!-- ===== 1. 生成 ===== -->
     <div class="theater-panel active" data-panel="generate">
-        <div class="theater-section">
-            <label class="theater-label">小剧场指令</label>
+        <div class="theater-section theater-compose">
+            <div class="theater-section-head">
+                <label class="theater-label"><i class="fa-solid fa-fire"></i> 小剧场指令</label>
+                <span class="theater-hint-inline">描述你想看的番外</span>
+            </div>
             <textarea id="theater-instruction" class="theater-textarea" rows="4" placeholder="例如：生成一个角色们一起吃火锅的番外小剧场">${esc(settings.lastInstruction || '')}</textarea>
             <div class="theater-toggle-row">
                 <label class="theater-toggle-label"><input type="checkbox" id="theater-interactive-toggle" ${settings.interactiveMode ? 'checked' : ''}><span>交互模式</span></label>
                 <span class="theater-hint-inline">生成可交互的小剧场</span>
             </div>
-            <div class="theater-btn-row">
-                <div id="theater-save-instruction-btn" class="theater-btn generate"><i class="fa-solid fa-floppy-disk"></i><span>存为模板</span></div>
-                <div id="theater-clear-instruction-btn" class="theater-btn generate"><i class="fa-solid fa-eraser"></i><span>清空</span></div>
-                <div id="theater-random-btn" class="theater-btn generate" style="${settings.randomEnabled ? '' : 'display:none;'}"><i class="fa-solid fa-dice"></i><span>抽一个</span></div>
+            <div class="theater-btn-row theater-quick-actions">
+                <div id="theater-save-instruction-btn" class="theater-btn"><i class="fa-solid fa-floppy-disk"></i><span>存为模板</span></div>
+                <div id="theater-clear-instruction-btn" class="theater-btn"><i class="fa-solid fa-eraser"></i><span>清空</span></div>
+                <div id="theater-random-btn" class="theater-btn" style="${settings.randomEnabled ? '' : 'display:none;'}"><i class="fa-solid fa-dice"></i><span>抽一个</span></div>
             </div>
-            <div class="theater-btn-row">
-                <div id="theater-generate-btn" class="theater-btn primary generate">${LAMP_SVG_HTML}<span>生成</span></div>
-                <div id="theater-stop-btn" class="theater-btn danger generate" style="display:none;"><i class="fa-solid fa-stop"></i><span>停止</span></div>
-            </div>
+            <div id="theater-generate-btn" class="theater-btn primary theater-cta">${LAMP_SVG_HTML}<span>生成小剧场</span></div>
+            <div id="theater-stop-btn" class="theater-btn danger theater-cta" style="display:none;"><i class="fa-solid fa-stop"></i><span>停止生成</span></div>
         </div>
-        <div class="theater-section" id="theater-output-section" style="display:none;">
+        <div class="theater-section theater-result" id="theater-output-section" style="display:none;">
             <div class="theater-output-toolbar" id="theater-output-toolbar">
-                <div id="theater-zen-btn" class="theater-btn primary theater-zen-btn" title="全屏沉浸阅读（Esc 退出）"><i class="fa-solid fa-expand"></i><span>沉浸阅读</span></div>
-                <div class="theater-recent-nav" id="theater-recent-nav" style="display:none; margin-left:auto;">
-                    <span id="theater-recent-prev" class="theater-recent-arrow" title="上一条"><i class="fa-solid fa-chevron-left"></i></span>
-                    <span id="theater-recent-indicator"></span>
-                    <span id="theater-recent-next" class="theater-recent-arrow" title="下一条"><i class="fa-solid fa-chevron-right"></i></span>
+                <label class="theater-label"><i class="fa-solid fa-book-open"></i> 生成结果</label>
+                <div class="theater-output-tools">
+                    <div class="theater-recent-nav" id="theater-recent-nav" style="display:none;">
+                        <span id="theater-recent-prev" class="theater-recent-arrow" title="上一条"><i class="fa-solid fa-chevron-left"></i></span>
+                        <span id="theater-recent-indicator"></span>
+                        <span id="theater-recent-next" class="theater-recent-arrow" title="下一条"><i class="fa-solid fa-chevron-right"></i></span>
+                    </div>
+                    <div id="theater-zen-btn" class="theater-btn primary theater-zen-btn" title="全屏沉浸阅读（Esc 退出）"><i class="fa-solid fa-expand"></i><span>沉浸阅读</span></div>
                 </div>
             </div>
-            <label class="theater-label">生成结果</label>
             <pre id="theater-stream-text" class="theater-stream-pre" style="display:none;"></pre>
             <div id="theater-output-container"><iframe id="theater-output-frame" sandbox="allow-scripts allow-same-origin" class="theater-iframe"></iframe></div>
             <div class="theater-btn-row theater-output-actions" style="display:none;">

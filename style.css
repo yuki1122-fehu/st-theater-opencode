@@ -2248,3 +2248,208 @@ body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="
     border-radius: 14px !important;
     color: var(--t-fg-soft) !important;
 }
+
+/* ============================================================
+ * v4 布局重构 · 温暖炉火 · 简约高级
+ * —— 横向 Masthead / 图标化分段导航 / 全宽主 CTA / 工具栏重排
+ * ============================================================ */
+
+/* —— 整体容器：去外层留白，由各区块自管 padding —— */
+.theater-popup {
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+/* —— 顶部 Masthead（仅主弹窗含 .theater-brand 时生效，避免影响子弹窗）—— */
+.theater-popup:has(.theater-brand) .theater-popup-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 16px 18px 14px !important;
+    margin: 0 !important;
+    text-align: left !important;
+    border-bottom: 1px solid var(--t-border) !important;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .45), transparent) !important;
+}
+.theater-popup .theater-brand {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+}
+.theater-popup:has(.theater-brand) .theater-logo {
+    width: 42px !important;
+    height: 42px !important;
+    margin: 0 !important;
+    flex: 0 0 auto !important;
+    border-radius: 13px !important;
+}
+.theater-popup .theater-brand-text {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+    min-width: 0 !important;
+}
+.theater-popup:has(.theater-brand) .theater-popup-header .theater-title {
+    font-size: 18px !important;
+    letter-spacing: 2px !important;
+    margin: 0 !important;
+    text-align: left !important;
+}
+.theater-popup:has(.theater-brand) .theater-popup-header .theater-title::after {
+    display: none !important;
+}
+.theater-popup:has(.theater-brand) .theater-popup-header .theater-subtitle {
+    font-size: 11px !important;
+    letter-spacing: .5px !important;
+    text-transform: none !important;
+    margin: 0 !important;
+}
+.theater-popup:has(.theater-brand) .theater-popup-header .theater-function {
+    display: none !important;
+}
+
+/* —— 图标化分段导航 —— */
+.theater-popup .theater-tabs {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 4px !important;
+    padding: 10px 12px !important;
+    background: rgba(120, 60, 20, .045) !important;
+    border-bottom: 1px solid var(--t-border) !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+}
+.theater-popup .theater-tabs::-webkit-scrollbar { display: none !important; }
+.theater-popup .theater-tab {
+    flex: 1 1 auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    padding: 8px 10px !important;
+    border-radius: 10px !important;
+    font-size: 12.5px !important;
+    white-space: nowrap !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    color: var(--t-fg-mute) !important;
+}
+.theater-popup .theater-tab i {
+    font-size: 12px !important;
+    opacity: .8 !important;
+}
+.theater-popup .theater-tab:hover {
+    color: var(--t-fg) !important;
+    background: var(--t-surface-1) !important;
+}
+.theater-popup .theater-tab.active {
+    color: var(--t-on-accent) !important;
+    background: linear-gradient(135deg, #f29a5e 0%, #e8743b 55%, #c2541f 100%) !important;
+    border-color: transparent !important;
+    box-shadow: 0 4px 12px rgba(232, 116, 59, .32) !important;
+}
+.theater-popup .theater-tab.active i { opacity: 1 !important; }
+
+/* —— 面板区：可滚动 + 进入动画 —— */
+.theater-popup .theater-panels-wrapper {
+    height: clamp(480px, 64vh, 680px) !important;
+    min-height: 480px !important;
+    padding: 16px 16px 22px !important;
+}
+.theater-popup .theater-panel.active {
+    animation: theater-panel-in .28s cubic-bezier(.2, .8, .2, 1) !important;
+}
+@keyframes theater-panel-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* —— Section 头部：label 与 hint 同行 —— */
+.theater-popup .theater-section-head {
+    display: flex !important;
+    align-items: baseline !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    margin-bottom: 10px !important;
+}
+
+/* —— Compose 卡：指令输入区，左上角炉火微光 —— */
+.theater-popup .theater-compose {
+    background:
+        radial-gradient(120% 80% at 0% 0%, rgba(232, 116, 59, .07), transparent 55%),
+        var(--t-surface-1) !important;
+}
+
+/* —— 主 CTA：全宽炉火渐变（不强制 display，尊重 inline display:none 切换）—— */
+.theater-popup .theater-cta {
+    display: flex;
+    width: 100% !important;
+    min-height: 50px !important;
+    margin: 6px 0 0 !important;
+    justify-content: center !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    letter-spacing: 1.5px !important;
+    background: linear-gradient(135deg, #f29a5e 0%, #e8743b 50%, #c2541f 100%) !important;
+    color: var(--t-on-accent) !important;
+    border: none !important;
+    box-shadow: 0 10px 26px rgba(232, 116, 59, .40), inset 0 1px 0 rgba(255, 255, 255, .28) !important;
+}
+.theater-popup .theater-cta:hover {
+    box-shadow: 0 14px 32px rgba(232, 116, 59, .50), inset 0 1px 0 rgba(255, 255, 255, .4) !important;
+    transform: translateY(-1px) !important;
+}
+.theater-popup .theater-cta:active { transform: translateY(0) scale(.99) !important; }
+.theater-popup .theater-cta svg { width: 18px !important; height: 18px !important; }
+
+/* —— 快捷操作行：等宽紧凑幽灵按钮 —— */
+.theater-popup .theater-quick-actions {
+    gap: 8px !important;
+    margin: 10px 0 6px !important;
+}
+.theater-popup .theater-quick-actions .theater-btn {
+    flex: 1 1 0 !important;
+    min-height: 38px !important;
+    font-size: 12.5px !important;
+}
+
+/* —— 结果工具栏：label 左 / 工具右 —— */
+.theater-popup .theater-output-toolbar {
+    justify-content: space-between !important;
+    margin-bottom: 12px !important;
+}
+.theater-popup .theater-output-tools {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-left: auto !important;
+}
+.theater-popup .theater-recent-nav {
+    display: flex;
+    align-items: center !important;
+    gap: 8px !important;
+    font-size: 12px !important;
+    color: var(--t-fg-mute) !important;
+}
+.theater-popup .theater-zen-btn {
+    padding: 7px 14px !important;
+    font-size: 12.5px !important;
+}
+
+/* —— 表单控件统一炉火强调色 —— */
+.theater-popup input[type="checkbox"],
+.theater-popup input[type="radio"],
+.theater-popup input[type="range"] {
+    accent-color: var(--t-accent) !important;
+}
+
+/* —— 通用按钮行 / Section 节奏微调 —— */
+.theater-popup .theater-btn-row { gap: 8px !important; margin: 10px 0 !important; }
+.theater-popup .theater-section { padding: 18px !important; margin-bottom: 14px !important; }
+.theater-popup .theater-toggle-row { align-items: center !important; gap: 10px !important; margin: 10px 0 4px !important; }
+
+/* Tab badge 在 flex 居中环境下的微调 */
+.theater-popup .theater-tab .theater-tab-new-badge { margin-top: 0 !important; align-self: center !important; }
+
