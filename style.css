@@ -1969,7 +1969,7 @@ body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="
     }
 
 /* ============================================================
- * 重设计覆盖层 · 暖羊皮纸 + 金红火焰 (Scheme A · Ember)
+ * 重设计覆盖层 · 暖羊皮纸 + 暖陶土余烬 (Scheme A · Ember, 降饱和)
  * 仅覆盖设计令牌与少量关键组件，不改动上方原有结构
  * ============================================================ */
 .theater-popup {
@@ -1992,9 +1992,9 @@ body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="
     --t-border: rgba(58, 42, 28, .14);
     --t-border-strong: rgba(58, 42, 28, .26);
 
-    --t-accent: #c0432b;            /* 金红 / 余烬红 */
-    --t-accent-soft: #e0764a;       /* 暖橙 */
-    --t-accent-deep: #8f2e1c;       /* 深余烬 */
+    --t-accent: #a85e46;            /* 暖陶土 / 低饱和余烬 */
+    --t-accent-soft: #c4825f;       /* 暖陶 */
+    --t-accent-deep: #7a4329;       /* 深棕 */
     --t-on-accent: #fff6ec;
 
     --t-danger: #b23a2e;
@@ -2012,24 +2012,38 @@ body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="
     background:
         radial-gradient(120% 60% at 50% -12%, #fff8ec 0%, transparent 55%),
         linear-gradient(168deg, #fbf1dc 0%, #f3e3c6 100%);
-    border: 1px solid rgba(192, 67, 43, .18);
+    border: 1px solid rgba(168, 94, 70, .18);
     box-shadow: 0 24px 70px rgba(45, 24, 10, .28);
 }
 
-/* 顶部火焰装饰条 */
+/* Logo 徽标：暖炉余烬底 + 拾光火焰 */
+.theater-logo {
+    width: 44px; height: 44px;
+    margin: 0 auto 6px;
+    border-radius: 13px;
+    background: linear-gradient(145deg, #7a4329 0%, #a85e46 100%);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 12px rgba(122, 67, 41, .35), inset 0 1px 0 rgba(255, 255, 255, .18);
+}
+.theater-logo svg {
+    width: 30px; height: 30px; display: block;
+    filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, .18));
+}
+
+/* 顶部火焰装饰条（低饱和暖陶土） */
 .theater-popup::before {
     content: "";
     position: absolute;
     top: -1px; left: -1px; right: -1px;
     height: 4px;
     border-radius: 18px 18px 0 0;
-    background: linear-gradient(90deg, #e0764a 0%, #c0432b 28%, #e0a23c 52%, #c0432b 76%, #e0764a 100%);
-    box-shadow: 0 1px 6px rgba(192, 67, 43, .4);
+    background: linear-gradient(90deg, #c98a5f 0%, #a85e46 28%, #d4b483 52%, #a85e46 76%, #c98a5f 100%);
+    box-shadow: 0 1px 6px rgba(168, 94, 70, .4);
     pointer-events: none;
     z-index: 5;
 }
 
-/* 标题：衬线 + 金红下划线 */
+/* 标题：衬线 + 暖陶土下划线（降饱和） */
 .theater-popup-header .theater-title {
     color: #5a2f1c;
     letter-spacing: 2px;
@@ -2041,18 +2055,33 @@ body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="
     width: 46px; height: 3px;
     margin: 8px auto 0;
     border-radius: 3px;
-    background: linear-gradient(90deg, #e0764a, #c0432b);
+    background: linear-gradient(90deg, #c4825f, #a85e46);
 }
 
-/* Tab：胶囊化 + 选中辉光 */
-.theater-tab { border-radius: 999px; }
+/* Tab：单行排列 + 横向滚动 + 胶囊化 + 选中辉光（降饱和） */
+.theater-popup .theater-tabs {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 4px 2px 8px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--t-accent-soft) transparent;
+}
+.theater-popup .theater-tabs::-webkit-scrollbar { height: 6px; }
+.theater-popup .theater-tabs::-webkit-scrollbar-thumb {
+    background: var(--t-accent-soft);
+    border-radius: 999px;
+}
+.theater-popup .theater-tabs::-webkit-scrollbar-track { background: transparent; }
+.theater-tab { border-radius: 999px; flex: 0 0 auto; }
 .theater-tab.active {
-    box-shadow: 0 6px 16px rgba(192, 67, 43, .35);
+    box-shadow: 0 6px 16px rgba(168, 94, 70, .35);
 }
 
-/* 主按钮：金红 + 余烬辉光 */
+/* 主按钮：金红 + 余烬辉光（降饱和） */
 .theater-btn.primary:hover {
-    box-shadow: 0 10px 24px rgba(192, 67, 43, .42);
+    box-shadow: 0 10px 24px rgba(168, 94, 70, .42);
 }
 
 /* 生成结果区（已与实时输出合并为同一张卡片） */
@@ -2064,10 +2093,10 @@ body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="
 }
 .theater-zen-btn {
     margin: 0;
-    box-shadow: 0 6px 16px rgba(192, 67, 43, .30);
+    box-shadow: 0 6px 16px rgba(168, 94, 70, .30);
 }
 .theater-zen-btn:hover {
-    box-shadow: 0 10px 22px rgba(192, 67, 43, .45);
+    box-shadow: 0 10px 22px rgba(168, 94, 70, .45);
 }
 #theater-output-container {
     border-radius: 12px;

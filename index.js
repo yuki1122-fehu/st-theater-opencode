@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '3.2.3';
+const VERSION = '3.3.5';
 let latestRemoteVersion = null;
 const cloneDefaultSettings = () => {
     if (typeof structuredClone === 'function') return structuredClone(defaultSettings);
@@ -763,6 +763,13 @@ function buildPopupHTML() {
     return `
 <div class="theater-popup" data-skin="${skin}">
     <div class="theater-popup-header">
+        <div class="theater-logo" aria-label="拾光锻匣">
+            <svg viewBox="0 0 32 32" aria-hidden="true">
+                <path d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z" fill="#fff6ec"/>
+                <path d="M16 12 C17.6 15 20 16.6 20 20 A4 4 0 1 1 12 20 C12 17.4 14 16.4 15 14 C15.5 16 16 16.2 16.5 15 C16.3 13.5 16 12.4 16 12 Z" fill="#f3c89a"/>
+                <circle cx="16" cy="21.5" r="2.2" fill="#e8b878"/>
+            </svg>
+        </div>
         <p class="theater-title">拾光锻匣</p>
         <p class="theater-function">小剧场生成插件</p>
         <p class="theater-subtitle">独立生成 · 不影响正文</p>
