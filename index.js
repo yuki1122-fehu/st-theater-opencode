@@ -375,6 +375,7 @@ async function init() {
         });
     }
 
+    ensureBuiltinTemplates();
     applyCustomCSS();
     // 悬浮球延迟创建，避免干扰其他插件初始化
     setTimeout(() => { try { createFloatingBall(); } catch (e) { console.warn('[Theater] Floating ball error:', e); } }, 2000);
@@ -772,7 +773,6 @@ function buildPopupHTML() {
         <div class="theater-tab" data-tab="dialogue">对话</div>
         <div class="theater-tab" data-tab="rules">规则</div>
         <div class="theater-tab" data-tab="history">历史</div>
-        <div class="theater-tab" data-tab="theme">美化</div>
         <div class="theater-tab" data-tab="diagnostics">诊断</div>
         <div class="theater-tab" data-tab="config">设置${hasRemoteUpdate() ? updateBadgeHTML() : ''}</div>
     </div>
@@ -797,24 +797,23 @@ function buildPopupHTML() {
                 <div id="theater-stop-btn" class="theater-btn danger generate" style="display:none;"><i class="fa-solid fa-stop"></i><span>停止</span></div>
             </div>
         </div>
-        <div class="theater-section" id="theater-stream-section" style="display:none;">
-            <label class="theater-label"><i class="fa-solid fa-feather"></i> 实时输出</label>
-            <pre id="theater-stream-text" class="theater-stream-pre"></pre>
-        </div>
         <div class="theater-section" id="theater-output-section" style="display:none;">
-            <div class="theater-recent-nav" id="theater-recent-nav" style="display:none;">
-                <span id="theater-recent-prev" class="theater-recent-arrow" title="上一条"><i class="fa-solid fa-chevron-left"></i></span>
-                <span id="theater-recent-indicator"></span>
-                <span id="theater-recent-next" class="theater-recent-arrow" title="下一条"><i class="fa-solid fa-chevron-right"></i></span>
+            <div class="theater-output-toolbar" id="theater-output-toolbar">
+                <div id="theater-zen-btn" class="theater-btn primary theater-zen-btn" title="全屏沉浸阅读（Esc 退出）"><i class="fa-solid fa-expand"></i><span>沉浸阅读</span></div>
+                <div class="theater-recent-nav" id="theater-recent-nav" style="display:none; margin-left:auto;">
+                    <span id="theater-recent-prev" class="theater-recent-arrow" title="上一条"><i class="fa-solid fa-chevron-left"></i></span>
+                    <span id="theater-recent-indicator"></span>
+                    <span id="theater-recent-next" class="theater-recent-arrow" title="下一条"><i class="fa-solid fa-chevron-right"></i></span>
+                </div>
             </div>
             <label class="theater-label">生成结果</label>
+            <pre id="theater-stream-text" class="theater-stream-pre" style="display:none;"></pre>
             <div id="theater-output-container"><iframe id="theater-output-frame" sandbox="allow-scripts allow-same-origin" class="theater-iframe"></iframe></div>
-            <div class="theater-btn-row">
+            <div class="theater-btn-row theater-output-actions" style="display:none;">
                 <div id="theater-save-history-btn" class="theater-btn"><i class="fa-solid fa-bookmark"></i><span>保存</span></div>
                 <div id="theater-copy-html-btn" class="theater-btn"><i class="fa-solid fa-copy"></i><span>复制HTML</span></div>
                 <div id="theater-continue-btn" class="theater-btn"><i class="fa-solid fa-forward"></i><span>续写</span></div>
                 <div id="theater-edit-result-btn" class="theater-btn"><i class="fa-solid fa-pen-to-square"></i><span>编辑文字</span></div>
-                <div id="theater-zen-btn" class="theater-btn"><i class="fa-solid fa-expand"></i><span>沉浸阅读</span></div>
                 <div id="theater-save-edit-btn" class="theater-btn primary" style="display:none;"><i class="fa-solid fa-check"></i><span>完成编辑</span></div>
             </div>
         </div>
@@ -979,58 +978,7 @@ function buildPopupHTML() {
         </div>
     </div>
 
-    <!-- ===== 5. 美化 ===== -->
-    <div class="theater-panel" data-panel="theme">
-        <div class="theater-section">
-            <label class="theater-label"><i class="fa-solid fa-palette"></i> 风格</label>
-            <div class="theater-drawer">
-                <div class="theater-drawer-toggle" id="theater-skin-toggle">
-                    <span><i class="fa-solid fa-swatchbook"></i> 当前 · <span id="theater-skin-current-label">${SKIN_LABELS[skin]}</span></span>
-                    <i class="fa-solid fa-chevron-down theater-drawer-arrow"></i>
-                </div>
-                <div class="theater-drawer-body" style="display:none;">
-                    <label class="theater-skin-row${skin === 'default' ? ' active' : ''}">
-                        <input type="radio" name="theater-skin" value="default"${skin === 'default' ? ' checked' : ''}>
-                        <span class="theater-skin-row-name">内置默认</span>
-                        <span class="theater-skin-row-desc">粉彩 · 衬线 · 大圆角</span>
-                    </label>
-                    <label class="theater-skin-row${skin === 'theater' ? ' active' : ''}">
-                        <input type="radio" name="theater-skin" value="theater"${skin === 'theater' ? ' checked' : ''}>
-                        <span class="theater-skin-row-name">跟随酒馆</span>
-                        <span class="theater-skin-row-desc">用酒馆当前主题色</span>
-                    </label>
-                    <label class="theater-skin-row${skin === 'custom' ? ' active' : ''}">
-                        <input type="radio" name="theater-skin" value="custom"${skin === 'custom' ? ' checked' : ''}>
-                        <span class="theater-skin-row-name">自定义</span>
-                        <span class="theater-skin-row-desc">下方 CSS 完全接管</span>
-                    </label>
-                </div>
-            </div>
-        </div>
-        <div class="theater-section">
-            <details class="theater-addon-details"${settings.customCSS || skin === 'custom' ? ' open' : ''}>
-                <summary class="theater-addon-summary"><i class="fa-solid fa-brush"></i> 自定义 CSS${settings.customCSS ? ' · 已填写' : ''}</summary>
-                <textarea id="theater-custom-css" class="theater-textarea theater-css-editor" rows="8" placeholder=".theater-popup { background: #1a1a2e; }">${esc(settings.customCSS || '')}</textarea>
-                <p class="theater-hint" style="margin:4px 0 8px;">所有规则会自动限定在小剧场弹窗内，不会污染酒馆界面。写 <code>body</code> 等同写 <code>.theater-popup</code>。</p>
-                <div class="theater-btn-row">
-                    <div id="theater-save-css-btn" class="theater-btn primary"><i class="fa-solid fa-floppy-disk"></i><span>保存并应用</span></div>
-                    <div id="theater-reset-css-btn" class="theater-btn danger"><i class="fa-solid fa-rotate-left"></i><span>重置</span></div>
-                </div>
-            </details>
-        </div>
-        <div class="theater-section">
-            <label class="theater-label"><i class="fa-solid fa-text-height"></i> 字体大小</label>
-            <div class="theater-inline-setting">
-                <span>插件界面字号</span>
-                <input id="theater-ui-font-size" class="theater-input theater-number-input" type="number" min="12" max="20" step="0.5" value="${normalizeUIFontSize(settings.uiFontSize)}">
-                <span>px</span>
-            </div>
-            <div class="theater-btn-row">
-                <div id="theater-save-font-size-btn" class="theater-btn primary"><i class="fa-solid fa-floppy-disk"></i><span>保存字号</span></div>
-                <div id="theater-reset-font-size-btn" class="theater-btn"><i class="fa-solid fa-rotate-left"></i><span>恢复默认</span></div>
-            </div>
-        </div>
-    </div>
+    <!-- ===== 5. 美化（已移除） ===== -->
 
     <!-- ===== 6. 诊断 ===== -->
     <div class="theater-panel" data-panel="diagnostics">
@@ -1201,6 +1149,69 @@ function historyItemHTML(h) {
             <span class="theater-history-delete" data-id="${h.id}"><i class="fa-solid fa-trash"></i> 删除</span>
         </div>
     </div>`;
+}
+
+// ============================================================
+// 内置指令模板（番外 / AU 平行世界）
+// ============================================================
+const BUILTIN_INSTRUCTION_TEMPLATES = [
+    // —— 番外 · 剧情相关 ——
+    {
+        name: '微信私聊体', group: '番外·剧情相关', builtin: true,
+        content: '请基于当前剧情与角色设定，以主角 A 和主角 B 的手机微信私聊形式，写一篇轻松日常的番外小剧场。用聊天气泡呈现（谁发的、说了什么），可带表情包语气、撤回、语音转文字等真实聊天细节，聊一些只有他们俩才懂的梗。控制在 300～600 字。'
+    },
+    {
+        name: '论坛读者讨论体', group: '番外·剧情相关', builtin: true,
+        content: '请以一个虚构读者论坛「浮梦茶馆」的帖子形式，模拟网友们热烈讨论当前剧情走向。包含楼主发帖抛出一个关于主角关系的猜测，以及 4～6 条不同立场的跟评（有人嗑 CP、有人分析伏笔、有人吐槽剧情），带点赞数和楼层。语气鲜活、像真实论坛。控制在 400～700 字。'
+    },
+    {
+        name: '节日温馨番外', group: '番外·剧情相关', builtin: true,
+        content: '请写一个和当前剧情相关的温馨节日番外（如生日、春节、中秋或某个角色的重要日子）。聚焦一两个角色之间的互动与心意，氛围温暖治愈，可以有一点小惊喜。控制在 400～700 字。'
+    },
+    // —— AU · 平行世界 ——
+    {
+        name: '校园 AU', group: 'AU·平行世界', builtin: true,
+        content: '把当前角色放进现代高中 / 大学背景的 AU（平行世界）小剧场：他们是有各自社团与烦恼的学生，在某次校园活动或课后相遇，发生一段轻松有趣的日常。保留角色核心性格，但身份换成学生。控制在 400～700 字。'
+    },
+    {
+        name: '动物拟人 AU', group: 'AU·平行世界', builtin: true,
+        content: '把当前角色设定为动物拟人 / 兽人，写一篇软萌治愈的 AU 小剧场。可以对应当小动物的性格（猫的傲娇、犬的忠诚等），描写他们作为动物时的可爱互动与一本正经的呆萌。控制在 300～600 字。'
+    },
+    {
+        name: '魔法校园（哈利波特风）AU', group: 'AU·平行世界', builtin: true,
+        content: '把当前角色放进类似《哈利·波特》的魔法世界观 AU：分院、魔咒课、魁地奇、深夜违反校规的冒险。为他们分配学院与专长，写一篇发生在魔法校园里的冒险 / 日常小剧场，带一点奇幻氛围。控制在 500～800 字。'
+    },
+    {
+        name: '末日废土 AU', group: 'AU·平行世界', builtin: true,
+        content: '把当前角色放进末日废土世界的 AU：资源匮乏、旧世界遗迹、危机四伏的旅途。描写他们在废土中相互扶持、寻找庇护所的一段经历，带荒凉与羁绊并存的氛围。控制在 400～700 字。'
+    },
+    {
+        name: '古代江湖 AU', group: 'AU·平行世界', builtin: true,
+        content: '把当前角色放进古代武侠江湖的 AU：门派恩怨、客栈夜话、刀光剑影下的柔情。为他们安排江湖身份（侠客、医师、琴师等），写一篇有武侠韵味的小剧场。控制在 400～700 字。'
+    },
+    {
+        name: '现代都市咖啡馆 AU', group: 'AU·平行世界', builtin: true,
+        content: '把当前角色放进现代都市的日常 AU：一家街角咖啡馆，慢节奏的午后，一杯手冲与几句闲谈。写一篇温柔治愈、充满生活气息的都市小剧场。控制在 300～600 字。'
+    },
+    {
+        name: '童话 / 神话 AU', group: 'AU·平行世界', builtin: true,
+        content: '把当前角色放进童话或神话背景的 AU（如精灵森林、海底龙宫、北欧神域等）。用 fairy-tale 的口吻讲述他们的一段奇遇，保留梦幻与浪漫的色彩。控制在 400～700 字。'
+    },
+];
+
+// 首次启动时把内置模板写入用户库（带去重与版本标记，避免重复注入）
+function ensureBuiltinTemplates() {
+    if (settings.builtinTplV1) return;
+    const existing = settings.instructionTemplates || [];
+    const have = new Set(existing.map(t => `${t.group || ''}|${t.name || ''}`));
+    const toAdd = BUILTIN_INSTRUCTION_TEMPLATES.filter(t => !have.has(`${t.group}|${t.name}`));
+    if (toAdd.length) {
+        settings.instructionTemplates = existing.concat(toAdd);
+        save();
+    }
+    settings.builtinTplV1 = true;
+    save();
+    try { refreshInstUI(); } catch (e) {}
 }
 
 // 把没有 group 字段或 group 在已删除组里的模板视为「未分组」
@@ -1509,14 +1520,19 @@ async function openTheaterPopup() {
     // === 恢复后台生成状态 ===
     if (isGenerating) {
         // 正在后台生成中：显示流式输出区域和停止按钮
-        $('#theater-stream-section').show();
-        $('#theater-stream-text').text(bgStreamText || '后台生成中…');
+        $('#theater-output-section').show();
+        $('#theater-stream-text').show().text(bgStreamText || '后台生成中…');
+        $('#theater-output-container').hide();
+        $('.theater-output-actions').hide();
         $('#theater-generate-btn').hide();
         $('#theater-stop-btn').show();
     } else if (lastGeneratedHtml || currentDisplayHtml) {
         const html = lastGeneratedHtml || currentDisplayHtml;
         showInIframe(html);
         $('#theater-output-section').show();
+        $('#theater-stream-text').hide();
+        $('#theater-output-container').show();
+        $('.theater-output-actions').show();
         updateRecentNav();
     } else if (recentCache.length) {
         // 没有当前生成但有最近记录，恢复最近一条
@@ -1526,6 +1542,9 @@ async function openTheaterPopup() {
             lastGeneratedHtml = item.html;
             showInIframe(item.html);
             $('#theater-output-section').show();
+            $('#theater-stream-text').hide();
+            $('#theater-output-container').show();
+            $('.theater-output-actions').show();
             updateRecentNav();
         }
     }
@@ -1817,7 +1836,9 @@ function bindEvents() {
     });
     $d.off('click.tid').on('click.tid', '.theater-inst-delete', async function () {
         const idx = $(this).data('index');
-        const name = settings.instructionTemplates[idx]?.name || '';
+        const tpl = settings.instructionTemplates[idx];
+        if (tpl?.builtin) { toastr.warning('内置模板不可删除哦～'); return; }
+        const name = tpl?.name || '';
         const { Popup, POPUP_TYPE } = SillyTavern.getContext();
         const ok = await Popup.show.confirm(`确定删除「${name}」？`, '删除后无法恢复');
         if (!ok) return;
@@ -2006,38 +2027,7 @@ function bindEvents() {
         toastr.success(`已删除 ${n} 条`);
     });
 
-    // ---- Theme ----
-    $d.off('click.tcss').on('click.tcss', '#theater-save-css-btn', function () { settings.customCSS = $('#theater-custom-css').val(); save(); applyCustomCSS(); toastr.success('样式已应用'); });
-    $d.off('click.trcss').on('click.trcss', '#theater-reset-css-btn', function () { settings.customCSS = ''; $('#theater-custom-css').val(''); save(); applyCustomCSS(); toastr.success('已重置'); });
-    $d.off('click.tfsave').on('click.tfsave', '#theater-save-font-size-btn', function () {
-        settings.uiFontSize = normalizeUIFontSize($('#theater-ui-font-size').val());
-        $('#theater-ui-font-size').val(settings.uiFontSize);
-        save();
-        applyUIFontSize();
-        toastr.success(`字号已调整为 ${settings.uiFontSize}px`);
-    });
-    $d.off('click.tfreset').on('click.tfreset', '#theater-reset-font-size-btn', function () {
-        settings.uiFontSize = defaultSettings.uiFontSize;
-        $('#theater-ui-font-size').val(settings.uiFontSize);
-        save();
-        applyUIFontSize();
-        toastr.success('已恢复默认字号');
-    });
-    // ---- Skin switcher ----
-    $d.off('click.tskt').on('click.tskt', '#theater-skin-toggle', function () {
-        $(this).next('.theater-drawer-body').slideToggle(150);
-        $(this).find('.theater-drawer-arrow').toggleClass('open');
-    });
-    $d.off('change.tskin').on('change.tskin', 'input[name="theater-skin"]', function () {
-        const v = $(this).val();
-        settings.skinMode = v;
-        save();
-        $('.theater-popup').attr('data-skin', v);
-        $('.theater-skin-row').removeClass('active');
-        $(this).closest('.theater-skin-row').addClass('active');
-        $('#theater-skin-current-label').text(SKIN_LABELS[v] || v);
-        toastr.success(`已切换到「${SKIN_LABELS[v] || v}」`, '', { timeOut: 2000 });
-    });
+    // ---- Theme / 美化（已移除）----
 
     // ---- Config ----
     $d.off('change.tamode').on('change.tamode', '#theater-api-mode', function () {
@@ -3356,9 +3346,10 @@ async function runGeneration(instruction, isAuto) {
     // UI（面板可能在生成过程中被关掉，所以用函数判断面板是否还在）
     const popupAlive = () => $('#theater-generate-btn').length > 0;
 
-    $('#theater-output-section').hide();
-    $('#theater-stream-section').show();
-    $('#theater-stream-text').text('');
+    $('#theater-output-section').show();
+    $('#theater-stream-text').show().text('');
+    $('#theater-output-container').hide();
+    $('.theater-output-actions').hide();
     $('#theater-generate-btn').hide();
     $('#theater-stop-btn').show();
     abortController = new AbortController();
@@ -3429,8 +3420,9 @@ async function runGeneration(instruction, isAuto) {
 
         if (popupAlive()) {
             showInIframe(lastGeneratedHtml);
-            $('#theater-stream-section').hide();
-            $('#theater-output-section').show();
+            $('#theater-stream-text').hide();
+            $('#theater-output-container').show();
+            $('.theater-output-actions').show();
             updateRecentNav();
         }
         toastr.success(isAuto ? '自动小剧场生成完成！打开面板查看' : '小剧场生成完成！点击打开面板查看', '', { timeOut: 6000 });

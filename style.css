@@ -1964,6 +1964,125 @@ body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="
 .theater-popup[data-skin="theater"] .theater-wb-entry-toggle,
 .theater-popup[data-skin="theater"] .theater-wb-action-link,
 .theater-popup[data-skin="theater"] .theater-wb-group-count,
-.theater-popup[data-skin="theater"] .theater-wb-group-arrow {
-    color: var(--SmartThemeEmColor, var(--SmartThemeBodyColor, #2a2a2a)) !important;
+    .theater-popup[data-skin="theater"] .theater-wb-group-arrow {
+        color: var(--SmartThemeEmColor, var(--SmartThemeBodyColor, #2a2a2a)) !important;
+    }
+
+/* ============================================================
+ * 重设计覆盖层 · 暖羊皮纸 + 金红火焰 (Scheme A · Ember)
+ * 仅覆盖设计令牌与少量关键组件，不改动上方原有结构
+ * ============================================================ */
+.theater-popup {
+    /* —— 配色令牌：暖羊皮纸底 + 金红(余烬)点缀 —— */
+    --t-fg: #3a2a1c;
+    --t-fg-soft: #6b5847;
+    --t-fg-mute: #9c8a73;
+    --t-fg-faint: #c2b39c;
+
+    --t-bg: #fbf1dc;
+    --t-surface-1: #fbf1dc;
+    --t-surface-2: #f3e6cc;
+    --t-surface-3: #ead9b8;
+
+    --t-card-warm: #ffe9c7;
+    --t-card-pink: #fbe2d2;
+    --t-card-blue: #ece2d2;
+    --t-card-green: #e3e8d4;
+
+    --t-border: rgba(58, 42, 28, .14);
+    --t-border-strong: rgba(58, 42, 28, .26);
+
+    --t-accent: #c0432b;            /* 金红 / 余烬红 */
+    --t-accent-soft: #e0764a;       /* 暖橙 */
+    --t-accent-deep: #8f2e1c;       /* 深余烬 */
+    --t-on-accent: #fff6ec;
+
+    --t-danger: #b23a2e;
+    --t-danger-soft: rgba(178, 58, 46, .12);
+
+    --t-elev-1: 0 1px 3px rgba(58, 30, 12, .08);
+    --t-elev-2: 0 6px 20px rgba(58, 30, 12, .12);
+    --t-elev-3: 0 16px 44px rgba(58, 30, 12, .18);
+
+    --t-font-serif: "Noto Serif SC", "Songti SC", "STSong", serif;
+    --t-font-sans: "Noto Serif SC", system-ui, -apple-system, "PingFang SC", sans-serif;
+
+    position: relative;
+    font-family: var(--t-font-serif);
+    background:
+        radial-gradient(120% 60% at 50% -12%, #fff8ec 0%, transparent 55%),
+        linear-gradient(168deg, #fbf1dc 0%, #f3e3c6 100%);
+    border: 1px solid rgba(192, 67, 43, .18);
+    box-shadow: 0 24px 70px rgba(45, 24, 10, .28);
+}
+
+/* 顶部火焰装饰条 */
+.theater-popup::before {
+    content: "";
+    position: absolute;
+    top: -1px; left: -1px; right: -1px;
+    height: 4px;
+    border-radius: 18px 18px 0 0;
+    background: linear-gradient(90deg, #e0764a 0%, #c0432b 28%, #e0a23c 52%, #c0432b 76%, #e0764a 100%);
+    box-shadow: 0 1px 6px rgba(192, 67, 43, .4);
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* 标题：衬线 + 金红下划线 */
+.theater-popup-header .theater-title {
+    color: #5a2f1c;
+    letter-spacing: 2px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+}
+.theater-popup-header .theater-title::after {
+    content: "";
+    display: block;
+    width: 46px; height: 3px;
+    margin: 8px auto 0;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #e0764a, #c0432b);
+}
+
+/* Tab：胶囊化 + 选中辉光 */
+.theater-tab { border-radius: 999px; }
+.theater-tab.active {
+    box-shadow: 0 6px 16px rgba(192, 67, 43, .35);
+}
+
+/* 主按钮：金红 + 余烬辉光 */
+.theater-btn.primary:hover {
+    box-shadow: 0 10px 24px rgba(192, 67, 43, .42);
+}
+
+/* 生成结果区（已与实时输出合并为同一张卡片） */
+.theater-output-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.theater-zen-btn {
+    margin: 0;
+    box-shadow: 0 6px 16px rgba(192, 67, 43, .30);
+}
+.theater-zen-btn:hover {
+    box-shadow: 0 10px 22px rgba(192, 67, 43, .45);
+}
+#theater-output-container {
+    border-radius: 12px;
+    border: 1px solid var(--t-border);
+    overflow: hidden;
+    box-shadow: var(--t-elev-1);
+}
+.theater-iframe {
+    background: #fffdf8;
+    border-radius: 12px;
+}
+/* 实时输出（流式）也用暖纸底，与结果区视觉统一 */
+.theater-stream-pre {
+    background: #fdf6e8;
+    border: 1px solid var(--t-border);
+    border-radius: 12px;
+    color: var(--t-fg-soft);
 }
