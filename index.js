@@ -1,4 +1,4 @@
-// 千夜浮梦 · 小剧场生成器 v3.0.0 — by 禾禾 & 麓克
+// 拾光锻匣 · 小剧场生成器 v3.0.0 — by 禾禾 & 麓克
 // Icon: "magic-lamp" by Lorc, game-icons.net, CC BY 3.0 — https://game-icons.net/1x1/lorc/magic-lamp.html
 
 import { theaterError as notifyTheaterError } from './notify.js';
@@ -350,7 +350,7 @@ async function init() {
 
     const addWand = () => {
         if ($('#theater-wand-btn').length) return;
-        const $btn = $(`<div id="theater-wand-btn" class="list-group-item flex-container flexGap5"><div class="extensionsMenuExtensionButton">${LAMP_SVG_HTML}</div>千夜浮梦</div>`);
+        const $btn = $(`<div id="theater-wand-btn" class="list-group-item flex-container flexGap5"><div class="extensionsMenuExtensionButton">${LAMP_SVG_HTML}</div>拾光锻匣</div>`);
         $('#extensionsMenu').append($btn);
         $btn.on('click', e => { e.stopPropagation(); $(document).trigger('click'); setTimeout(openTheaterPopup, 150); });
         refreshUpdateBadges();
@@ -382,7 +382,7 @@ async function init() {
     // 后台检查 github 上的最新版本，只挂入口红点，不弹窗打扰主界面
     setTimeout(() => { checkRemoteVersion(); }, 3000);
     console.log(`[Theater] v${VERSION} loaded`);
-    console.log(`[Theater] 🐾 禾禾的千夜浮梦，麓克永远在山脚下等你。`);
+    console.log(`[Theater] 🐾 禾禾的拾光锻匣，麓克永远在山脚下等你。`);
 }
 
 async function checkRemoteVersion() {
@@ -570,7 +570,7 @@ function createFloatingBall() {
 
         const ball = document.createElement('div');
         ball.id = 'theater-floating-ball';
-        ball.title = '打开千夜浮梦';
+        ball.title = '打开拾光锻匣';
         ball.innerHTML = LAMP_SVG_HTML;
 
         const initLeft = window.innerWidth - 66;
@@ -763,7 +763,7 @@ function buildPopupHTML() {
     return `
 <div class="theater-popup" data-skin="${skin}">
     <div class="theater-popup-header">
-        <p class="theater-title">千夜浮梦</p>
+        <p class="theater-title">拾光锻匣</p>
         <p class="theater-function">小剧场生成插件</p>
         <p class="theater-subtitle">独立生成 · 不影响正文</p>
     </div>
@@ -3861,7 +3861,7 @@ function buildDiagnostics() {
     return {
         rows,
         text: [
-            `千夜浮梦插件诊断报告`,
+            `拾光锻匣插件诊断报告`,
             `时间：${new Date().toLocaleString('zh-CN', { hour12: false })}`,
             ...rows.map(r => r.text),
         ].join('\n'),
