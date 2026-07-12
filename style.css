@@ -2545,3 +2545,32 @@ body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="
 /* Tab badge 在 flex 居中环境下的微调 */
 .theater-popup .theater-tab .theater-tab-new-badge { margin-top: 0 !important; align-self: center !important; }
 
+/* ============================================================
+ * v4 悬浮球 · 生成中涟漪 & 计时标签
+ * ============================================================ */
+
+/* 生成中：强制悬浮球可见（压制贴边收纳的半透明） */
+#theater-floating-ball.theater-ball-generating {
+    opacity: 0.92 !important;
+}
+
+/* 涟漪：两层错峰扩散 */
+#theater-floating-ball.theater-ball-generating::before,
+#theater-floating-ball.theater-ball-generating::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid #e8743b;
+    pointer-events: none;
+    animation: theater-ball-ripple 1.8s cubic-bezier(.2, .8, .2, 1) infinite;
+}
+#theater-floating-ball.theater-ball-generating::after {
+    border-color: #f29a5e;
+    animation-delay: 0.9s;
+}
+@keyframes theater-ball-ripple {
+    0%   { transform: scale(1);   opacity: 0.7; }
+    100% { transform: scale(2.1); opacity: 0; }
+}
+

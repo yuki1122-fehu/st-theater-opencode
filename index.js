@@ -344,7 +344,7 @@ async function init() {
     await storageInit();
     applyUIFontSize();
 
-    const html = await renderExtensionTemplateAsync('third-party/st-theater', 'settings');
+    const html = await renderExtensionTemplateAsync('third-party/' + EXT_FOLDER, 'settings');
     $('#extensions_settings2').append(html);
     $('#theater-open-btn').on('click', openTheaterPopup);
 
@@ -3280,6 +3280,68 @@ function stopGeneration() {
     if (abortController) { abortController.abort(); abortController = null; }
     isGenerating = false;
     bgStreamText = '';
+    stopGenTimer();
+}
+
+// —— 生成计时器 & 悬浮球涟漪 ——
+let _genTimerInterval = null;
+let _genStartTime = null;
+
+function startGenTimer() {
+    _genStartTime = Date.now();
+    const ball = document.getElementById('theater-floating-ball');
+    if (ball) ball.classList.add('theater-ball-generating');
+
+    let label = document.getElementById('theater-gen-timer');
+    if (!label) {
+        label = document.createElement('div');
+        label.id = 'theater-gen-timer';
+        label.style.cssText = [
+            'position:fixed',
+            'z-index:2147483646',
+            'background:linear-gradient(135deg,#c2541f 0%,#e8743b 100%)',
+            'color:#fff8ef',
+            'font-size:11px',
+            'font-weight:600',
+            'font-family:system-ui,-apple-system,"PingFang SC",sans-serif',
+            'letter-spacing:.5px',
+            'padding:3px 10px',
+            'border-radius:999px',
+            'box-shadow:0 4px 12px rgba(232,116,59,.35)',
+            'pointer-events:none',
+            'white-space:nowrap',
+            'display:flex',
+            'align-items:center',
+            'gap:4px',
+            'transform:translateX(-50%)',
+        ].join(';');
+        document.body.appendChild(label);
+    }
+    label.style.display = 'flex';
+
+    const tick = () => {
+        if (!_genStartTime) return;
+        const sec = Math.floor((Date.now() - _genStartTime) / 1000);
+        const m = Math.floor(sec / 60);
+        const s = sec % 60;
+        if (label) label.textContent = m > 0 ? `${m}:${String(s).padStart(2, '0')}` : `${s}s`;
+        if (ball && label) {
+            const r = ball.getBoundingClientRect();
+            label.style.left = (r.left + r.width / 2) + 'px';
+            label.style.top = (r.top - 26) + 'px';
+        }
+    };
+    tick();
+    _genTimerInterval = setInterval(tick, 300);
+}
+
+function stopGenTimer() {
+    if (_genTimerInterval) { clearInterval(_genTimerInterval); _genTimerInterval = null; }
+    _genStartTime = null;
+    const label = document.getElementById('theater-gen-timer');
+    if (label) label.remove();
+    const ball = document.getElementById('theater-floating-ball');
+    if (ball) ball.classList.remove('theater-ball-generating');
 }
 
 // 提取消息正文：优先取 <content> 标签内的内容，没有就用完整消息
@@ -3352,6 +3414,7 @@ async function runGeneration(instruction, isAuto) {
 
     // 标记开始生成
     isGenerating = true;
+    startGenTimer();
     bgStreamText = '';
     bgError = '';
     lastGeneratedHtml = '';
@@ -3448,6 +3511,7 @@ async function runGeneration(instruction, isAuto) {
         theaterError('生成失败: ' + bgError);
     } finally {
         isGenerating = false;
+        stopGenTimer();
         if (chunkThrottle) { clearTimeout(chunkThrottle); chunkThrottle = null; }
         flushStream();
         if (!isAuto && !contCtx) {

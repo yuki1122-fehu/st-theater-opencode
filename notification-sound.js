@@ -1,4 +1,4 @@
-const SOUNDS_BASE_URL = '/scripts/extensions/third-party/st-theater/sounds/';
+const SOUNDS_BASE_URL = new URL('./sounds/', import.meta.url).pathname;
 
 let notifyAudio = null;
 
