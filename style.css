@@ -1970,148 +1970,281 @@ body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="
 
 /* ============================================================
  * 重设计覆盖层 · 暖羊皮纸 + 暖陶土余烬 (Scheme A · Ember, 降饱和)
- * 仅覆盖设计令牌与少量关键组件，不改动上方原有结构
+ * 以 !important 全面压过原 default 皮肤的 :not(...) 硬编码规则，
+ * 使真实界面与预览页 .scheme-a 一致（无论当前是哪个皮肤）。
  * ============================================================ */
 .theater-popup {
-    /* —— 配色令牌：暖羊皮纸底 + 金红(余烬)点缀 —— */
-    --t-fg: #3a2a1c;
-    --t-fg-soft: #6b5847;
-    --t-fg-mute: #9c8a73;
-    --t-fg-faint: #c2b39c;
+    /* —— 配色令牌：暖羊皮纸底 + 暖陶土余烬 —— */
+    --t-fg: #3a2a1c !important;
+    --t-fg-soft: #6b5847 !important;
+    --t-fg-mute: #9c8a73 !important;
+    --t-fg-faint: #c2b39c !important;
 
-    --t-bg: #fbf1dc;
-    --t-surface-1: #fbf1dc;
-    --t-surface-2: #f3e6cc;
-    --t-surface-3: #ead9b8;
+    --t-bg: #fbf1dc !important;
+    --t-surface-1: #fbf1dc !important;
+    --t-surface-2: #f3e6cc !important;
+    --t-surface-3: #ead9b8 !important;
 
-    --t-card-warm: #ffe9c7;
-    --t-card-pink: #fbe2d2;
-    --t-card-blue: #ece2d2;
-    --t-card-green: #e3e8d4;
+    --t-card-warm: #ffe9c7 !important;
+    --t-card-pink: #fbe2d2 !important;
+    --t-card-blue: #ece2d2 !important;
+    --t-card-green: #e3e8d4 !important;
 
-    --t-border: rgba(58, 42, 28, .14);
-    --t-border-strong: rgba(58, 42, 28, .26);
+    --t-border: rgba(58, 42, 28, .14) !important;
+    --t-border-strong: rgba(58, 42, 28, .26) !important;
 
-    --t-accent: #a85e46;            /* 暖陶土 / 低饱和余烬 */
-    --t-accent-soft: #c4825f;       /* 暖陶 */
-    --t-accent-deep: #7a4329;       /* 深棕 */
-    --t-on-accent: #fff6ec;
+    --t-accent: #a85e46 !important;            /* 暖陶土 / 低饱和余烬 */
+    --t-accent-soft: #c4825f !important;       /* 暖陶 */
+    --t-accent-deep: #7a4329 !important;       /* 深棕 */
+    --t-on-accent: #fff6ec !important;
 
-    --t-danger: #b23a2e;
-    --t-danger-soft: rgba(178, 58, 46, .12);
+    --t-danger: #b23a2e !important;
+    --t-danger-soft: rgba(178, 58, 46, .12) !important;
 
-    --t-elev-1: 0 1px 3px rgba(58, 30, 12, .08);
-    --t-elev-2: 0 6px 20px rgba(58, 30, 12, .12);
-    --t-elev-3: 0 16px 44px rgba(58, 30, 12, .18);
+    --t-elev-1: 0 1px 3px rgba(58, 30, 12, .08) !important;
+    --t-elev-2: 0 6px 20px rgba(58, 30, 12, .12) !important;
+    --t-elev-3: 0 16px 44px rgba(58, 30, 12, .18) !important;
 
-    --t-font-serif: "Noto Serif SC", "Songti SC", "STSong", serif;
-    --t-font-sans: "Noto Serif SC", system-ui, -apple-system, "PingFang SC", sans-serif;
+    --t-font-serif: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif !important;
+    --t-font-sans: "Noto Serif SC", system-ui, -apple-system, "PingFang SC", sans-serif !important;
 
     position: relative;
-    font-family: var(--t-font-serif);
+    font-family: var(--t-font-serif) !important;
+    color: var(--t-fg) !important;
     background:
         radial-gradient(120% 60% at 50% -12%, #fff8ec 0%, transparent 55%),
-        linear-gradient(168deg, #fbf1dc 0%, #f3e3c6 100%);
-    border: 1px solid rgba(168, 94, 70, .18);
-    box-shadow: 0 24px 70px rgba(45, 24, 10, .28);
+        linear-gradient(168deg, #fbf1dc 0%, #f3e3c6 100%) !important;
+    border: 1px solid rgba(168, 94, 70, .18) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 24px 70px rgba(45, 24, 10, .28) !important;
 }
 
 /* Logo 徽标：暖炉余烬底 + 拾光火焰 */
 .theater-logo {
-    width: 44px; height: 44px;
-    margin: 0 auto 6px;
-    border-radius: 13px;
-    background: linear-gradient(145deg, #7a4329 0%, #a85e46 100%);
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 12px rgba(122, 67, 41, .35), inset 0 1px 0 rgba(255, 255, 255, .18);
+    width: 44px !important; height: 44px !important;
+    margin: 0 auto 6px !important;
+    border-radius: 13px !important;
+    background: linear-gradient(145deg, #7a4329 0%, #a85e46 100%) !important;
+    display: flex !important; align-items: center !important; justify-content: center !important;
+    box-shadow: 0 4px 12px rgba(122, 67, 41, .35), inset 0 1px 0 rgba(255, 255, 255, .18) !important;
 }
 .theater-logo svg {
-    width: 30px; height: 30px; display: block;
-    filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, .18));
+    width: 30px !important; height: 30px !important; display: block !important;
+    filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, .18)) !important;
 }
 
 /* 顶部火焰装饰条（低饱和暖陶土） */
 .theater-popup::before {
-    content: "";
-    position: absolute;
-    top: -1px; left: -1px; right: -1px;
-    height: 4px;
-    border-radius: 18px 18px 0 0;
-    background: linear-gradient(90deg, #c98a5f 0%, #a85e46 28%, #d4b483 52%, #a85e46 76%, #c98a5f 100%);
-    box-shadow: 0 1px 6px rgba(168, 94, 70, .4);
-    pointer-events: none;
-    z-index: 5;
+    content: "" !important;
+    position: absolute !important;
+    top: -1px !important; left: -1px !important; right: -1px !important;
+    height: 4px !important;
+    border-radius: 18px 18px 0 0 !important;
+    background: linear-gradient(90deg, #c98a5f 0%, #a85e46 28%, #d4b483 52%, #a85e46 76%, #c98a5f 100%) !important;
+    box-shadow: 0 1px 6px rgba(168, 94, 70, .4) !important;
+    pointer-events: none !important;
+    z-index: 5 !important;
 }
 
 /* 标题：衬线 + 暖陶土下划线（降饱和） */
+.theater-popup-header { text-align: center !important; }
 .theater-popup-header .theater-title {
-    color: #5a2f1c;
-    letter-spacing: 2px;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+    color: #5a2f1c !important;
+    font-family: var(--t-font-serif) !important;
+    letter-spacing: 2px !important;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, .5) !important;
 }
 .theater-popup-header .theater-title::after {
-    content: "";
-    display: block;
-    width: 46px; height: 3px;
-    margin: 8px auto 0;
-    border-radius: 3px;
-    background: linear-gradient(90deg, #c4825f, #a85e46);
+    content: "" !important;
+    display: block !important;
+    width: 46px !important; height: 3px !important;
+    margin: 8px auto 0 !important;
+    border-radius: 3px !important;
+    background: linear-gradient(90deg, #c4825f, #a85e46) !important;
 }
+.theater-popup-header .theater-function,
+.theater-popup-header .theater-subtitle { color: var(--t-fg-mute) !important; }
 
-/* Tab：单行排列 + 横向滚动 + 胶囊化 + 选中辉光（降饱和） */
+/* Tab：单行排列 + 横向滚动 + 胶囊化 + 选中辉光 */
 .theater-popup .theater-tabs {
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    overflow-x: auto;
-    gap: 8px;
-    padding: 4px 2px 8px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--t-accent-soft) transparent;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    overflow-x: auto !important;
+    gap: 8px !important;
+    padding: 4px 2px 10px !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: var(--t-accent-soft) transparent !important;
 }
-.theater-popup .theater-tabs::-webkit-scrollbar { height: 6px; }
+.theater-popup .theater-tabs::-webkit-scrollbar { height: 6px !important; display: block !important; }
 .theater-popup .theater-tabs::-webkit-scrollbar-thumb {
-    background: var(--t-accent-soft);
-    border-radius: 999px;
+    background: var(--t-accent-soft) !important;
+    border-radius: 999px !important;
 }
-.theater-popup .theater-tabs::-webkit-scrollbar-track { background: transparent; }
-.theater-tab { border-radius: 999px; flex: 0 0 auto; }
+.theater-popup .theater-tabs::-webkit-scrollbar-track { background: transparent !important; }
+.theater-tab {
+    flex: 0 0 auto !important;
+    border-radius: 999px !important;
+    color: var(--t-fg-soft) !important;
+    background: var(--t-surface-2) !important;
+    border: 1px solid var(--t-border) !important;
+}
+.theater-tab:hover { color: var(--t-fg) !important; background: var(--t-surface-3) !important; }
 .theater-tab.active {
-    box-shadow: 0 6px 16px rgba(168, 94, 70, .35);
+    color: var(--t-on-accent) !important;
+    font-weight: 600 !important;
+    background: linear-gradient(135deg, var(--t-accent) 0%, var(--t-accent-deep) 100%) !important;
+    border-color: transparent !important;
+    box-shadow: 0 6px 16px rgba(168, 94, 70, .35) !important;
 }
 
-/* 主按钮：金红 + 余烬辉光（降饱和） */
-.theater-btn.primary:hover {
-    box-shadow: 0 10px 24px rgba(168, 94, 70, .42);
+/* 卡片（section）：统一暖羊皮纸，与预览一致；取消原逐面板彩色 */
+.theater-section {
+    background: #f6ecd8 !important;
+    border: 1px solid var(--t-border) !important;
+    border-radius: 14px !important;
+    box-shadow: var(--t-elev-1) !important;
+    padding: 18px !important;
+    margin-bottom: 14px !important;
 }
+
+/* 标签 / 提示 / 空态 */
+.theater-label { color: var(--t-fg) !important; font-weight: 600 !important; letter-spacing: .5px !important; }
+.theater-label i { color: var(--t-fg-mute) !important; }
+.theater-hint, .theater-hint-inline { color: var(--t-fg-mute) !important; }
+.theater-empty { color: var(--t-fg-faint) !important; }
+
+/* 输入框 / 下拉：暖纸底，压住原皮肤硬编码 #FFFFFF */
+.theater-textarea,
+.theater-input,
+.theater-select {
+    background: #fffaf0 !important;
+    border: 1px solid var(--t-border) !important;
+    border-radius: 10px !important;
+    color: var(--t-fg) !important;
+    font-family: var(--t-font-serif) !important;
+}
+.theater-textarea:focus,
+.theater-input:focus,
+.theater-select:focus {
+    outline: none !important;
+    border-color: var(--t-accent) !important;
+    box-shadow: 0 0 0 3px rgba(168, 94, 70, .18) !important;
+    background: #fffdf8 !important;
+}
+.theater-textarea::placeholder,
+.theater-input::placeholder { color: var(--t-fg-faint) !important; }
+
+/* 按钮：暖底胶囊，压住原皮肤 #FFFFFF */
+.theater-btn {
+    background: #f0e3c8 !important;
+    color: var(--t-fg) !important;
+    border: 1px solid var(--t-border-strong) !important;
+    border-radius: 999px !important;
+    font-family: var(--t-font-serif) !important;
+    box-shadow: none !important;
+}
+.theater-btn:hover {
+    color: var(--t-fg) !important;
+    background: #ead9b8 !important;
+    border-color: var(--t-accent) !important;
+    transform: translateY(-1px) !important;
+}
+.theater-btn:active { transform: translateY(0) scale(.98) !important; }
+.theater-btn.primary {
+    background: linear-gradient(135deg, var(--t-accent) 0%, var(--t-accent-deep) 100%) !important;
+    color: var(--t-on-accent) !important;
+    border-color: transparent !important;
+    box-shadow: 0 8px 20px rgba(168, 94, 70, .4) !important;
+}
+.theater-btn.primary:hover {
+    box-shadow: 0 12px 26px rgba(168, 94, 70, .5) !important;
+    transform: translateY(-1px) !important;
+}
+.theater-btn.danger {
+    color: var(--t-danger) !important;
+    border-color: color-mix(in srgb, var(--t-danger) 30%, transparent) !important;
+    background: transparent !important;
+}
+.theater-btn.danger:hover { background: var(--t-danger-soft) !important; }
+.theater-btn.generate {
+    min-height: 46px !important;
+    font-size: var(--t-text-md) !important;
+    font-weight: 600 !important;
+    letter-spacing: .4px !important;
+}
+.theater-btn:focus-visible {
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(168, 94, 70, .3) !important;
+}
+
+/* 指令模板列表项 */
+.theater-inst-item {
+    background: #fffaf0 !important;
+    border: 1px solid var(--t-border) !important;
+    border-radius: 10px !important;
+    color: var(--t-fg) !important;
+}
+.theater-inst-item:hover { background: #fffdf8 !important; border-color: var(--t-accent) !important; }
+.theater-inst-item-selected { border-color: var(--t-accent) !important; background: #fbeede !important; }
+.theater-inst-name { color: var(--t-fg) !important; }
+.theater-inst-group-badge { color: var(--t-fg-mute) !important; }
+.theater-inst-edit, .theater-inst-move, .theater-inst-delete { color: var(--t-fg-mute) !important; }
+.theater-inst-edit:hover, .theater-inst-move:hover { color: var(--t-accent) !important; }
+.theater-inst-delete:hover { color: var(--t-danger) !important; }
+
+/* 历史项 */
+.theater-history-item {
+    background: #fffaf0 !important;
+    border: 1px solid var(--t-border) !important;
+    border-radius: 10px !important;
+    color: var(--t-fg) !important;
+}
+.theater-history-item:hover { border-color: var(--t-accent) !important; }
+.theater-history-item-selected { border-color: var(--t-accent) !important; background: #fbeede !important; }
+.theater-history-title { color: var(--t-fg) !important; font-weight: 600 !important; }
+.theater-history-date { color: var(--t-fg-faint) !important; }
+.theater-history-actions span { color: var(--t-fg-soft) !important; }
+.theater-history-view:hover, .theater-history-continue:hover { color: var(--t-accent) !important; }
+.theater-history-export:hover { color: var(--t-accent-deep) !important; }
+.theater-history-delete:hover { color: var(--t-danger) !important; }
+
+/* 最近结果翻页箭头 */
+.theater-recent-arrow { color: var(--t-fg-soft) !important; }
+.theater-recent-arrow:hover { color: var(--t-accent) !important; }
+
+/* 版本号 */
+.theater-version { color: var(--t-fg-mute) !important; }
 
 /* 生成结果区（已与实时输出合并为同一张卡片） */
 .theater-output-toolbar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-bottom: 10px !important;
 }
 .theater-zen-btn {
-    margin: 0;
-    box-shadow: 0 6px 16px rgba(168, 94, 70, .30);
+    margin: 0 !important;
+    box-shadow: 0 6px 16px rgba(168, 94, 70, .30) !important;
 }
 .theater-zen-btn:hover {
-    box-shadow: 0 10px 22px rgba(168, 94, 70, .45);
+    box-shadow: 0 10px 22px rgba(168, 94, 70, .45) !important;
 }
 #theater-output-container {
-    border-radius: 12px;
-    border: 1px solid var(--t-border);
-    overflow: hidden;
-    box-shadow: var(--t-elev-1);
+    border-radius: 12px !important;
+    border: 1px solid var(--t-border) !important;
+    overflow: hidden !important;
+    box-shadow: var(--t-elev-1) !important;
+    background: #fffdf8 !important;
 }
 .theater-iframe {
-    background: #fffdf8;
-    border-radius: 12px;
+    background: #fffdf8 !important;
+    border-radius: 12px !important;
 }
 /* 实时输出（流式）也用暖纸底，与结果区视觉统一 */
 .theater-stream-pre {
-    background: #fdf6e8;
-    border: 1px solid var(--t-border);
-    border-radius: 12px;
-    color: var(--t-fg-soft);
+    background: #fdf6e8 !important;
+    border: 1px solid var(--t-border) !important;
+    border-radius: 12px !important;
+    color: var(--t-fg-soft) !important;
 }
+
