@@ -8,6 +8,8 @@ import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } fro
 
 const MODULE_NAME = 'theater_generator';
 const VERSION = '3.3.6';
+// 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
+const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
 const cloneDefaultSettings = () => {
     if (typeof structuredClone === 'function') return structuredClone(defaultSettings);
