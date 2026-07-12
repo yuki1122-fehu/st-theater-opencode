@@ -62,8 +62,8 @@
     --t-accent-soft: #f29a5e;   /* 暖琥珀 */
     --t-accent-deep: #c2541f;   /* 余烬深橙 */
     --t-on-accent: #fff8ef;
-    --t-danger: #cc4b2e;
-    --t-danger-soft: rgba(204, 75, 46, .12);
+    --t-danger: #bd5642;
+    --t-danger-soft: rgba(189, 86, 66, .12);
 
     --t-elev-1: 0 1px 3px rgba(120, 60, 20, .07), 0 1px 2px rgba(120, 60, 20, .04);
     --t-elev-2: 0 6px 20px rgba(120, 60, 20, .10);
@@ -402,7 +402,7 @@
 }
 .theater-diagnostic-row.ok .theater-diagnostic-status { background: #2f8f5b; }
 .theater-diagnostic-row.warn .theater-diagnostic-status { background: #b7791f; }
-.theater-diagnostic-row.bad .theater-diagnostic-status { background: #b94444; }
+.theater-diagnostic-row.bad .theater-diagnostic-status { background: #ab5050; }
 .theater-error-log-list {
     margin-top: var(--t-space-3);
     display: flex;
@@ -1138,7 +1138,7 @@
     transition: color var(--t-dur-fast) var(--t-ease), opacity var(--t-dur-fast) var(--t-ease);
 }
 .theater-wb-entry-delete:hover {
-    color: #c0635a;
+    color: #b15f58;
     opacity: 1;
 }
 .theater-wb-clear-manual {
@@ -1146,7 +1146,7 @@
     font-size: var(--t-text-xs);
 }
 .theater-wb-clear-manual:hover {
-    color: #c0635a;
+    color: #b15f58;
 }
 .theater-wb-entry-body,
 .theater-preset-entry-body { border-top: 1px solid var(--t-border); }
@@ -1524,7 +1524,7 @@
     width: 9px;
     height: 9px;
     border-radius: 50%;
-    background: #C25555;
+    background: #b25858;
     box-shadow: 0 0 0 2px var(--SmartThemeBlurTintColor, #fff);
     pointer-events: none;
 }
@@ -1922,7 +1922,7 @@ body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="
     width: 11px;
     height: 11px;
     border-radius: 50%;
-    background: #C25555;
+    background: #b25858;
     box-shadow: 0 0 0 2px rgba(255, 246, 228, .95);
     pointer-events: none;
 }
@@ -1998,8 +1998,8 @@ body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="
     --t-accent-deep: #c2541f !important;       /* 余烬深橙 */
     --t-on-accent: #fff8ef !important;
 
-    --t-danger: #cc4b2e !important;
-    --t-danger-soft: rgba(204, 75, 46, .12) !important;
+    --t-danger: #bd5642 !important;
+    --t-danger-soft: rgba(189, 86, 66, .12) !important;
 
     --t-elev-1: 0 1px 3px rgba(120, 60, 20, .07), 0 1px 2px rgba(120, 60, 20, .04) !important;
     --t-elev-2: 0 6px 20px rgba(120, 60, 20, .10) !important;
@@ -2407,11 +2407,11 @@ body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="
 /* 停止按钮 danger CTA 变体 */
 .theater-popup .theater-btn.danger.theater-cta {
     color: var(--t-on-accent) !important;
-    background: linear-gradient(135deg, #ef5f48 0%, #cc4b2e 100%) !important;
-    box-shadow: 0 8px 22px rgba(204, 75, 46, .35), inset 0 1px 0 rgba(255, 255, 255, .25) !important;
+    background: linear-gradient(135deg, #d67060 0%, #bd5642 100%) !important;
+    box-shadow: 0 8px 22px rgba(189, 86, 66, .35), inset 0 1px 0 rgba(255, 255, 255, .25) !important;
 }
 .theater-popup .theater-btn.danger.theater-cta:hover {
-    box-shadow: 0 14px 32px rgba(204, 75, 46, .45), inset 0 1px 0 rgba(255, 255, 255, .35) !important;
+    box-shadow: 0 14px 32px rgba(189, 86, 66, .45), inset 0 1px 0 rgba(255, 255, 255, .35) !important;
 }
 
 /* —— 快捷操作行：等宽紧凑幽灵按钮 —— */
@@ -2421,8 +2421,13 @@ body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="
 }
 .theater-popup .theater-quick-actions .theater-btn {
     flex: 1 1 0 !important;
-    min-height: 38px !important;
-    font-size: 12.5px !important;
+    min-height: 32px !important;
+    font-size: 11.5px !important;
+    padding: 5px 8px !important;
+    gap: 4px !important;
+}
+.theater-popup .theater-quick-actions .theater-btn i {
+    font-size: 11px !important;
 }
 
 /* —— 结果工具栏：label 左 / 工具右 —— */

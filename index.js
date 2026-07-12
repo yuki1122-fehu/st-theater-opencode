@@ -571,7 +571,7 @@ function createFloatingBall() {
         const ball = document.createElement('div');
         ball.id = 'theater-floating-ball';
         ball.title = '打开拾光锻匣';
-        ball.innerHTML = LAMP_SVG_HTML;
+        ball.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true" style="width:26px;height:26px;display:block;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.18));"><path d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z" fill="#fff6ec"/><path d="M16 12 C17.6 15 20 16.6 20 20 A4 4 0 1 1 12 20 C12 17.4 14 16.4 15 14 C15.5 16 16 16.2 16.5 15 C16.3 13.5 16 12.4 16 12 Z" fill="#f3c89a"/><circle cx="16" cy="21.5" r="2.2" fill="#e8b878"/></svg>';
 
         const initLeft = window.innerWidth - 66;
         const initTop = window.innerHeight - 126;
