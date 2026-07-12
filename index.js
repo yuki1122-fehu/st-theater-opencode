@@ -622,7 +622,7 @@ function createFloatingBall() {
             return !!document.querySelector('.edge-panel-root .action-icon--active, .edge-panel-root [title*="捕获"].action-icon--active');
         }
 
-        // 暖底 + 焦糖色油灯 + 软阴影
+        // 炉火橙余烬光球 + 软辉光
         ball.setAttribute('style', [
             'position:fixed !important',
             `left:${initLeft}px`,
@@ -630,15 +630,15 @@ function createFloatingBall() {
             'width:48px !important',
             'height:48px !important',
             'border-radius:50% !important',
-            'background:linear-gradient(140deg, #FFF6E4 0%, #F5E0BC 100%) !important',
-            'color:#8C5A2F !important',
-            'border:1px solid rgba(140, 90, 47, 0.18) !important',
+            'background:linear-gradient(145deg, #c2541f 0%, #e8743b 100%) !important',
+            'color:#fff8ef !important',
+            'border:1px solid rgba(255, 255, 255, .14) !important',
             'display:flex !important',
             'align-items:center !important',
             'justify-content:center !important',
             'font-size:1.2em !important',
             'cursor:pointer !important',
-            'box-shadow:0 6px 18px rgba(140, 90, 47, 0.22), inset 0 1px 0 rgba(255,255,255,0.6) !important',
+            'box-shadow:0 6px 20px rgba(232, 116, 59, .45), 0 0 0 1px rgba(194, 84, 31, .25), inset 0 1px 0 rgba(255,255,255,0.3) !important',
             'z-index:2147483647 !important',
             'opacity:0.92',
             'transition:transform 0.18s cubic-bezier(.2,.8,.2,1), opacity 0.18s, box-shadow 0.18s',
