@@ -1418,6 +1418,15 @@
 .theater-recent-arrow:hover:not(.disabled) { color: var(--t-accent); }
 .theater-recent-arrow.disabled { opacity: 0.3; cursor: default; }
 
+/* Recent nav indicator — compact mono time */
+#theater-recent-indicator {
+    font-family: var(--t-font-mono);
+    font-size: 0.6875rem;
+    color: var(--t-ink-faint);
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+}
+
 /* ============================================================
    HISTORY
    ============================================================ */
