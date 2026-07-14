@@ -813,7 +813,7 @@ function buildPopupHTML() {
         </div>
         <div class="theater-section" id="theater-output-section" style="display:none; margin-top:var(--t-space-10);">
             <div class="theater-output-toolbar" id="theater-output-toolbar">
-                <label class="theater-label" style="margin-bottom:0;">生成结果</label>
+                <label class="theater-label" style="margin-bottom:0;">生成<br>结果</label>
                 <div class="theater-output-tools">
                     <div class="theater-recent-nav" id="theater-recent-nav" style="display:none;">
                         <span id="theater-recent-prev" class="theater-recent-arrow" title="上一条"><i class="fa-solid fa-chevron-left"></i></span>
