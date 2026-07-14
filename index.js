@@ -139,7 +139,7 @@ const defaultSettings = Object.freeze({
     apiMode: 'custom',  // 'custom' 独立 API | 'main' 酒馆主 API（实验）
     apiUrl: '', apiKey: '', apiModel: '',
     lastGenModel: '',  // 最后一次生成使用的模型名
-    lastGenTime: '',   // 最后一次生成完成的时间
+    lastGenDuration: '', // 最后一次生成耗时（如 "12s" 或 "1:05"）
     userPersona: '',
     worldBookEntries: [], worldBookStates: [],  // 旧版字段，v2.8.0 起仅用于迁移
     worldBookStatesByBook: {},  // { [bookName]: { [entryKey]: false } }，缺省 true
@@ -809,7 +809,7 @@ function buildPopupHTML() {
             <div id="theater-random-btn" class="theater-btn" style="${settings.randomEnabled ? '' : 'display:none;'}">随机抽取</div>
             <div id="theater-save-instruction-btn" class="theater-btn">存为模板</div>
             <div id="theater-clear-instruction-btn" class="theater-btn">清空</div>
-            <span class="theater-gen-meta" id="theater-gen-meta">${settings.lastGenModel ? esc(settings.lastGenModel) + ' · ' + esc(settings.lastGenTime) : ''}</span>
+            <span class="theater-gen-meta" id="theater-gen-meta">${settings.lastGenModel ? esc(settings.lastGenModel) + ' · ' + esc(settings.lastGenDuration) : ''}</span>
         </div>
         <div class="theater-section" id="theater-output-section" style="display:none; margin-top:var(--t-space-10);">
             <div class="theater-output-toolbar" id="theater-output-toolbar">
@@ -3497,16 +3497,21 @@ async function runGeneration(instruction, isAuto) {
             recentPersist();
         }
 
-        // 保存最后一次生成信息
+        // 保存最后一次生成信息（模型 + 耗时）
         settings.lastGenModel = settings.apiMode === 'main' ? '酒馆主 API' : (settings.apiModel || '');
-        settings.lastGenTime = new Date().toLocaleString('zh-CN', { hour12: false, month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+        if (_genStartTime) {
+            const d = Math.round((Date.now() - _genStartTime) / 1000);
+            settings.lastGenDuration = d >= 60 ? Math.floor(d / 60) + ':' + String(d % 60).padStart(2, '0') : d + 's';
+        } else {
+            settings.lastGenDuration = '';
+        }
         save();
 
         if (popupAlive()) {
             showInIframe(lastGeneratedHtml);
             // 更新右侧 meta 信息
             var metaText = '';
-            if (settings.lastGenModel) metaText = settings.lastGenModel + ' · ' + settings.lastGenTime;
+            if (settings.lastGenModel) metaText = settings.lastGenModel + ' · ' + settings.lastGenDuration;
             $('#theater-gen-meta').text(metaText);
             $('#theater-stream-text').hide().removeClass('stream-visible');
             $('#theater-output-container').show();
