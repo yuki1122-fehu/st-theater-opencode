@@ -1675,52 +1675,6 @@
     box-shadow: 0 0 0 2px var(--t-surface-card);
 }
 
-/* Floating ball — ripple animation during generation */
-#theater-floating-ball.theater-ball-generating {
-    opacity: 0.92 !important;
-    box-shadow: 0 0 0 0 oklch(47% 0.17 16 / 0.45), 0 4px 16px oklch(47% 0.17 16 / 0.3) !important;
-    overflow: visible !important;
-    clip-path: none !important;
-}
-
-#theater-floating-ball.theater-ball-generating::before,
-#theater-floating-ball.theater-ball-generating::after {
-    content: '' !important;
-    position: absolute !important;
-    top: -10px !important;
-    left: -10px !important;
-    right: -10px !important;
-    bottom: -10px !important;
-    border-radius: 50% !important;
-    border: 2.5px solid var(--t-accent) !important;
-    animation: t-rip-1 2s ease-out infinite !important;
-    pointer-events: none !important;
-    z-index: 0 !important;
-    display: block !important;
-    box-sizing: border-box !important;
-    background: transparent !important;
-}
-
-#theater-floating-ball.theater-ball-generating::after {
-    animation: t-rip-2 2s ease-out 0.7s infinite !important;
-    border-width: 2px !important;
-}
-
-#theater-floating-ball.theater-ball-generating > * {
-    position: relative !important;
-    z-index: 2 !important;
-}
-
-@keyframes t-rip-1 {
-    0%   { transform: scale(0.6); opacity: 0.9; }
-    100% { transform: scale(2.0); opacity: 0; }
-}
-
-@keyframes t-rip-2 {
-    0%   { transform: scale(0.6); opacity: 0.7; }
-    100% { transform: scale(2.4); opacity: 0; }
-}
-
 /* Generate timer label (floating above ball during generation) */
 #theater-gen-timer {
     position: fixed;
@@ -1837,6 +1791,52 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     .theater-section { margin-bottom: var(--t-space-5); }
     .theater-history-actions { gap: var(--t-space-3); }
     .theater-history-actions span { font-size: 10px; }
+}
+
+/* ============================================================
+   V4 悬浮球：生成中涟漪 — 放在文件末尾保证最高优先级
+   ============================================================ */
+/* 生成中强制悬浮球可见（压制贴边收纳半透明） */
+#theater-floating-ball.theater-ball-generating {
+    opacity: 0.92 !important;
+}
+
+/* 两层错峰扩散涟漪 */
+#theater-floating-ball.theater-ball-generating::before,
+#theater-floating-ball.theater-ball-generating::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: theater-ball-ripple 1.8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+#theater-floating-ball.theater-ball-generating::before {
+    border: 2px solid var(--t-accent);
+}
+#theater-floating-ball.theater-ball-generating::after {
+    border: 2px solid oklch(55% 0.14 30);
+    animation-delay: 0.9s;
+}
+
+@keyframes theater-ball-ripple {
+    0%   { transform: scale(1);   opacity: 0.7; }
+    100% { transform: scale(2.1); opacity: 0; }
+}
+
+/* 生成计时标签 */
+#theater-gen-timer {
+    position: fixed;
+    z-index: 2147483646;
+    pointer-events: none;
+    font-family: var(--t-font-mono);
+    font-size: var(--t-text-xs);
+    color: #fff8ef;
+    background: var(--t-accent);
+    padding: 3px 10px;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px oklch(0% 0 0 / 0.15);
 }
 
 /* Reduced motion */
