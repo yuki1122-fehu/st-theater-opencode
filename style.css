@@ -1839,15 +1839,16 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     box-shadow: 0 2px 8px oklch(0% 0 0 / 0.15);
 }
 
-/* Generate meta info (model + time in generate panel) */
+/* Generate meta info (model + duration in generate panel) */
 .theater-gen-meta {
     margin-left: auto;
-    font-family: var(--t-font-serif);
-    font-size: var(--t-text-xs);
-    font-style: italic;
-    color: var(--t-ink-muted);
+    font-family: var(--t-font-mono);
+    font-size: 0.6875rem;
+    font-style: normal;
+    color: var(--t-ink-faint);
     white-space: nowrap;
     align-self: center;
+    letter-spacing: 0.03em;
 }
 
 /* Reduced motion */
