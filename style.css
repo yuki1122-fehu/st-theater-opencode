@@ -1678,7 +1678,7 @@
 #theater-floating-ball { pointer-events: auto !important; }
 
 #theater-floating-ball:hover {
-    filter: drop-shadow(0 0 16px oklch(47% 0.17 16 / 0.70)) drop-shadow(0 0 6px oklch(47% 0.17 16 / 0.90)) !important;
+    filter: drop-shadow(0 0 14px oklch(55% 0.16 42 / 0.65)) drop-shadow(0 0 5px oklch(52% 0.17 38 / 0.80)) !important;
 }
 
 #theater-floating-ball .theater-ball-dot {
@@ -1797,27 +1797,27 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     opacity: 0.92 !important;
 }
 
-/* 两层错峰扩散涟漪（从火焰中心扩散，无圆形边框感） */
+/* 两层错峰扩散涟漪（从火焰中心扩散，橙红色调） */
 #theater-floating-ball.theater-ball-generating::before,
 #theater-floating-ball.theater-ball-generating::after {
     content: '';
     position: absolute;
-    inset: -4px;
+    inset: -6px;
     border-radius: 50%;
     pointer-events: none;
-    animation: theater-ball-ripple 1.8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+    animation: theater-ball-ripple 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
 }
 #theater-floating-ball.theater-ball-generating::before {
-    border: 2.5px solid oklch(47% 0.17 16 / 0.55);
+    border: 2.5px solid oklch(55% 0.16 42 / 0.50);
 }
 #theater-floating-ball.theater-ball-generating::after {
-    border: 2px solid oklch(47% 0.17 16 / 0.35);
-    animation-delay: 0.9s;
+    border: 2px solid oklch(58% 0.14 45 / 0.35);
+    animation-delay: 0.8s;
 }
 
 @keyframes theater-ball-ripple {
-    0%   { transform: scale(0.5); opacity: 0.9; }
-    100% { transform: scale(3.0); opacity: 0; }
+    0%   { transform: scale(0.6); opacity: 0.85; }
+    100% { transform: scale(1.8); opacity: 0; }
 }
 
 /* 生成计时标签 */
