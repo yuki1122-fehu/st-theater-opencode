@@ -138,6 +138,8 @@ const defaultSettings = Object.freeze({
     uiFontSize: 13.5,
     apiMode: 'custom',  // 'custom' 独立 API | 'main' 酒馆主 API（实验）
     apiUrl: '', apiKey: '', apiModel: '',
+    lastGenModel: '',  // 最后一次生成使用的模型名
+    lastGenTime: '',   // 最后一次生成完成的时间
     userPersona: '',
     worldBookEntries: [], worldBookStates: [],  // 旧版字段，v2.8.0 起仅用于迁移
     worldBookStatesByBook: {},  // { [bookName]: { [entryKey]: false } }，缺省 true
@@ -802,11 +804,12 @@ function buildPopupHTML() {
             <span class="theater-hint-inline">生成可交互的小剧场</span>
         </div>
         <div class="theater-btn-row">
+            <div id="theater-generate-btn" class="theater-btn primary">生成小剧场</div>
+            <div id="theater-stop-btn" class="theater-btn danger" style="display:none;">停止生成</div>
             <div id="theater-random-btn" class="theater-btn" style="${settings.randomEnabled ? '' : 'display:none;'}">随机抽取</div>
             <div id="theater-save-instruction-btn" class="theater-btn">存为模板</div>
             <div id="theater-clear-instruction-btn" class="theater-btn">清空</div>
-            <div id="theater-generate-btn" class="theater-btn primary" style="margin-left:auto;">生成小剧场</div>
-            <div id="theater-stop-btn" class="theater-btn danger" style="display:none;">停止生成</div>
+            <span class="theater-gen-meta" id="theater-gen-meta">${settings.lastGenModel ? esc(settings.lastGenModel) + ' · ' + esc(settings.lastGenTime) : ''}</span>
         </div>
         <div class="theater-section" id="theater-output-section" style="display:none; margin-top:var(--t-space-10);">
             <div class="theater-output-toolbar" id="theater-output-toolbar">
@@ -3494,8 +3497,17 @@ async function runGeneration(instruction, isAuto) {
             recentPersist();
         }
 
+        // 保存最后一次生成信息
+        settings.lastGenModel = settings.apiMode === 'main' ? '酒馆主 API' : (settings.apiModel || '');
+        settings.lastGenTime = new Date().toLocaleString('zh-CN', { hour12: false, month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+        save();
+
         if (popupAlive()) {
             showInIframe(lastGeneratedHtml);
+            // 更新右侧 meta 信息
+            var metaText = '';
+            if (settings.lastGenModel) metaText = settings.lastGenModel + ' · ' + settings.lastGenTime;
+            $('#theater-gen-meta').text(metaText);
             $('#theater-stream-text').hide().removeClass('stream-visible');
             $('#theater-output-container').show();
             $('.theater-output-actions').show();
