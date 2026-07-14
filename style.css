@@ -1839,6 +1839,17 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     box-shadow: 0 2px 8px oklch(0% 0 0 / 0.15);
 }
 
+/* Generate meta info (model + time in generate panel) */
+.theater-gen-meta {
+    margin-left: auto;
+    font-family: var(--t-font-serif);
+    font-size: var(--t-text-xs);
+    font-style: italic;
+    color: var(--t-ink-muted);
+    white-space: nowrap;
+    align-self: center;
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
     .theater-popup *,
