@@ -1674,12 +1674,17 @@
 #theater-wand-btn .theater-lamp-icon { transform: scale(1.5) rotate(8deg); }
 #theater-open-btn .theater-lamp-icon { width: 1.2em; height: 1.2em; }
 
+/* 异形悬浮球 — 无容器，纯火焰图案漂浮 */
 #theater-floating-ball {
-    width: 48px; height: 48px; border-radius: 0;
-    background: transparent;
+    width: auto; height: auto;
+    border-radius: 0;
+    background: transparent !important;
     display: flex; align-items: center; justify-content: center;
     position: fixed; z-index: 2147483647; cursor: pointer;
-    box-shadow: none;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    padding: 0;
     transition: transform var(--t-dur-fast) var(--t-ease), filter var(--t-dur-normal) var(--t-ease);
     filter: drop-shadow(0 0 10px oklch(47% 0.17 16 / 0.55)) drop-shadow(0 0 4px oklch(47% 0.17 16 / 0.70));
 }
@@ -1805,27 +1810,27 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     opacity: 0.92 !important;
 }
 
-/* 两层错峰扩散涟漪 */
+/* 两层错峰扩散涟漪（从火焰中心扩散，无圆形边框感） */
 #theater-floating-ball.theater-ball-generating::before,
 #theater-floating-ball.theater-ball-generating::after {
     content: '';
     position: absolute;
-    inset: 0;
+    inset: -4px;
     border-radius: 50%;
     pointer-events: none;
     animation: theater-ball-ripple 1.8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
 }
 #theater-floating-ball.theater-ball-generating::before {
-    border: 2px solid var(--t-accent);
+    border: 2.5px solid oklch(47% 0.17 16 / 0.55);
 }
 #theater-floating-ball.theater-ball-generating::after {
-    border: 2px solid oklch(55% 0.14 30);
+    border: 2px solid oklch(47% 0.17 16 / 0.35);
     animation-delay: 0.9s;
 }
 
 @keyframes theater-ball-ripple {
-    0%   { transform: scale(1);   opacity: 0.7; }
-    100% { transform: scale(2.1); opacity: 0; }
+    0%   { transform: scale(0.5); opacity: 0.9; }
+    100% { transform: scale(3.0); opacity: 0; }
 }
 
 /* 生成计时标签 */
@@ -1855,6 +1860,19 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     white-space: nowrap;
     align-self: center;
     letter-spacing: 0.03em;
+}
+
+/* 强制悬浮球透明 — 防止 ST 全局样式覆盖 */
+html body #theater-floating-ball,
+html body #theater-floating-ball:hover,
+html body #theater-floating-ball:active,
+html body #theater-floating-ball.theater-ball-generating {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
 /* Reduced motion */
