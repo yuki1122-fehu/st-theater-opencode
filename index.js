@@ -3312,7 +3312,6 @@ function startGenTimer() {
             'display:flex',
             'align-items:center',
         ].join(';');
-        ].join(';');
         document.body.appendChild(label);
     }
     label.style.display = 'flex';
