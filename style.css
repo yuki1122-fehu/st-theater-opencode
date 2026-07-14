@@ -197,27 +197,18 @@
 
 .theater-popup-header .theater-brand {
     display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    gap: var(--t-space-4);
+    flex-direction: column;
+    gap: var(--t-space-2);
 }
 
-/* Logo — display as decorative flame icon beside title */
 .theater-popup-header .theater-logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    width: clamp(2.4rem, 4.5vw, 3.2rem);
-    height: clamp(2.4rem, 4.5vw, 3.2rem);
-    opacity: 0.85;
+    display: none;
 }
 
 .theater-popup-header .theater-brand-text {
     display: flex;
     flex-direction: column;
     gap: 0;
-    flex: 1;
 }
 
 /* Masthead top — English tagline */
@@ -248,11 +239,6 @@
 .theater-popup[data-skin="theater"] .theater-popup-header .theater-title,
 .theater-popup[data-skin="custom"] .theater-popup-header .theater-title {
     font-size: var(--t-text-2xl);
-}
-
-.theater-popup[data-skin="theater"] .theater-popup-header .theater-logo,
-.theater-popup[data-skin="custom"] .theater-popup-header .theater-logo {
-    display: none;
 }
 
 /* Subtitle — 小剧场生成器 */
@@ -1673,7 +1659,6 @@
     position: absolute; top: 0; right: 0;
     width: 10px; height: 10px; border-radius: 50%;
     background: var(--t-accent);
-    box-shadow: 0 0 0 2px var(--t-surface);
 }
 
 .theater-update-notice {
@@ -1690,21 +1675,24 @@
 #theater-open-btn .theater-lamp-icon { width: 1.2em; height: 1.2em; }
 
 #theater-floating-ball {
-    width: 48px; height: 48px; border-radius: 50%;
-    background: var(--t-accent);
+    width: 48px; height: 48px; border-radius: 0;
+    background: transparent;
     display: flex; align-items: center; justify-content: center;
     position: fixed; z-index: 2147483647; cursor: pointer;
-    box-shadow: 0 4px 16px oklch(47% 0.17 16 / 0.3);
-    transition: transform var(--t-dur-fast) var(--t-ease);
+    box-shadow: none;
+    transition: transform var(--t-dur-fast) var(--t-ease), filter var(--t-dur-fast) var(--t-ease);
+    filter: drop-shadow(0 2px 6px oklch(0% 0 0 / 0.25));
 }
 
-#theater-floating-ball:hover { transform: scale(1.08); }
+#theater-floating-ball:hover {
+    transform: scale(1.12);
+    filter: drop-shadow(0 4px 12px oklch(0% 0 0 / 0.35));
+}
 
 #theater-floating-ball .theater-ball-dot {
     position: absolute; top: 1px; right: 1px;
     width: 11px; height: 11px; border-radius: 50%;
     background: var(--t-error);
-    box-shadow: 0 0 0 2px var(--t-surface-card);
 }
 
 /* ST outer container overrides */
@@ -1847,13 +1835,14 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     pointer-events: none;
     font-family: var(--t-font-mono);
     font-size: var(--t-text-xs);
-    color: #fff8ef;
-    background: var(--t-accent);
-    padding: 3px 10px;
+    color: var(--t-ink);
+    background: transparent;
+    padding: 0;
     letter-spacing: 0.05em;
     white-space: nowrap;
-    box-shadow: 0 2px 8px oklch(0% 0 0 / 0.15);
+    box-shadow: none;
     transform: translateX(-50%);
+    text-shadow: 0 0 8px oklch(99% 0 0 / 0.9), 0 0 4px oklch(99% 0 0 / 0.9);
 }
 
 /* Generate meta info (model + duration in generate panel) */
