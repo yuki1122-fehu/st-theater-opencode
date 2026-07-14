@@ -92,30 +92,37 @@ const DEFAULT_SYSTEM_PROMPT = `【身份锚定】
 
 const DEFAULT_RENDER_TEMPLATE = `小剧场输出规范：
 请输出一个完整的、可独立运行的HTML页面。要求如下：
-1. 布局：单个居中容器（max-width: 480px），body背景transparent，内容区圆角卡片
-2. 样式：简洁现代，无衬线字体，柔和配色，卡片带轻微阴影
-3. 角色对话：不同背景色区分角色，角色名加粗
-4. 旁白/叙述：斜体或不同颜色
-5. 响应式，适配手机。不引用外部资源。使用简体中文
-6. 输出完整HTML文档（DOCTYPE→html→head+style→body+内容）
-输出格式：直接输出完整HTML代码，不要用markdown代码块包裹。`;
+1. 布局：单个居中容器（max-width: 480px），body背景透明（background: transparent），容器圆角12px，卡片质感
+2. 样式：简洁现代，系统无衬线字体栈（system-ui, -apple-system, sans-serif），正文15px/1.75行高
+3. 配色：柔和低饱和，避免高纯色。卡片白色/浅灰底，文字深灰（#2d2d2d），点缀色低调（蓝灰色系或暖灰色系）
+4. 角色对话：对话气泡左右交替，不同角色不同底色（如#f0f4f8 vs #f8f5f0），角色名加粗+小字号（12px）放在气泡上方
+5. 旁白/叙述：斜体、略小字号、居中排布、上下留白、颜色比正文浅
+6. 排版细节：段间距1em，首行不缩进，场景切换用分割线或空行
+7. 尺寸完全自包含，不引用外部资源。使用简体中文
+8. 输出完整HTML文档（<!DOCTYPE html>开头，含<head><meta charset="UTF-8"><meta name="viewport">+<style>+<body>内容）
+输出格式：直接输出HTML代码文本，不要用\`\`\`html代码块包裹，不要在任何地方加markdown标记。`;
 
 const DEFAULT_RENDER_TEMPLATE_PC = `小剧场输出规范（PC端）：
 请输出一个完整的、可独立运行的HTML页面。要求如下：
-1. 布局：单个居中容器（max-width: 800px），body背景transparent，内容区圆角卡片，内边距充裕（padding: 32px 40px）
-2. 样式：简洁现代，无衬线字体，柔和配色，卡片带轻微阴影，正文字号16px，行高1.8
-3. 角色对话：不同背景色区分角色，角色名加粗，对话气泡最大宽度75%，左右交替排列
-4. 旁白/叙述：斜体或不同颜色，居中显示，上下留白
-5. 适配宽屏显示，合理利用横向空间。不引用外部资源。使用简体中文
-6. 输出完整HTML文档（DOCTYPE→html→head+style→body+内容）
-输出格式：直接输出完整HTML代码，不要用markdown代码块包裹。`;
+1. 布局：单个居中容器（max-width: 780px），body背景透明，容器圆角14px、padding: 36px 44px
+2. 样式：系统无衬线字体栈，正文16px/1.85行高，标题18-22px。柔和低饱和配色
+3. 角色对话：气泡最大宽度68%，左右交替排列，不同角色底色区分，角色名加粗置于气泡上方
+4. 旁白/叙述：斜体、居中、上下各1.5em留白
+5. 响应式：小于640px时padding缩至16px、正文14px
+6. 尺寸完全自包含，不引用外部资源。使用简体中文
+7. 输出完整HTML文档（<!DOCTYPE html>开头）
+输出格式：直接输出HTML代码，不要用\`\`\`html代码块包裹。`;
 
 const INTERACTIVE_ADDON = `
 额外要求 - 交互模式：
-- 必须包含可交互元素（按钮、选择、切换、展开收起等）
-- 使用JavaScript实现交互逻辑
-- 可点击元素有:active缩放反馈
-- 可包含选项分支、隐藏内容、角色回复切换、小游戏等`;
+本页面将在一个沙箱iframe中运行（允许脚本执行，但不允许弹窗、不允许跳转、不允许表单提交）。
+因此交互逻辑必须遵守以下约束：
+- 所有交互使用纯JavaScript DOM操作（element.onclick / addEventListener / classList.toggle / style切换）
+- 禁止使用：alert()、confirm()、prompt()、window.open()、window.top、document.cookie、localStorage、表单submit
+- 按钮点击后直接在当前页面内展开/收起内容、替换文字、切换显示隐藏区域
+- 可交互元素样式：cursor: pointer、hover变色、:active缩放至0.96、transition 0.15s
+- 支持场景：选项分支（点击不同选项显示不同段落）、角色对话切换（点击角色名切换发言视角）、折叠面板（展开/收起隐藏剧情）、简易骰子/随机事件
+- 所有事件处理器必须写在页面内部<script>标签中，不使用外部JS文件`;
 
 // ============================================================
 let settings = {};
@@ -825,7 +832,7 @@ function buildPopupHTML() {
                 </div>
             </div>
             <pre id="theater-stream-text" class="theater-stream-pre" style="display:none;"></pre>
-            <div id="theater-output-container"><iframe id="theater-output-frame" sandbox="allow-scripts allow-same-origin" class="theater-iframe"></iframe></div>
+            <div id="theater-output-container"><iframe id="theater-output-frame" sandbox="allow-scripts allow-same-origin allow-modals" class="theater-iframe"></iframe></div>
             <div class="theater-btn-row theater-output-actions" style="display:none;">
                 <div id="theater-save-history-btn" class="theater-btn"><i class="fa-solid fa-bookmark"></i><span>保存</span></div>
                 <div id="theater-copy-html-btn" class="theater-btn"><i class="fa-solid fa-copy"></i><span>复制HTML</span></div>
@@ -4039,7 +4046,7 @@ function openZenMode(html) {
             '<button id="theater-zen-close" class="theater-zen-close" title="关闭 (Esc)" aria-label="关闭">' +
                 '<i class="fa-solid fa-xmark"></i>' +
             '</button>' +
-            '<iframe id="theater-zen-frame" class="theater-zen-frame" sandbox="allow-scripts allow-same-origin"></iframe>' +
+            '<iframe id="theater-zen-frame" class="theater-zen-frame" sandbox="allow-scripts allow-same-origin allow-modals"></iframe>' +
             '<div class="theater-zen-hint">沉浸阅读 · 按 Esc 或点击空白处退出</div>';
         document.body.appendChild(dialog);
         // 关闭按钮
