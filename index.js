@@ -4081,7 +4081,9 @@ function updateRecentNav() {
         const m = item.time.match(/(\d{2})\/(\d{2}).*?(\d{1,2}:\d{2})/);
         timeStr = m ? m[1] + '/' + m[2] + ' ' + m[3] : item.time;
     }
-    $('#theater-recent-indicator').text(`${recentIndex + 1} / ${recentCache.length}${timeStr ? ' · ' + timeStr : ''}`);
+    const $ind = $('#theater-recent-indicator');
+    const txt = `${recentIndex + 1} / ${recentCache.length}${timeStr ? ' · ' + timeStr : ''}`;
+    $ind.text(txt).attr('title', item?.time || txt);
     $('#theater-recent-prev').toggleClass('disabled', recentIndex <= 0);
     $('#theater-recent-next').toggleClass('disabled', recentIndex >= recentCache.length - 1);
 }
