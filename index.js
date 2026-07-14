@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '3.3.6';
+const VERSION = '4.0.0';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -775,7 +775,7 @@ function buildPopupHTML() {
             </div>
             <div class="theater-brand-text">
                 <p class="theater-title">拾光锻匣</p>
-                <p class="theater-subtitle">小剧场生成 · 独立不影响正文</p>
+                <p class="theater-subtitle">小剧场生成器 · 独立不影响正文</p>
             </div>
         </div>
     </div>
@@ -792,34 +792,32 @@ function buildPopupHTML() {
 
     <!-- ===== 1. 生成 ===== -->
     <div class="theater-panel active" data-panel="generate">
-        <div class="theater-section theater-compose">
-            <div class="theater-section-head">
-                <label class="theater-label"><i class="fa-solid fa-fire"></i> 小剧场指令</label>
-                <span class="theater-hint-inline">描述你想看的番外</span>
-            </div>
-            <textarea id="theater-instruction" class="theater-textarea" rows="4" placeholder="例如：生成一个角色们一起吃火锅的番外小剧场">${esc(settings.lastInstruction || '')}</textarea>
-            <div class="theater-toggle-row">
-                <label class="theater-toggle-label"><input type="checkbox" id="theater-interactive-toggle" ${settings.interactiveMode ? 'checked' : ''}><span>交互模式</span></label>
-                <span class="theater-hint-inline">生成可交互的小剧场</span>
-            </div>
-            <div class="theater-btn-row theater-quick-actions">
-                <div id="theater-save-instruction-btn" class="theater-btn"><i class="fa-solid fa-floppy-disk"></i><span>存为模板</span></div>
-                <div id="theater-clear-instruction-btn" class="theater-btn"><i class="fa-solid fa-eraser"></i><span>清空</span></div>
-                <div id="theater-random-btn" class="theater-btn" style="${settings.randomEnabled ? '' : 'display:none;'}"><i class="fa-solid fa-dice"></i><span>抽一个</span></div>
-            </div>
-            <div id="theater-generate-btn" class="theater-btn primary theater-cta">${LAMP_SVG_HTML}<span>生成小剧场</span></div>
-            <div id="theater-stop-btn" class="theater-btn danger theater-cta" style="display:none;"><i class="fa-solid fa-stop"></i><span>停止生成</span></div>
+        <div class="theater-section">
+            <label class="theater-label">小剧场指令</label>
+            <textarea id="theater-instruction" class="theater-textarea" rows="4" placeholder="描述你想看的番外故事…&#10;&#10;例如：角色们在初雪的夜晚围炉夜话，窗外飘着细雪，屋内暖意融融。">${esc(settings.lastInstruction || '')}</textarea>
+            <div class="theater-hint-inline" style="margin-top:var(--t-space-2);">像写一封信那样描述你想要的场景</div>
         </div>
-        <div class="theater-section theater-result" id="theater-output-section" style="display:none;">
+        <div class="theater-toggle-row">
+            <label class="theater-toggle-label"><input type="checkbox" id="theater-interactive-toggle" ${settings.interactiveMode ? 'checked' : ''}><span>交互模式</span></label>
+            <span class="theater-hint-inline">生成可交互的小剧场</span>
+        </div>
+        <div class="theater-btn-row">
+            <div id="theater-random-btn" class="theater-btn" style="${settings.randomEnabled ? '' : 'display:none;'}">随机抽取</div>
+            <div id="theater-save-instruction-btn" class="theater-btn">存为模板</div>
+            <div id="theater-clear-instruction-btn" class="theater-btn">清空</div>
+            <div id="theater-generate-btn" class="theater-btn primary" style="margin-left:auto;">生成小剧场</div>
+            <div id="theater-stop-btn" class="theater-btn danger" style="display:none;">停止生成</div>
+        </div>
+        <div class="theater-section" id="theater-output-section" style="display:none; margin-top:var(--t-space-10);">
             <div class="theater-output-toolbar" id="theater-output-toolbar">
-                <label class="theater-label"><i class="fa-solid fa-book-open"></i> 生成结果</label>
+                <label class="theater-label" style="margin-bottom:0;">生成结果</label>
                 <div class="theater-output-tools">
                     <div class="theater-recent-nav" id="theater-recent-nav" style="display:none;">
                         <span id="theater-recent-prev" class="theater-recent-arrow" title="上一条"><i class="fa-solid fa-chevron-left"></i></span>
                         <span id="theater-recent-indicator"></span>
                         <span id="theater-recent-next" class="theater-recent-arrow" title="下一条"><i class="fa-solid fa-chevron-right"></i></span>
                     </div>
-                    <div id="theater-zen-btn" class="theater-btn primary theater-zen-btn" title="全屏沉浸阅读（Esc 退出）"><i class="fa-solid fa-expand"></i><span>沉浸阅读</span></div>
+                    <div id="theater-zen-btn" class="theater-btn" title="全屏沉浸阅读（Esc 退出）">沉浸阅读</div>
                 </div>
             </div>
             <pre id="theater-stream-text" class="theater-stream-pre" style="display:none;"></pre>
