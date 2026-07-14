@@ -3307,21 +3307,11 @@ function startGenTimer() {
         label.style.cssText = [
             'position:fixed',
             'z-index:2147483646',
-            'background:linear-gradient(135deg,#c2541f 0%,#e8743b 100%)',
-            'color:#fff8ef',
-            'font-size:11px',
-            'font-weight:600',
-            'font-family:system-ui,-apple-system,"PingFang SC",sans-serif',
-            'letter-spacing:.5px',
-            'padding:3px 10px',
-            'border-radius:999px',
-            'box-shadow:0 4px 12px rgba(232,116,59,.35)',
             'pointer-events:none',
             'white-space:nowrap',
             'display:flex',
             'align-items:center',
-            'gap:4px',
-            'transform:translateX(-50%)',
+        ].join(';');
         ].join(';');
         document.body.appendChild(label);
     }
