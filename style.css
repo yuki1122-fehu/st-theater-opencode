@@ -116,7 +116,7 @@
     background-color: var(--t-surface);
     font-family: var(--t-font-sans);
     font-size: var(--t-text-base);
-    border-radius: 0;
+    border-radius: var(--t-space-3);
     box-shadow: var(--t-shadow-popup);
 }
 
@@ -197,18 +197,27 @@
 
 .theater-popup-header .theater-brand {
     display: flex;
-    flex-direction: column;
-    gap: var(--t-space-2);
+    flex-direction: row;
+    align-items: flex-end;
+    gap: var(--t-space-4);
 }
 
+/* Logo — display as decorative flame icon beside title */
 .theater-popup-header .theater-logo {
-    display: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: clamp(2.4rem, 4.5vw, 3.2rem);
+    height: clamp(2.4rem, 4.5vw, 3.2rem);
+    opacity: 0.85;
 }
 
 .theater-popup-header .theater-brand-text {
     display: flex;
     flex-direction: column;
     gap: 0;
+    flex: 1;
 }
 
 /* Masthead top — English tagline */
@@ -227,7 +236,7 @@
 /* Main title — 拾光锻匣 */
 .theater-popup-header .theater-title {
     font-family: var(--t-font-serif);
-    font-size: var(--t-text-display);
+    font-size: clamp(2.8rem, 6vw, 4rem);
     font-weight: 600;
     line-height: 1;
     letter-spacing: -0.01em;
@@ -239,6 +248,11 @@
 .theater-popup[data-skin="theater"] .theater-popup-header .theater-title,
 .theater-popup[data-skin="custom"] .theater-popup-header .theater-title {
     font-size: var(--t-text-2xl);
+}
+
+.theater-popup[data-skin="theater"] .theater-popup-header .theater-logo,
+.theater-popup[data-skin="custom"] .theater-popup-header .theater-logo {
+    display: none;
 }
 
 /* Subtitle — 小剧场生成器 */
@@ -1693,29 +1707,13 @@
     box-shadow: 0 0 0 2px var(--t-surface-card);
 }
 
-/* Generate timer label (floating above ball during generation) */
-#theater-gen-timer {
-    position: fixed;
-    z-index: 2147483646;
-    pointer-events: none;
-    font-family: var(--t-font-mono);
-    font-size: var(--t-text-xs);
-    color: var(--t-on-accent);
-    background: var(--t-accent);
-    padding: 3px 10px;
-    border-radius: 0;
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-    box-shadow: 0 2px 8px oklch(0% 0 0 / 0.15);
-}
-
 /* ST outer container overrides */
 body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])),
 body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])) {
     background: var(--t-surface) !important;
     color: var(--t-ink) !important;
     border: 0.5px solid var(--t-border) !important;
-    border-radius: 0 !important;
+    border-radius: var(--t-space-3) !important;
     box-shadow: var(--t-shadow-popup) !important;
     overflow: hidden;
 }
@@ -1855,6 +1853,7 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     letter-spacing: 0.05em;
     white-space: nowrap;
     box-shadow: 0 2px 8px oklch(0% 0 0 / 0.15);
+    transform: translateX(-50%);
 }
 
 /* Generate meta info (model + duration in generate panel) */
