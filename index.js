@@ -626,29 +626,30 @@ function createFloatingBall() {
             return !!document.querySelector('.edge-panel-root .action-icon--active, .edge-panel-root [title*="捕获"].action-icon--active');
         }
 
-        // 炉火橙余烬光球 + 软辉光
+        // 异形悬浮球：纯火焰 SVG，透明底，橙色光晕
         ball.setAttribute('style', [
             'position:fixed !important',
             `left:${initLeft}px`,
             `top:${initTop}px`,
-            'width:48px !important',
-            'height:48px !important',
-            'border-radius:50% !important',
-            'background:linear-gradient(145deg, #c2541f 0%, #e8743b 100%) !important',
-            'color:#fff8ef !important',
-            'border:1px solid rgba(255, 255, 255, .14) !important',
+            'width:auto !important',
+            'height:auto !important',
+            'border-radius:0 !important',
+            'background:transparent !important',
+            'border:none !important',
+            'outline:none !important',
             'display:flex !important',
             'align-items:center !important',
             'justify-content:center !important',
-            'font-size:1.2em !important',
             'cursor:pointer !important',
-            'box-shadow:0 6px 20px rgba(232, 116, 59, .45), 0 0 0 1px rgba(194, 84, 31, .25), inset 0 1px 0 rgba(255,255,255,0.3) !important',
+            'box-shadow:none !important',
             'z-index:2147483647 !important',
             'opacity:0.92',
-            'transition:transform 0.18s cubic-bezier(.2,.8,.2,1), opacity 0.18s, box-shadow 0.18s',
+            'padding:0 !important',
+            'transition:transform 0.18s cubic-bezier(.2,.8,.2,1), opacity 0.18s, filter 0.18s',
             '-webkit-user-select:none !important',
             'user-select:none !important',
             'pointer-events:auto !important',
+            'filter:drop-shadow(0 0 10px oklch(47% 0.17 16 / 0.55)) drop-shadow(0 0 3px oklch(45% 0.18 16 / 0.65))',
         ].join(';'));
 
         let isDragging = false;
