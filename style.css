@@ -1308,6 +1308,7 @@
    STREAMING / OUTPUT
    ============================================================ */
 .theater-stream-pre {
+    display: none;
     min-height: 120px;
     max-height: 350px;
     overflow-y: auto;
@@ -1318,8 +1319,13 @@
     color: var(--t-ink);
     background: var(--t-surface-card);
     border: var(--t-rule-thin);
+    border-left: 3px solid var(--t-accent);
     white-space: pre-wrap;
     word-break: break-word;
+}
+
+#theater-stream-text.stream-visible {
+    display: block !important;
 }
 
 .theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-stream-pre {
@@ -1676,32 +1682,58 @@
 /* Floating ball — ripple animation during generation */
 #theater-floating-ball.theater-ball-generating {
     opacity: 0.92 !important;
-    box-shadow: 0 0 0 0 oklch(47% 0.17 16 / 0.45), 0 4px 16px oklch(47% 0.17 16 / 0.3);
+    box-shadow: 0 0 0 0 oklch(47% 0.17 16 / 0.45), 0 4px 16px oklch(47% 0.17 16 / 0.3) !important;
+    overflow: visible !important;
 }
 
 #theater-floating-ball.theater-ball-generating::before,
 #theater-floating-ball.theater-ball-generating::after {
-    content: '';
-    position: absolute;
-    inset: -6px;
-    border-radius: 50%;
-    border: 2px solid var(--t-accent);
-    animation: theater-ripple 1.8s ease-out infinite;
-    pointer-events: none;
+    content: '' !important;
+    position: absolute !important;
+    top: -8px !important;
+    left: -8px !important;
+    right: -8px !important;
+    bottom: -8px !important;
+    border-radius: 50% !important;
+    border: 2px solid var(--t-accent) !important;
+    animation: theater-ripple-l1 1.8s ease-out infinite !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+    display: block !important;
 }
 
 #theater-floating-ball.theater-ball-generating::after {
-    animation-delay: 0.9s;
+    animation: theater-ripple-l2 1.8s ease-out 0.9s infinite !important;
 }
 
-@keyframes theater-ripple {
+#theater-floating-ball.theater-ball-generating > * {
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes theater-ripple-l1 {
     0% {
-        transform: scale(0.85);
-        opacity: 0.7;
+        transform: scale(0.7);
+        opacity: 0.8;
+        border-color: var(--t-accent);
     }
     100% {
-        transform: scale(1.6);
+        transform: scale(1.8);
         opacity: 0;
+        border-color: oklch(47% 0.17 16 / 0.1);
+    }
+}
+
+@keyframes theater-ripple-l2 {
+    0% {
+        transform: scale(0.7);
+        opacity: 0.6;
+        border-color: var(--t-accent);
+    }
+    100% {
+        transform: scale(2.0);
+        opacity: 0;
+        border-color: oklch(47% 0.17 16 / 0.1);
     }
 }
 
