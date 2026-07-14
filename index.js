@@ -1921,6 +1921,11 @@ function bindEvents() {
         lastGeneratedHtml = recentCache[recentIndex].html;
         updateRecentNav();
     });
+    // ---- Click indicator to expand/collapse ----
+    $d.off('click.tri').on('click.tri', '#theater-recent-indicator', function (e) {
+        e.stopPropagation();
+        $(this).toggleClass('expanded');
+    });
     // ---- Edit result text ----
     $d.off('click.ter').on('click.ter', '#theater-edit-result-btn', function () {
         const f = document.getElementById('theater-output-frame');
@@ -4083,7 +4088,7 @@ function updateRecentNav() {
     }
     const $ind = $('#theater-recent-indicator');
     const txt = `${recentIndex + 1} / ${recentCache.length}${timeStr ? ' · ' + timeStr : ''}`;
-    $ind.text(txt).attr('title', item?.time || txt);
+    $ind.text(txt);
     $('#theater-recent-prev').toggleClass('disabled', recentIndex <= 0);
     $('#theater-recent-next').toggleClass('disabled', recentIndex >= recentCache.length - 1);
 }
