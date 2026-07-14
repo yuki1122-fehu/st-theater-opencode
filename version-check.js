@@ -1,7 +1,6 @@
 const REMOTE_MANIFEST_URLS = [
-    'https://cdn.jsdelivr.net/gh/koichole213-ui/st-theater@main/manifest.json',
-    'https://ghproxy.net/https://raw.githubusercontent.com/koichole213-ui/st-theater/main/manifest.json',
-    'https://raw.githubusercontent.com/koichole213-ui/st-theater/main/manifest.json',
+    'https://raw.githubusercontent.com/yuki1122-fehu/st-theater-opencode/main/manifest.json',
+    'https://ghproxy.net/https://raw.githubusercontent.com/yuki1122-fehu/st-theater-opencode/main/manifest.json',
 ];
 
 export function compareVersion(a, b) {
