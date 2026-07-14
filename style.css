@@ -1418,7 +1418,7 @@
 .theater-recent-arrow:hover:not(.disabled) { color: var(--t-accent); }
 .theater-recent-arrow.disabled { opacity: 0.3; cursor: default; }
 
-/* Recent nav indicator — compact mono time */
+/* Recent nav indicator — compact mono time, click to expand */
 #theater-recent-indicator {
     font-family: var(--t-font-mono);
     font-size: 0.6875rem;
@@ -1428,6 +1428,12 @@
     max-width: 11ch;
     overflow: hidden;
     text-overflow: ellipsis;
+    cursor: pointer;
+    user-select: none;
+}
+#theater-recent-indicator.expanded {
+    max-width: none;
+    overflow: visible;
 }
 
 /* ============================================================
