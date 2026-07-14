@@ -1680,13 +1680,13 @@
     display: flex; align-items: center; justify-content: center;
     position: fixed; z-index: 2147483647; cursor: pointer;
     box-shadow: none;
-    transition: transform var(--t-dur-fast) var(--t-ease), filter var(--t-dur-fast) var(--t-ease);
-    filter: drop-shadow(0 2px 6px oklch(0% 0 0 / 0.25));
+    transition: transform var(--t-dur-fast) var(--t-ease), filter var(--t-dur-normal) var(--t-ease);
+    filter: drop-shadow(0 0 10px oklch(47% 0.17 16 / 0.55)) drop-shadow(0 0 4px oklch(47% 0.17 16 / 0.70));
 }
 
 #theater-floating-ball:hover {
-    transform: scale(1.12);
-    filter: drop-shadow(0 4px 12px oklch(0% 0 0 / 0.35));
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 16px oklch(47% 0.17 16 / 0.70)) drop-shadow(0 0 6px oklch(47% 0.17 16 / 0.90));
 }
 
 #theater-floating-ball .theater-ball-dot {
@@ -1834,7 +1834,7 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     z-index: 2147483646;
     pointer-events: none;
     font-family: var(--t-font-mono);
-    font-size: var(--t-text-xs);
+    font-size: 0.5625rem;
     color: var(--t-ink);
     background: transparent;
     padding: 0;
