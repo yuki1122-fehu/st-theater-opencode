@@ -4075,8 +4075,13 @@ function updateRecentNav() {
     if (recentCache.length <= 1) { $nav.hide(); return; }
     $nav.show();
     const item = recentCache[recentIndex];
-    const timeStr = item?.time || '';
-    $('#theater-recent-indicator').text(`${recentIndex + 1} / ${recentCache.length}${timeStr ? '  ·  ' + timeStr : ''}`);
+    // 精简时间显示：去掉年份和秒，只保留 MM/DD HH:MM
+    let timeStr = '';
+    if (item?.time) {
+        const m = item.time.match(/(\d{2})\/(\d{2}).*?(\d{1,2}:\d{2})/);
+        timeStr = m ? m[1] + '/' + m[2] + ' ' + m[3] : item.time;
+    }
+    $('#theater-recent-indicator').text(`${recentIndex + 1} / ${recentCache.length}${timeStr ? ' · ' + timeStr : ''}`);
     $('#theater-recent-prev').toggleClass('disabled', recentIndex <= 0);
     $('#theater-recent-next').toggleClass('disabled', recentIndex >= recentCache.length - 1);
 }
