@@ -1674,24 +1674,11 @@
 #theater-wand-btn .theater-lamp-icon { transform: scale(1.5) rotate(8deg); }
 #theater-open-btn .theater-lamp-icon { width: 1.2em; height: 1.2em; }
 
-/* 异形悬浮球 — 无容器，纯火焰图案漂浮 */
-#theater-floating-ball {
-    width: auto; height: auto;
-    border-radius: 0;
-    background: transparent !important;
-    display: flex; align-items: center; justify-content: center;
-    position: fixed; z-index: 2147483647; cursor: pointer;
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-    padding: 0;
-    transition: transform var(--t-dur-fast) var(--t-ease), filter var(--t-dur-normal) var(--t-ease);
-    filter: drop-shadow(0 0 10px oklch(47% 0.17 16 / 0.55)) drop-shadow(0 0 4px oklch(47% 0.17 16 / 0.70));
-}
+/* 异形悬浮球 — inline style 主导，CSS 只做 hover/涟漪增强 */
+#theater-floating-ball { pointer-events: auto !important; }
 
 #theater-floating-ball:hover {
-    transform: scale(1.15);
-    filter: drop-shadow(0 0 16px oklch(47% 0.17 16 / 0.70)) drop-shadow(0 0 6px oklch(47% 0.17 16 / 0.90));
+    filter: drop-shadow(0 0 16px oklch(47% 0.17 16 / 0.70)) drop-shadow(0 0 6px oklch(47% 0.17 16 / 0.90)) !important;
 }
 
 #theater-floating-ball .theater-ball-dot {
