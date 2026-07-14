@@ -1534,7 +1534,7 @@ async function openTheaterPopup() {
     if (isGenerating) {
         // 正在后台生成中：显示流式输出区域和停止按钮
         $('#theater-output-section').show();
-        $('#theater-stream-text').show().text(bgStreamText || '后台生成中…');
+        $('#theater-stream-text').show().text(bgStreamText || '后台生成中…').addClass('stream-visible');
         $('#theater-output-container').hide();
         $('.theater-output-actions').hide();
         $('#theater-generate-btn').hide();
@@ -1543,7 +1543,7 @@ async function openTheaterPopup() {
         const html = lastGeneratedHtml || currentDisplayHtml;
         showInIframe(html);
         $('#theater-output-section').show();
-        $('#theater-stream-text').hide();
+        $('#theater-stream-text').hide().removeClass('stream-visible');
         $('#theater-output-container').show();
         $('.theater-output-actions').show();
         updateRecentNav();
@@ -1555,7 +1555,7 @@ async function openTheaterPopup() {
             lastGeneratedHtml = item.html;
             showInIframe(item.html);
             $('#theater-output-section').show();
-            $('#theater-stream-text').hide();
+            $('#theater-stream-text').hide().removeClass('stream-visible');
             $('#theater-output-container').show();
             $('.theater-output-actions').show();
             updateRecentNav();
@@ -3423,7 +3423,7 @@ async function runGeneration(instruction, isAuto) {
     const popupAlive = () => $('#theater-generate-btn').length > 0;
 
     $('#theater-output-section').show();
-    $('#theater-stream-text').show().text('');
+    $('#theater-stream-text').show().text('').addClass('stream-visible');
     $('#theater-output-container').hide();
     $('.theater-output-actions').hide();
     $('#theater-generate-btn').hide();
@@ -3496,7 +3496,7 @@ async function runGeneration(instruction, isAuto) {
 
         if (popupAlive()) {
             showInIframe(lastGeneratedHtml);
-            $('#theater-stream-text').hide();
+            $('#theater-stream-text').hide().removeClass('stream-visible');
             $('#theater-output-container').show();
             $('.theater-output-actions').show();
             updateRecentNav();
