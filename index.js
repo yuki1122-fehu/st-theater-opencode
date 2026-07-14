@@ -4212,7 +4212,7 @@ async function updateExtension() {
         const tryUpdate = async (global) => fetch('/api/extensions/update', {
             method: 'POST',
             headers,
-            body: JSON.stringify({ extensionName: 'st-theater', global }),
+            body: JSON.stringify({ extensionName: EXT_FOLDER, global }),
         }).catch(err => ({ ok: false, status: 0, _err: err }));
 
         let resp = await tryUpdate(false);
@@ -4230,7 +4230,7 @@ async function updateExtension() {
         try { detail = await resp.text?.() || ''; } catch (_) {}
         detail = (detail || resp._err?.message || '').slice(0, 220);
         const tip = (resp.status === 409 || /already exists/i.test(detail))
-            ? '插件目录被旧版残留卡住了。请在【扩展管理】卸载本插件，再用 Install from URL 输入 https://github.com/koichole213-ui/st-theater 重新安装（设置不会丢）。'
+            ? '插件目录被旧版残留卡住了。请在【扩展管理】卸载本插件，再用 Install from URL 输入 https://github.com/yuki1122-fehu/st-theater-opencode 重新安装（设置不会丢）。'
             : '如遇 Git 冲突或网络问题，可在【扩展管理】卸载后重新安装。';
         theaterError(`更新失败 (HTTP ${resp.status || 0})\n${detail}\n\n${tip}`, '更新失败');
     } catch (e) {
