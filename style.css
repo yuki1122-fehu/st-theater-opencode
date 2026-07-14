@@ -1425,6 +1425,9 @@
     color: var(--t-ink-faint);
     letter-spacing: 0.03em;
     white-space: nowrap;
+    max-width: 11ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* ============================================================
