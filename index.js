@@ -3815,7 +3815,7 @@ async function callCustomAPIStream(sys, user, onChunk) {
     const rawUrl = (settings.apiUrl || '').trim().replace(/\/+$/, '');
    if (!rawUrl) throw new Error('请先在【设置】填写 API URL（如 https://opencode.ai/zen/go/v1）');
    const isAnthropic = resolveApiFormat(rawUrl) === 'anthropic';
-   const source = isAnthropic ? 'anthropic' : 'openai';
+   const source = isAnthropic ? 'claude' : 'openai';
     // base 只取到「不含 /chat/completions」的地址，例如 https://opencode.ai/zen/go/v1
     const base = rawUrl
         .replace(/\/chat\/completions\/?$/i, '')
@@ -4161,7 +4161,7 @@ async function fetchModelList() {
     $btn.find('span').text('获取中…');
 
     const format = resolveApiFormat(url);
-    const source = format === 'anthropic' ? 'anthropic' : 'openai';
+    const source = format === 'anthropic' ? 'claude' : 'openai';
     const base = url
         .replace(/\/chat\/completions\/?$/i, '')
         .replace(/\/messages\/?$/i, '')
@@ -4175,14 +4175,14 @@ async function fetchModelList() {
         const ctx = SillyTavern.getContext();
         const stHeaders = ctx.getRequestHeaders ? ctx.getRequestHeaders() : { 'Content-Type': 'application/json' };
 
-        // 尝试经酒馆后端代理获取模型列表
+        // 经酒馆后端 /status 端点获取模型列表（服务端 GET {base}/models，无 CORS 限制）
         try {
             const proxyBody = {
                 chat_completion_source: source,
                 reverse_proxy: base,
                 proxy_password: key || '',
             };
-            const proxyRes = await fetch('/api/backends/chat-completions/models', {
+            const proxyRes = await fetch('/api/backends/chat-completions/status', {
                 method: 'POST',
                 headers: stHeaders,
                 body: JSON.stringify(proxyBody),
@@ -4269,7 +4269,7 @@ async function testAPIConnection() {
     $btn.find('span').text('测试中…');
 
     const format = resolveApiFormat(url);
-    const source = format === 'anthropic' ? 'anthropic' : 'openai';
+    const source = format === 'anthropic' ? 'claude' : 'openai';
     const base = url
         .replace(/\/chat\/completions\/?$/i, '')
         .replace(/\/messages\/?$/i, '')
