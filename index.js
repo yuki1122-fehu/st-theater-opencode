@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '4.0.0';
+const VERSION = '4.1.0';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -147,9 +147,11 @@ const defaultSettings = Object.freeze({
     customCSS: '',
     skinMode: 'default',  // 'default' (内置粉彩) | 'theater' (跟随酒馆) | 'custom' (用户CSS接管)
     uiFontSize: 13.5,
-    apiMode: 'custom',  // 'custom' 独立 API | 'main' 酒馆主 API（实验）
-    apiUrl: '', apiKey: '', apiModel: '',
-    lastGenModel: '',  // 最后一次生成使用的模型名
+   apiMode: 'custom',  // 'custom' 独立 API | 'main' 酒馆主 API（实验）
+   apiUrl: '', apiKey: '', apiModel: '',
+   apiFormat: 'auto',  // 'auto' 自动检测 | 'openai' | 'anthropic'
+   maxTokens: 8192,    // 独立 API 最大输出 token 数
+   lastGenModel: '',  // 最后一次生成使用的模型名
     lastGenDuration: '', // 最后一次生成耗时（如 "12s" 或 "1:05"）
     userPersona: '',
     worldBookEntries: [], worldBookStates: [],  // 旧版字段，v2.8.0 起仅用于迁移
@@ -1045,16 +1047,28 @@ function buildPopupHTML() {
             </select>
             <div id="theater-custom-api-area" style="${settings.apiMode === 'main' ? 'display:none;' : ''}margin-top:10px;">
                 <input id="theater-api-url" class="theater-input" placeholder="API URL" value="${esc(settings.apiUrl || '')}">
-                <input id="theater-api-key" class="theater-input" type="password" placeholder="API Key" value="${esc(settings.apiKey || '')}" style="margin-top:6px;">
-                <div style="margin-top:6px;">
-                    <div class="theater-btn-row" style="margin:0 0 6px;">
-                        <div id="theater-fetch-models-btn" class="theater-btn"><i class="fa-solid fa-list"></i><span>获取模型列表</span></div>
-                        <div id="theater-test-api-btn" class="theater-btn"><i class="fa-solid fa-plug"></i><span>测试连接</span></div>
-                    </div>
-                    <select id="theater-api-model-select" class="theater-select" style="display:none;"></select>
-                    <input id="theater-api-model" class="theater-input" placeholder="模型名称（可手动输入，或点上方按钮自动获取）" value="${esc(settings.apiModel || '')}">
-                </div>
-                <div class="theater-btn-row"><div id="theater-save-api-btn" class="theater-btn primary"><i class="fa-solid fa-floppy-disk"></i><span>保存</span></div></div>
+               <input id="theater-api-key" class="theater-input" type="password" placeholder="API Key" value="${esc(settings.apiKey || '')}" style="margin-top:6px;">
+               <div style="margin-top:6px;">
+                   <span class="theater-hint" style="display:block;margin-bottom:4px;">API 格式</span>
+                   <select id="theater-api-format" class="theater-select">
+                       <option value="auto" ${(settings.apiFormat || 'auto') === 'auto' ? 'selected' : ''}>自动检测</option>
+                       <option value="openai" ${settings.apiFormat === 'openai' ? 'selected' : ''}>OpenAI 兼容</option>
+                       <option value="anthropic" ${settings.apiFormat === 'anthropic' ? 'selected' : ''}>Anthropic</option>
+                   </select>
+               </div>
+               <div style="margin-top:6px;">
+                   <div class="theater-btn-row" style="margin:0 0 6px;">
+                       <div id="theater-fetch-models-btn" class="theater-btn"><i class="fa-solid fa-list"></i><span>获取模型列表</span></div>
+                       <div id="theater-test-api-btn" class="theater-btn"><i class="fa-solid fa-plug"></i><span>测试连接</span></div>
+                   </div>
+                   <select id="theater-api-model-select" class="theater-select" style="display:none;"></select>
+                   <input id="theater-api-model" class="theater-input" placeholder="模型名称（可手动输入，或点上方按钮自动获取）" value="${esc(settings.apiModel || '')}">
+                   <div style="margin-top:6px;">
+                       <span class="theater-hint" style="display:block;margin-bottom:4px;">最大输出 token</span>
+                       <input id="theater-max-tokens" class="theater-input" type="number" min="256" max="131072" step="256" placeholder="8192" value="${Number(settings.maxTokens) || 8192}">
+                   </div>
+               </div>
+               <div class="theater-btn-row"><div id="theater-save-api-btn" class="theater-btn primary"><i class="fa-solid fa-floppy-disk"></i><span>保存</span></div></div>
             </div>
         </div>
         <div class="theater-section">
@@ -2073,13 +2087,15 @@ function bindEvents() {
         save();
         await reloadWorldBooks();
     });
-    $d.off('click.tsa').on('click.tsa', '#theater-save-api-btn', function () {
-        settings.apiMode = $('#theater-api-mode').val() || 'custom';
-        settings.apiUrl = $('#theater-api-url').val().trim().replace(/\/+$/, '');
-        settings.apiKey = $('#theater-api-key').val().trim();
-        settings.apiModel = $('#theater-api-model').val().trim();
-        save(); toastr.success('API 已保存');
-    });
+   $d.off('click.tsa').on('click.tsa', '#theater-save-api-btn', function () {
+       settings.apiMode = $('#theater-api-mode').val() || 'custom';
+       settings.apiUrl = $('#theater-api-url').val().trim().replace(/\/+$/, '');
+       settings.apiKey = $('#theater-api-key').val().trim();
+       settings.apiModel = $('#theater-api-model').val().trim();
+       settings.apiFormat = $('#theater-api-format').val() || 'auto';
+       settings.maxTokens = Math.max(256, Math.min(131072, parseInt($('#theater-max-tokens').val()) || 8192));
+       save(); toastr.success('API 已保存');
+   });
     $d.off('click.tup').on('click.tup', '#theater-update-btn', updateExtension);
     $d.off('click.tfm').on('click.tfm', '#theater-fetch-models-btn', fetchModelList);
     $d.off('click.ttest').on('click.ttest', '#theater-test-api-btn', testAPIConnection);
@@ -3279,10 +3295,13 @@ function startContinue(html) {
     // 使用累积内容（如果有的话），否则用当前传入的内容
     const fullText = accumulatedTheater || plainText;
 
-    // 如果超过8000字，只取后半段
-    if (fullText.length > 8000) {
-        continueContext = '…（前文省略）\n\n' + fullText.slice(-8000);
-        toastr.info('前情内容较长，已自动截取后半段', '', { timeOut: 3000 });
+   // 如果超过8000字，只取后半段
+   if (fullText.length > 8000) {
+       // 在段落边界截断，避免从句子中间断开
+       const tail = fullText.slice(-8000);
+       const cut = tail.indexOf('\n\n');
+       continueContext = '…（前文省略）\n\n' + (cut >= 0 && cut < 500 ? tail.slice(cut + 2) : tail);
+       toastr.info('前情内容较长，已自动截取后半段', '', { timeOut: 3000 });
     } else {
         continueContext = fullText;
     }
@@ -3485,10 +3504,17 @@ async function runGeneration(instruction, isAuto) {
             return;
         }
         checkLengthRequirement(targetWordCount, readableCharCount(newText));
-        if (newText) {
-            accumulatedTheater = accumulatedTheater ? (accumulatedTheater + '\n\n---\n\n' + newText) : newText;
-            if (contCtx) continueContext = accumulatedTheater.length > 8000 ? '…（前文省略）\n\n' + accumulatedTheater.slice(-8000) : accumulatedTheater;
-        }
+       if (newText) {
+           accumulatedTheater = accumulatedTheater ? (accumulatedTheater + '\n\n---\n\n' + newText) : newText;
+           if (contCtx && accumulatedTheater.length > 8000) {
+               // 在段落边界截断，避免从句子中间断开影响续写质量
+               const tail = accumulatedTheater.slice(-8000);
+               const cut = tail.indexOf('\n\n');
+               continueContext = '…（前文省略）\n\n' + (cut >= 0 && cut < 500 ? tail.slice(cut + 2) : tail);
+           } else if (contCtx) {
+               continueContext = accumulatedTheater;
+           }
+       }
         generationSucceeded = true;
 
         // 自动保留到最近生成（最多 3 条）
@@ -3515,8 +3541,8 @@ async function runGeneration(instruction, isAuto) {
 
         if (popupAlive()) {
             showInIframe(lastGeneratedHtml);
-            // 更新右侧 meta 信息
-            var metaText = '';
+           // 更新右侧 meta 信息
+           let metaText = '';
             if (settings.lastGenModel) metaText = settings.lastGenModel + ' · ' + settings.lastGenDuration;
             $('#theater-gen-meta').text(metaText);
             $('#theater-stream-text').hide().removeClass('stream-visible');
@@ -3775,11 +3801,21 @@ async function callViaGenerateRaw(messages, signal, onChunk) {
 // ============================================================
 // Custom API streaming
 // ============================================================
+// 根据 settings.apiFormat 判定 API 格式：auto 时从 URL 推断，否则用用户指定值
+function resolveApiFormat(rawUrl) {
+    const fmt = settings.apiFormat || 'auto';
+    if (fmt === 'openai') return 'openai';
+    if (fmt === 'anthropic') return 'anthropic';
+    // auto: 从 URL 推断
+    if (/anthropic|claude/i.test(rawUrl)) return 'anthropic';
+    return 'openai';
+}
+
 async function callCustomAPIStream(sys, user, onChunk) {
     const rawUrl = (settings.apiUrl || '').trim().replace(/\/+$/, '');
-    if (!rawUrl) throw new Error('请先在【设置】填写 API URL（如 https://opencode.ai/zen/go/v1）');
-    const isAnthropic = /anthropic|claude/i.test(rawUrl);
-    const source = isAnthropic ? 'anthropic' : 'openai';
+   if (!rawUrl) throw new Error('请先在【设置】填写 API URL（如 https://opencode.ai/zen/go/v1）');
+   const isAnthropic = resolveApiFormat(rawUrl) === 'anthropic';
+   const source = isAnthropic ? 'anthropic' : 'openai';
     // base 只取到「不含 /chat/completions」的地址，例如 https://opencode.ai/zen/go/v1
     const base = rawUrl
         .replace(/\/chat\/completions\/?$/i, '')
@@ -3801,29 +3837,47 @@ async function callCustomAPIStream(sys, user, onChunk) {
         ],
         model,
         chat_completion_source: source,
-        reverse_proxy: base,
-        proxy_password: settings.apiKey || '',
-        max_tokens: 8192,
-        stream: true,
+       reverse_proxy: base,
+       proxy_password: settings.apiKey || '',
+       max_tokens: Number(settings.maxTokens) || 8192,
+       stream: true,
     };
 
-    let r;
-    try {
-        r = await fetch('/api/backends/chat-completions/generate', {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(body),
-            signal: abortController?.signal,
-        });
-    } catch (e) {
-        throw new Error('经酒馆后端代理请求失败（同域 fetch 失败）：' + (e?.message || e) + '\n请确认酒馆服务器在线，或改用「酒馆主 API」模式。');
-    }
+   // 智能重试：遇到 502/524/529 网关错误时自动重试，最多 2 次
+   const MAX_RETRIES = 2;
+   let lastError = null;
+   let r = null;
 
-    if (!r.ok) {
-        const txt = await r.text().catch(() => '');
-        throw new Error(`酒馆代理返回 ${r.status}：${txt.slice(0, 400)}`);
-    }
-    return await readSSEStream(r, onChunk, false);
+   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+       try {
+           r = await fetch('/api/backends/chat-completions/generate', {
+               method: 'POST',
+               headers,
+               body: JSON.stringify(body),
+               signal: abortController?.signal,
+           });
+       } catch (e) {
+           if (e?.name === 'AbortError') throw e;
+           throw new Error('经酒馆后端代理请求失败（同域 fetch 失败）：' + (e?.message || e) + '\n请确认酒馆服务器在线，或改用「酒馆主 API」模式。');
+       }
+
+       if (r.ok) break;
+
+       const status = r.status;
+       const txt = await r.text().catch(() => '');
+       lastError = new Error(`酒馆代理返回 ${status}：${txt.slice(0, 400)}`);
+
+       // 502/524/529 是网关错误，值得重试；其他状态码直接抛出
+       if (attempt < MAX_RETRIES && (status === 502 || status === 524 || status === 529)) {
+           const delay = (attempt + 1) * 2000;
+           toastr.info(`网关错误 ${status}，${delay / 1000}s 后重试 (${attempt + 1}/${MAX_RETRIES})…`);
+           await new Promise(resolve => setTimeout(resolve, delay));
+           continue;
+       }
+       throw lastError;
+   }
+   if (!r) throw lastError || new Error('请求失败');
+   return await readSSEStream(r, onChunk, isAnthropic);
 }
 
 // ============================================================
@@ -4106,40 +4160,64 @@ async function fetchModelList() {
     $btn.addClass('disabled');
     $btn.find('span').text('获取中…');
 
+    const format = resolveApiFormat(url);
+    const source = format === 'anthropic' ? 'anthropic' : 'openai';
+    const base = url
+        .replace(/\/chat\/completions\/?$/i, '')
+        .replace(/\/messages\/?$/i, '')
+        .replace(/\/models\/?$/i, '')
+        .replace(/\/+$/, '');
+
     try {
-        const isAnthropic = url.toLowerCase().includes('anthropic.com') || url.includes('/v1/messages');
         let data = null;
 
-        if (isAnthropic) {
-            if (!key) throw new Error('Anthropic 接口需要 API Key');
-            // Anthropic: 先清理URL，再拼 /v1/models
-            const base = url.replace(/\/v1\/messages$/, '').replace(/\/v1$/, '').replace(/\/$/, '');
-            try {
-                const res = await fetch(`${base}/v1/models`, {
-                    method: 'GET',
-                    headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01' }
-                });
-                if (res.ok) data = await res.json();
-            } catch { }
-        }
+        // 优先走酒馆后端代理（避免 CORS），fallback 到浏览器直连
+        const ctx = SillyTavern.getContext();
+        const stHeaders = ctx.getRequestHeaders ? ctx.getRequestHeaders() : { 'Content-Type': 'application/json' };
 
+        // 尝试经酒馆后端代理获取模型列表
+        try {
+            const proxyBody = {
+                chat_completion_source: source,
+                reverse_proxy: base,
+                proxy_password: key || '',
+            };
+            const proxyRes = await fetch('/api/backends/chat-completions/models', {
+                method: 'POST',
+                headers: stHeaders,
+                body: JSON.stringify(proxyBody),
+            });
+            if (proxyRes.ok) data = await proxyRes.json();
+        } catch { }
+
+        // 代理失败时 fallback 到浏览器直连（适用于无 CORS 限制的场景）
         if (!data) {
-            // OpenAI兼容格式：清理URL尾巴，尝试多个可能的路径
-            const cleanBase = url.replace(/\/chat\/completions$/, '').replace(/\/$/, '');
-            const endpoints = [
-                /\/v\d+$/.test(cleanBase) ? `${cleanBase}/models` : `${cleanBase}/v1/models`,
-                `${cleanBase}/models`
-            ];
-            for (const ep of endpoints) {
+            if (format === 'anthropic') {
+                const anthBase = base.replace(/\/v1$/, '').replace(/\/$/, '');
                 try {
-                    const headers = key ? { 'Authorization': `Bearer ${key}` } : {};
-                    const res = await fetch(ep, { method: 'GET', headers });
-                    if (res.ok) { data = await res.json(); break; }
+                    const res = await fetch(`${anthBase}/v1/models`, {
+                        method: 'GET',
+                        headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01' }
+                    });
+                    if (res.ok) data = await res.json();
                 } catch { }
+            }
+            if (!data) {
+                const endpoints = [
+                    /\/v\d+$/.test(base) ? `${base}/models` : `${base}/v1/models`,
+                    `${base}/models`,
+                ];
+                for (const ep of endpoints) {
+                    try {
+                        const headers = key ? { 'Authorization': `Bearer ${key}` } : {};
+                        const res = await fetch(ep, { method: 'GET', headers });
+                        if (res.ok) { data = await res.json(); break; }
+                    } catch { }
+                }
             }
         }
 
-        if (!data) throw new Error('连接失败或无法获取模型列表');
+        if (!data) throw new Error('获取模型列表失败（可能因 CORS 被拦截，请直接手动填写模型名称）');
 
         // 解析模型列表：兼容 { data: [...] } 和直接数组两种格式
         const rawList = data.data || data;
@@ -4190,34 +4268,42 @@ async function testAPIConnection() {
     $btn.addClass('disabled');
     $btn.find('span').text('测试中…');
 
-    try {
-        const isAnthropic = url.toLowerCase().includes('anthropic.com') || url.includes('/v1/messages');
+    const format = resolveApiFormat(url);
+    const source = format === 'anthropic' ? 'anthropic' : 'openai';
+    const base = url
+        .replace(/\/chat\/completions\/?$/i, '')
+        .replace(/\/messages\/?$/i, '')
+        .replace(/\/models\/?$/i, '')
+        .replace(/\/+$/, '');
 
-        if (isAnthropic) {
-            if (!key) { toastr.warning('Anthropic 接口需要 API Key'); return; }
-            const base = url.replace(/\/v1\/messages$/, '').replace(/\/v1$/, '').replace(/\/$/, '');
-            const res = await fetch(`${base}/v1/messages`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
-                body: JSON.stringify({ model, max_tokens: 16, messages: [{ role: 'user', content: 'Hi' }] })
-            });
-            if (res.ok) toastr.success('连接成功！');
-            else theaterError(`连接失败 (${res.status})`);
+    try {
+        // 经酒馆后端代理发送一条极短请求来验证连通性
+        const ctx = SillyTavern.getContext();
+        const stHeaders = ctx.getRequestHeaders ? ctx.getRequestHeaders() : { 'Content-Type': 'application/json' };
+        const body = {
+            messages: [{ role: 'user', content: 'Hi' }],
+            model,
+            chat_completion_source: source,
+            reverse_proxy: base,
+            proxy_password: key || '',
+            max_tokens: 5,
+            stream: false,
+        };
+
+        const res = await fetch('/api/backends/chat-completions/generate', {
+            method: 'POST',
+            headers: stHeaders,
+            body: JSON.stringify(body),
+        });
+
+        if (res.ok) {
+            toastr.success('连接成功！');
         } else {
-            const cleanBase = url.replace(/\/chat\/completions$/, '').replace(/\/$/, '');
-            const ep = /\/v\d+$/.test(cleanBase) ? `${cleanBase}/chat/completions` : `${cleanBase}/v1/chat/completions`;
-            const headers = { 'Content-Type': 'application/json' };
-            if (key) headers.Authorization = `Bearer ${key}`;
-            const res = await fetch(ep, {
-                method: 'POST',
-                headers,
-                body: JSON.stringify({ model, messages: [{ role: 'user', content: 'Hi' }], max_tokens: 5 })
-            });
-            if (res.ok) toastr.success('连接成功！');
-            else theaterError(`连接失败 (${res.status})`);
+            const txt = await res.text().catch(() => '');
+            theaterError(`连接失败 (HTTP ${res.status})：${txt.slice(0, 300)}`);
         }
     } catch (e) {
-        theaterError('请求发送失败');
+        theaterError('请求发送失败：' + (e?.message || e) + '\n（若为 CORS 问题，请确认酒馆服务器在线，或直接尝试生成）');
     } finally {
         $btn.removeClass('disabled');
         $btn.find('span').text('测试连接');
