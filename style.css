@@ -1862,12 +1862,67 @@ html body #theater-floating-ball.theater-ball-generating {
     -webkit-backdrop-filter: none !important;
 }
 
-/* Reduced motion */
+/* Reduced motion — 也覆盖悬浮球（它不在 .theater-popup 内） */
 @media (prefers-reduced-motion: reduce) {
     .theater-popup *,
     .theater-popup *::before,
-    .theater-popup *::after {
+    .theater-popup *::after,
+    #theater-floating-ball,
+    #theater-floating-ball::before,
+    #theater-floating-ball::after,
+    #theater-floating-ball .theater-ball-timer {
         transition-duration: 0.01ms !important;
         animation-duration: 0.01ms !important;
     }
+}
+
+/* ============================================================
+   V4.1 精修 · 方向一（不换风格，沿用 Editorial Minimalist）
+   —— 球体首次引导脉冲 / 计时内嵌球体 / 深度质感
+   ============================================================ */
+
+/* —— 内嵌计时标签：生成时显示在火焰中央，随球拖动/吸附自动跟随 —— */
+#theater-floating-ball .theater-ball-timer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--t-font-mono);
+    font-size: 0.5rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--t-accent);
+    text-shadow: 0 0 6px oklch(99% 0 0 / 0.95), 0 0 3px oklch(99% 0 0 / 0.95);
+    white-space: nowrap;
+    pointer-events: none;
+    display: none;
+    z-index: 2;
+}
+#theater-floating-ball.theater-ball-generating .theater-ball-timer { display: block; }
+#theater-floating-ball.theater-ball-generating > svg {
+    opacity: 0.22;
+    transition: opacity var(--t-dur-base) var(--t-ease);
+}
+
+/* —— 首次出现引导脉冲：缩放呼吸 + 扩散环，吸引视线（解决"找不到球"） —— */
+#theater-floating-ball.theater-ball-attention {
+    animation: theater-ball-bounce 1.2s cubic-bezier(.2, .8, .2, 1) 2;
+}
+#theater-floating-ball.theater-ball-attention::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid oklch(55% 0.16 42 / 0.85);
+    pointer-events: none;
+    animation: theater-ball-attention 1.2s cubic-bezier(.2, .8, .2, 1) 2;
+}
+@keyframes theater-ball-bounce {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.15); }
+}
+@keyframes theater-ball-attention {
+    0%   { opacity: 0;   transform: scale(0.8); }
+    30%  { opacity: 0.8; }
+    100% { opacity: 0;   transform: scale(2.2); }
 }

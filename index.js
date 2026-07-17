@@ -165,6 +165,7 @@ const defaultSettings = Object.freeze({
     followUserPersona: false,   // 生成时自动读取当前 user 人设
     floatingBall: false,
     floatingBallTuck: true,
+    ballIntroDone: false,       // 悬浮球首次引导脉冲是否已播放
     soundEnabled: true,
     soundPreset: 'chime',
     soundVolume: 70,
@@ -588,7 +589,9 @@ function createFloatingBall() {
         const ball = document.createElement('div');
         ball.id = 'theater-floating-ball';
         ball.title = '打开拾光锻匣';
-        ball.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true" style="width:40px;height:40px;display:block;"><path d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z" fill="#ffffff"/><path d="M16 12 C17.6 15 20 16.6 20 20 A4 4 0 1 1 12 20 C12 17.4 14 16.4 15 14 C15.5 16 16 16.2 16.5 15 C16.3 13.5 16 12.4 16 12 Z" fill="#f3c89a"/><circle cx="16" cy="21.5" r="2.2" fill="#e8743b"/></svg>';
+        // 纯火焰 SVG + 内嵌计时标签（生成时随球移动，不再用独立浮层）
+        ball.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true" style="width:40px;height:40px;display:block;"><path d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z" fill="#ffffff"/><path d="M16 12 C17.6 15 20 16.6 20 20 A4 4 0 1 1 12 20 C12 17.4 14 16.4 15 14 C15.5 16 16 16.2 16.5 15 C16.3 13.5 16 12.4 16 12 Z" fill="#f3c89a"/><circle cx="16" cy="21.5" r="2.2" fill="#e8743b"/></svg>' +
+            '<span class="theater-ball-timer" aria-hidden="true"></span>';
 
         const initLeft = window.innerWidth - 66;
         const initTop = window.innerHeight - 126;
@@ -763,6 +766,16 @@ function createFloatingBall() {
         document.documentElement.appendChild(ball);
         refreshUpdateBadges();
         snapToEdge();
+
+        // 首次出现：播放注意力引导脉冲，直接解决"找不到球"
+        if (!settings.ballIntroDone) {
+            ball.classList.add('theater-ball-attention');
+            setTimeout(() => {
+                ball.classList.remove('theater-ball-attention');
+                settings.ballIntroDone = true;
+                try { save(); } catch (e) { /* 忽略保存失败 */ }
+            }, 3600);
+        }
     } catch (e) {
         console.warn('[Theater] Floating ball error:', e);
     }
@@ -3329,35 +3342,24 @@ let _genStartTime = null;
 function startGenTimer() {
     _genStartTime = Date.now();
     const ball = document.getElementById('theater-floating-ball');
-    if (ball) ball.classList.add('theater-ball-generating');
-
-    let label = document.getElementById('theater-gen-timer');
-    if (!label) {
-        label = document.createElement('div');
-        label.id = 'theater-gen-timer';
-        label.style.cssText = [
-            'position:fixed',
-            'z-index:2147483646',
-            'pointer-events:none',
-            'white-space:nowrap',
-            'display:flex',
-            'align-items:center',
-        ].join(';');
-        document.body.appendChild(label);
+    if (ball) {
+        ball.classList.add('theater-ball-generating');
+        const label = ball.querySelector('.theater-ball-timer');
+        if (label) {
+            label.style.display = 'block';
+            label.textContent = '0s';
+        }
     }
-    label.style.display = 'flex';
 
     const tick = () => {
         if (!_genStartTime) return;
         const sec = Math.floor((Date.now() - _genStartTime) / 1000);
         const m = Math.floor(sec / 60);
         const s = sec % 60;
-        if (label) label.textContent = m > 0 ? `${m}:${String(s).padStart(2, '0')}` : `${s}s`;
-        if (ball && label) {
-            const r = ball.getBoundingClientRect();
-            label.style.left = (r.left + r.width / 2) + 'px';
-            label.style.top = (r.top - 26) + 'px';
-        }
+        const txt = m > 0 ? `${m}:${String(s).padStart(2, '0')}` : `${s}s`;
+        const b = document.getElementById('theater-floating-ball');
+        const lbl = b && b.querySelector('.theater-ball-timer');
+        if (lbl) lbl.textContent = txt;
     };
     tick();
     _genTimerInterval = setInterval(tick, 300);
@@ -3366,10 +3368,15 @@ function startGenTimer() {
 function stopGenTimer() {
     if (_genTimerInterval) { clearInterval(_genTimerInterval); _genTimerInterval = null; }
     _genStartTime = null;
-    const label = document.getElementById('theater-gen-timer');
-    if (label) label.remove();
     const ball = document.getElementById('theater-floating-ball');
-    if (ball) ball.classList.remove('theater-ball-generating');
+    if (ball) {
+        ball.classList.remove('theater-ball-generating');
+        const label = ball.querySelector('.theater-ball-timer');
+        if (label) { label.style.display = 'none'; label.textContent = ''; }
+    }
+    // 兼容清理：旧版独立计时浮层若仍有残留则移除
+    const legacy = document.getElementById('theater-gen-timer');
+    if (legacy) legacy.remove();
 }
 
 // 提取消息正文：优先取 <content> 标签内的内容，没有就用完整消息
