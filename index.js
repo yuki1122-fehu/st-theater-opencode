@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '4.2.2';
+const VERSION = '4.2.3';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -133,7 +133,6 @@ const defaultSettings = Object.freeze({
     lastInstruction: '',
     history: [],
     interactiveMode: false,
-    defaultRenderRules: '',       // 自定义默认渲染规则；留空则使用内置 DEFAULT_RENDER_TEMPLATE
     interactiveRenderRules: '',   // 自定义交互模式渲染规则；留空则使用内置 INTERACTIVE_PROMPT
     customCSS: '',
     skinMode: 'default',  // 'default' (内置粉彩) | 'theater' (跟随酒馆) | 'custom' (用户CSS接管)
@@ -994,19 +993,11 @@ function buildPopupHTML() {
             </div>
         </div>
 
-        <!-- 内置渲染规则（默认 / 交互）自定义 -->
+        <!-- 交互模式渲染规则（可自定义） -->
         <div class="theater-section">
-            <label class="theater-label"><i class="fa-solid fa-sliders"></i> 内置渲染规则（可自定义）</label>
-            <span class="theater-hint-inline">默认与交互规则二选一发送：开启生成页「交互模式」时发送交互规则，否则发送默认规则；留空使用内置值</span>
+            <label class="theater-label"><i class="fa-solid fa-clapperboard"></i> 交互模式渲染规则（可自定义）</label>
+            <span class="theater-hint-inline">仅在生成页开启「交互模式」时发送，替代上方所选渲染模板；留空使用内置 Visual Director 指令</span>
 
-            <label class="theater-label" style="margin-top:14px;">默认渲染规则</label>
-            <textarea id="theater-default-render" class="theater-textarea" rows="5" placeholder="${esc(DEFAULT_RENDER_TEMPLATE)}">${esc(settings.defaultRenderRules || '')}</textarea>
-            <div class="theater-btn-row">
-                <div id="theater-save-default-render" class="theater-btn primary"><i class="fa-solid fa-floppy-disk"></i><span>保存默认规则</span></div>
-                <div id="theater-reset-default-render" class="theater-btn"><i class="fa-solid fa-rotate-left"></i><span>恢复内置</span></div>
-            </div>
-
-            <label class="theater-label" style="margin-top:14px;">交互模式渲染规则</label>
             <textarea id="theater-interactive-render" class="theater-textarea" rows="9" placeholder="${esc(INTERACTIVE_PROMPT)}">${esc(settings.interactiveRenderRules || '')}</textarea>
             <div class="theater-btn-row">
                 <div id="theater-save-interactive-render" class="theater-btn primary"><i class="fa-solid fa-floppy-disk"></i><span>保存交互规则</span></div>
@@ -1983,16 +1974,7 @@ function bindEvents() {
     $d.off('click.tsr').on('click.tsr', '#theater-save-render-btn', saveRenderTpl);
     $d.off('click.tdr').on('click.tdr', '#theater-delete-render-btn', deleteRenderTpl);
 
-    // 自定义内置渲染规则（默认 / 交互）—— 填入即覆盖内置值
-    $d.off('click.tsdr').on('click.tsdr', '#theater-save-default-render', () => {
-        settings.defaultRenderRules = ($('#theater-default-render').val() || '').trim();
-        save(); toastr.success('已保存默认渲染规则'); schedulePromptInspector();
-    });
-    $d.off('click.trdr').on('click.trdr', '#theater-reset-default-render', () => {
-        settings.defaultRenderRules = ''; save();
-        $('#theater-default-render').val('');
-        toastr.success('已恢复内置默认渲染规则'); schedulePromptInspector();
-    });
+    // 自定义交互模式渲染规则 —— 填入即覆盖内置值
     $d.off('click.tsir').on('click.tsir', '#theater-save-interactive-render', () => {
         settings.interactiveRenderRules = ($('#theater-interactive-render').val() || '').trim();
         save(); toastr.success('已保存交互模式渲染规则'); schedulePromptInspector();
@@ -3481,9 +3463,9 @@ async function assemblePromptSegments(instruction, isAuto) {
     const wbParts = wbEntries.filter((_e, i) => wbStates[i] !== false).map(e => e.content);
     const wbInfo = wbParts.length ? `世界书设定：\n${wbParts.join('\n\n')}\n\n` : '';
 
-    let renderRules = settings.defaultRenderRules?.trim() || DEFAULT_RENDER_TEMPLATE;
+    let renderRules = DEFAULT_RENDER_TEMPLATE;
     const rs = settings.selectedRenderIndex || '__default__';
-    if (rs === '__default_pc__') renderRules = settings.defaultRenderRules?.trim() || DEFAULT_RENDER_TEMPLATE_PC;
+    if (rs === '__default_pc__') renderRules = DEFAULT_RENDER_TEMPLATE_PC;
     else if (rs !== '__default__') { const t = settings.renderTemplates[parseInt(rs)]; if (t) renderRules = t.content; }
     // 交互模式：整体替换为交互渲染规则（对应"提示词则变成…"），自定义优先，否则用内置
     if (settings.interactiveMode) renderRules = settings.interactiveRenderRules?.trim() || INTERACTIVE_PROMPT;
