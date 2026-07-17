@@ -1929,3 +1929,139 @@ html body #theater-floating-ball.theater-ball-generating {
     30%  { opacity: 0.8; }
     100% { opacity: 0;   transform: scale(2.2); }
 }
+
+/* ============================================================
+   提示词检视（v4.2 新增）— 分段卡片 + 来源标签 + 发送顺序
+   ============================================================ */
+.theater-prompt-inspector {
+    display: flex;
+    flex-direction: column;
+    gap: var(--t-space-6);
+}
+.theater-prompt-group-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--t-space-3);
+    padding-bottom: var(--t-space-2);
+    margin-bottom: var(--t-space-3);
+    border-bottom: var(--t-rule-thin);
+}
+.theater-prompt-group-title {
+    font-family: var(--t-font-serif);
+    font-size: var(--t-text-md);
+    font-weight: 600;
+    color: var(--t-ink);
+    letter-spacing: 0.02em;
+}
+.theater-prompt-group-hint {
+    font-size: var(--t-text-xs);
+    color: var(--t-ink-faint);
+}
+.theater-prompt-seg {
+    border: 1px solid var(--t-border);
+    border-radius: var(--t-space-2);
+    background: var(--t-surface-card);
+    margin-bottom: var(--t-space-3);
+    overflow: hidden;
+}
+.theater-prompt-seg-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--t-space-3);
+    padding: var(--t-space-2) var(--t-space-4);
+    background: var(--t-surface-accent);
+    border-bottom: var(--t-rule-thin);
+}
+.theater-prompt-seg-label {
+    font-weight: 600;
+    font-size: var(--t-text-sm);
+    color: var(--t-ink);
+}
+.theater-prompt-seg-meta {
+    font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+    font-size: 0.6875rem;
+    color: var(--t-ink-faint);
+    white-space: nowrap;
+}
+.theater-prompt-seg-body {
+    margin: 0;
+    padding: var(--t-space-4);
+    font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+    font-size: 0.75rem;
+    line-height: 1.6;
+    color: var(--t-ink-soft);
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 340px;
+    overflow: auto;
+}
+
+/* ============================================================
+   提示词检视（v4.2 新增）— 分段卡片 + 来源标签 + 发送顺序
+   ============================================================ */
+.theater-prompt-inspector {
+    display: flex;
+    flex-direction: column;
+    gap: var(--t-space-6);
+}
+.theater-prompt-group-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--t-space-3);
+    padding-bottom: var(--t-space-2);
+    margin-bottom: var(--t-space-3);
+    border-bottom: var(--t-rule-thin);
+}
+.theater-prompt-group-title {
+    font-family: var(--t-font-serif);
+    font-size: var(--t-text-md);
+    font-weight: 600;
+    color: var(--t-ink);
+    letter-spacing: 0.02em;
+}
+.theater-prompt-group-hint {
+    font-size: var(--t-text-xs);
+    color: var(--t-ink-faint);
+}
+.theater-prompt-seg {
+    border: 1px solid var(--t-border);
+    border-radius: var(--t-space-2);
+    background: var(--t-surface-card);
+    margin-bottom: var(--t-space-3);
+    overflow: hidden;
+}
+.theater-prompt-seg-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--t-space-3);
+    padding: var(--t-space-2) var(--t-space-4);
+    background: var(--t-surface-accent);
+    border-bottom: var(--t-rule-thin);
+}
+.theater-prompt-seg-label {
+    font-weight: 600;
+    font-size: var(--t-text-sm);
+    color: var(--t-ink);
+}
+.theater-prompt-seg-meta {
+    font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+    font-size: 0.6875rem;
+    color: var(--t-ink-faint);
+    white-space: nowrap;
+}
+.theater-prompt-seg-body {
+    margin: 0;
+    padding: var(--t-space-4);
+    font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+    font-size: 0.75rem;
+    line-height: 1.6;
+    color: var(--t-ink-soft);
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 340px;
+    overflow: auto;
+}

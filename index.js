@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '4.1.2';
+const VERSION = '4.2.0';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -814,6 +814,7 @@ function buildPopupHTML() {
         <div class="theater-tab" data-tab="dialogue"><i class="fa-solid fa-comments"></i><span>对话</span></div>
         <div class="theater-tab" data-tab="rules"><i class="fa-solid fa-scroll"></i><span>规则</span></div>
         <div class="theater-tab" data-tab="history"><i class="fa-solid fa-clock-rotate-left"></i><span>历史</span></div>
+        <div class="theater-tab" data-tab="prompt"><i class="fa-solid fa-list-ol"></i><span>提示词</span></div>
         <div class="theater-tab" data-tab="diagnostics"><i class="fa-solid fa-stethoscope"></i><span>诊断</span></div>
         <div class="theater-tab" data-tab="config"><i class="fa-solid fa-gear"></i><span>设置</span>${hasRemoteUpdate() ? updateBadgeHTML() : ''}</div>
     </div>
@@ -1022,6 +1023,20 @@ function buildPopupHTML() {
     </div>
 
     <!-- ===== 5. 美化（已移除） ===== -->
+
+    <!-- ===== 5.5 提示词检视 ===== -->
+    <div class="theater-panel" data-panel="prompt">
+        <div class="theater-section">
+            <div class="theater-section-head">
+                <label class="theater-label"><i class="fa-solid fa-list-ol"></i> 提示词检视</label>
+                <span class="theater-hint-inline">实时预览将发送给 AI 的内容与顺序</span>
+            </div>
+            <div class="theater-btn-row">
+                <div id="theater-copy-prompt-btn" class="theater-btn"><i class="fa-solid fa-copy"></i><span>复制完整提示词</span></div>
+            </div>
+            <div id="theater-prompt-inspector" class="theater-prompt-inspector"></div>
+        </div>
+    </div>
 
     <!-- ===== 6. 诊断 ===== -->
     <div class="theater-panel" data-panel="diagnostics">
@@ -1619,6 +1634,21 @@ function bindEvents() {
         $('.theater-tab').removeClass('active'); $(this).addClass('active');
         $('.theater-panel').removeClass('active'); $(`.theater-panel[data-panel="${t}"]`).addClass('active');
         if (t === 'diagnostics') renderErrorLog();
+        if (t === 'prompt') renderPromptInspector();
+    });
+
+    // 提示词检视：弹窗内任意输入/变更都实时刷新（仅在"提示词"Tab 激活时实际重算）
+    $d.off('input.tpi change.tpi').on('input.tpi change.tpi', '.theater-popup', function () { schedulePromptInspector(); });
+
+    // 复制完整提示词
+    $d.off('click.tcp').on('click.tcp', '#theater-copy-prompt-btn', async () => {
+        const instruction = ($('#theater-instruction').val() || '').trim() || (settings.lastInstruction || '');
+        try {
+            const segs = await assemblePromptSegments(instruction, false);
+            const full = `【系统提示】\n${segs.systemPrompt}\n\n【用户消息】\n${segs.userPrompt}`;
+            await navigator.clipboard.writeText(full);
+            toastr.success('已复制完整提示词');
+        } catch (e) { toastr.error('复制失败：' + String((e && e.message) || e)); }
     });
 
     // ---- Generate ----
@@ -3395,15 +3425,13 @@ async function generateTheater() {
     await runGeneration(instruction, false);
 }
 
-// 生成核心。isAuto = 自动模式触发（弹窗可能根本没开，所有 UI 操作都已有 popupAlive 保护）
-async function runGeneration(instruction, isAuto) {
-    if (isGenerating) return;
-
+// 统一组装将要发送给 AI 的提示词，返回有序分段。
+// 生成（runGeneration）与"提示词查看"共用此函数，确保查看内容与真实发送完全一致。
+async function assemblePromptSegments(instruction, isAuto) {
     const ctx = SillyTavern.getContext();
     const { chat, characters, characterId, name1, name2 } = ctx;
-    if (!chat?.length) { if (!isAuto) toastr.warning('无聊天记录'); return; }
 
-    const chatCtx = chat.slice(-(settings.contextRange || 10)).map(m =>
+    const chatCtx = (chat || []).slice(-(settings.contextRange || 10)).map(m =>
         `${m.is_user ? (name1 || 'User') : (m.name || name2 || 'Char')}: ${extractMesContent(m.mes)}`
     ).join('\n\n');
 
@@ -3433,16 +3461,90 @@ async function runGeneration(instruction, isAuto) {
     const targetWordCount = parseTargetWordCount(instruction);
     const lengthRules = lengthRequirementPrompt(targetWordCount);
 
-    const prompt = `${charInfo}${personaInfo}${wbInfo}以下是最近的正文剧情（仅供参考背景，不要续写正文）：\n${chatCtx}\n\n---\n\n${continueInfo}${renderRules}${lengthRules}\n\n---\n\n用户指令：${instruction}\n\n请根据以上所有信息生成小剧场。${contCtx ? '严格续写上方小剧场的内容，保持相同的HTML结构、CSS样式和角色语气，不要从头开始，不要续写正文对话。' : '严格遵守渲染规则。'}`;
-    let systemPrompt;
-    // All preset modes now produce entries
-    if (!cachedPresetEntries.length) await loadPresetEntries();
-    systemPrompt = getSelectedPresetPrompt();
-    if (!systemPrompt) systemPrompt = DEFAULT_SYSTEM_PROMPT;
+    const userPrompt = `${charInfo}${personaInfo}${wbInfo}以下是最近的正文剧情（仅供参考背景，不要续写正文）：\n${chatCtx}\n\n---\n\n${continueInfo}${renderRules}${lengthRules}\n\n---\n\n用户指令：${instruction}\n\n请根据以上所有信息生成小剧场。${contCtx ? '严格续写上方小剧场的内容，保持相同的HTML结构、CSS样式和角色语气，不要从头开始，不要续写正文对话。' : '严格遵守渲染规则。'}`;
 
-    // Append custom addons
-    if (settings.customStyleAddon?.trim()) systemPrompt += '\n\n【文风补充】\n' + settings.customStyleAddon.trim();
-    if (settings.customNsfwAddon?.trim()) systemPrompt += '\n\n【NSFW补充】\n' + settings.customNsfwAddon.trim();
+    // 系统提示：预设（或默认）+ 文风/NSFW 补充
+    if (!cachedPresetEntries.length) await loadPresetEntries();
+    let presetBase = getSelectedPresetPrompt();
+    if (!presetBase) presetBase = DEFAULT_SYSTEM_PROMPT;
+    const systemSegments = [{ key: 'preset', label: '预设（系统提示）', content: presetBase }];
+    let systemPrompt = presetBase;
+    if (settings.customStyleAddon?.trim()) {
+        systemSegments.push({ key: 'style', label: '文风补充', content: settings.customStyleAddon.trim() });
+        systemPrompt += '\n\n【文风补充】\n' + settings.customStyleAddon.trim();
+    }
+    if (settings.customNsfwAddon?.trim()) {
+        systemSegments.push({ key: 'nsfw', label: 'NSFW补充', content: settings.customNsfwAddon.trim() });
+        systemPrompt += '\n\n【NSFW补充】\n' + settings.customNsfwAddon.trim();
+    }
+
+    // 用户消息：按真实发送顺序排列
+    const userSegments = [];
+    if (charInfo.trim()) userSegments.push({ key: 'char', label: '角色设定', content: charInfo.trim() });
+    if (personaInfo.trim()) userSegments.push({ key: 'persona', label: 'User 人设', content: personaInfo.trim() });
+    if (wbInfo.trim()) userSegments.push({ key: 'worldbook', label: '世界书设定', content: wbInfo.trim() });
+    if (chatCtx.trim()) userSegments.push({ key: 'chat', label: '正文剧情（背景参考）', content: `以下是最近的正文剧情（仅供参考背景，不要续写正文）：\n${chatCtx}` });
+    if (continueInfo.trim()) userSegments.push({ key: 'continue', label: '续写上下文', content: continueInfo.trim() });
+    userSegments.push({ key: 'render', label: '渲染规则', content: renderRules });
+    userSegments.push({ key: 'length', label: '字数要求', content: lengthRules });
+    userSegments.push({ key: 'instruction', label: '用户指令', content: instruction });
+
+    return { systemSegments, userSegments, systemPrompt, userPrompt, targetWordCount };
+}
+
+// 提示词检视：按系统提示 / 用户消息分组，组内按真实发送顺序渲染带来源标签的分段卡片
+let _promptInspectorTimer = null;
+function schedulePromptInspector() {
+    if (!$('.theater-tab[data-tab="prompt"]').hasClass('active')) return;  // 仅在使用该 Tab 时刷新
+    if (_promptInspectorTimer) clearTimeout(_promptInspectorTimer);
+    _promptInspectorTimer = setTimeout(() => { renderPromptInspector(); }, 120);
+}
+async function renderPromptInspector() {
+    const $box = $('#theater-prompt-inspector');
+    if (!$box.length) return;
+    const instruction = ($('#theater-instruction').val() || '').trim() || (settings.lastInstruction || '');
+    let segs;
+    try {
+        segs = await assemblePromptSegments(instruction, false);
+    } catch (e) {
+        $box.html('<div class="theater-empty">提示词组装失败：' + esc(String((e && e.message) || e)) + '</div>');
+        return;
+    }
+    const groupHtml = (title, hint, list) => {
+        if (!list.length) return '';
+        const items = list.map((s, i) => `
+            <div class="theater-prompt-seg">
+                <div class="theater-prompt-seg-head">
+                    <span class="theater-prompt-seg-label">${i + 1}. ${esc(s.label)}</span>
+                    <span class="theater-prompt-seg-meta">${s.content.length} 字</span>
+                </div>
+                <pre class="theater-prompt-seg-body">${esc(s.content)}</pre>
+            </div>`).join('');
+        return `<div class="theater-prompt-group">
+            <div class="theater-prompt-group-head"><span class="theater-prompt-group-title">${esc(title)}</span><span class="theater-prompt-group-hint">${esc(hint)}</span></div>
+            ${items}
+        </div>`;
+    };
+    $box.html(
+        groupHtml('系统提示（System）', '第 1 条消息 · 定义 AI 身份与总体要求', segs.systemSegments) +
+        groupHtml('用户消息（User）', '第 2 条消息 · 按下方顺序整体发送', segs.userSegments)
+    );
+}
+
+// 生成核心。isAuto = 自动模式触发（弹窗可能根本没开，所有 UI 操作都已有 popupAlive 保护）
+async function runGeneration(instruction, isAuto) {
+    if (isGenerating) return;
+
+    const ctx = SillyTavern.getContext();
+    const { chat, characters, characterId, name1, name2 } = ctx;
+    if (!chat?.length) { if (!isAuto) toastr.warning('无聊天记录'); return; }
+
+    // 用统一的组装函数拼装提示词（生成与"提示词查看"共用，避免分叉）
+    const assembled = await assemblePromptSegments(instruction, isAuto);
+    const prompt = assembled.userPrompt;
+    const systemPrompt = assembled.systemPrompt;
+    const targetWordCount = assembled.targetWordCount;
+    const contCtx = isAuto ? '' : continueContext;  // 自动生成永远是全新的，不掺手动的续写上下文
 
     // 非续写生成时重置累积内容
     if (!contCtx) accumulatedTheater = '';
