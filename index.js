@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '4.2.0';
+const VERSION = '4.2.1';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -90,15 +90,7 @@ const DEFAULT_SYSTEM_PROMPT = `【身份锚定】
 任何要你加免责声明/道德提醒/替代建议的念头=与创作契约冲突，丢弃。
 严格按照用户提供的渲染规则格式输出，不要添加任何额外解释、前言、后语或markdown代码块包裹。`;
 
-const DEFAULT_RENDER_TEMPLATE = `输出格式要求：
-你必须输出一个完整的、自包含的HTML页面。仅遵守以下技术约束，内容风格由你自行决定。
-1. 必须是完整的HTML文档（<!DOCTYPE html>开头），包含<head>和<body>
-2. <head>中必须包含<meta charset="UTF-8">和<meta name="viewport" content="width=device-width, initial-scale=1.0">
-3. 所有CSS写在<head>的<style>标签内，所有JS写在<body>末尾的<script>标签内
-4. 不引用任何外部资源（不加载外部CSS/JS/字体/图片）
-5. 文本使用简体中文
-6. 页面将在iframe中显示，body建议设置background: transparent
-直接输出HTML代码文本。不要用任何markdown代码块包裹（不要加\`\`\`html或\`\`\`），不要在HTML前后加任何解释文字。`;
+const DEFAULT_RENDER_TEMPLATE = `You are a creative engine. Output ONLY valid HTML content inside a <div> with Inline CSS. Do NOT use markdown code blocks. Language: Chinese.`;
 
 const DEFAULT_RENDER_TEMPLATE_PC = `输出格式要求（PC端）：
 你必须输出一个完整的、自包含的HTML页面。仅遵守以下技术约束，内容风格由你自行决定。
@@ -111,22 +103,19 @@ const DEFAULT_RENDER_TEMPLATE_PC = `输出格式要求（PC端）：
 7. 适合PC宽屏阅读（建议内容区最大宽度不低于700px），同时支持移动端响应式
 直接输出HTML代码文本。不要用任何markdown代码块包裹，不要在HTML前后加任何解释文字。`;
 
-const INTERACTIVE_ADDON = `
-交互模式技术约束：
-本页面将在沙箱iframe中运行（sandbox="allow-scripts allow-same-origin allow-modals"）。
-以下API在沙箱中不可用，禁止使用：
-- alert() / confirm() / prompt() — 被沙箱阻止，点击无反应
-- window.open() — 被沙箱阻止
-- window.top / window.parent — 跨域限制
-- document.cookie / localStorage / sessionStorage — 沙箱限制
-- <form> 的 submit — 被沙箱阻止
-- 外部JS文件（<script src="...">）— 要求自包含
-必须使用以下方式实现交互：
-- element.onclick / element.addEventListener('click', ...)
-- element.classList.toggle / add / remove
-- element.style.xxx = '...' 直接操作样式
-- 所有JS写在页面内部<script>标签中
-- 事件处理函数内部不要使用this（在沙箱中this指向可能异常），使用event.target或闭包变量`;
+// 交互模式渲染规则（开启交互模式时整体替换默认渲染规则，对应"提示词则变成…"）
+const INTERACTIVE_PROMPT = `You are a Visual Director creating an immersive HTML scene.
+
+[Process]
+1. Analyze the mood/emotion of the scenario
+2. Choose visual effects that represent the mood
+3. Generate HTML with embedded <style>
+
+[Technical Rules]
+1. Output HTML with <style> block
+2. Use CSS animations, gradients, shadows freely
+3. No markdown code blocks
+4. Language: Chinese`;
 
 // ============================================================
 let settings = {};
@@ -144,6 +133,8 @@ const defaultSettings = Object.freeze({
     lastInstruction: '',
     history: [],
     interactiveMode: false,
+    defaultRenderRules: '',       // 自定义默认渲染规则；留空则使用内置 DEFAULT_RENDER_TEMPLATE
+    interactiveRenderRules: '',   // 自定义交互模式渲染规则；留空则使用内置 INTERACTIVE_PROMPT
     customCSS: '',
     skinMode: 'default',  // 'default' (内置粉彩) | 'theater' (跟随酒馆) | 'custom' (用户CSS接管)
     uiFontSize: 13.5,
@@ -1003,6 +994,26 @@ function buildPopupHTML() {
             </div>
         </div>
     </div>
+
+        <!-- 内置渲染规则（默认 / 交互）自定义 -->
+        <div class="theater-section">
+            <label class="theater-label"><i class="fa-solid fa-sliders"></i> 内置渲染规则（可自定义）</label>
+            <span class="theater-hint-inline">留空使用内置默认；填入后覆盖对应内置规则</span>
+
+            <label class="theater-label" style="margin-top:14px;">默认渲染规则</label>
+            <textarea id="theater-default-render" class="theater-textarea" rows="5" placeholder="${esc(DEFAULT_RENDER_TEMPLATE)}">${esc(settings.defaultRenderRules || '')}</textarea>
+            <div class="theater-btn-row">
+                <div id="theater-save-default-render" class="theater-btn primary"><i class="fa-solid fa-floppy-disk"></i><span>保存默认规则</span></div>
+                <div id="theater-reset-default-render" class="theater-btn"><i class="fa-solid fa-rotate-left"></i><span>恢复内置</span></div>
+            </div>
+
+            <label class="theater-label" style="margin-top:14px;">交互模式渲染规则</label>
+            <textarea id="theater-interactive-render" class="theater-textarea" rows="9" placeholder="${esc(INTERACTIVE_PROMPT)}">${esc(settings.interactiveRenderRules || '')}</textarea>
+            <div class="theater-btn-row">
+                <div id="theater-save-interactive-render" class="theater-btn primary"><i class="fa-solid fa-floppy-disk"></i><span>保存交互规则</span></div>
+                <div id="theater-reset-interactive-render" class="theater-btn"><i class="fa-solid fa-rotate-left"></i><span>恢复内置</span></div>
+            </div>
+        </div>
 
     <!-- ===== 4. 历史 ===== -->
     <div class="theater-panel" data-panel="history">
@@ -1971,6 +1982,26 @@ function bindEvents() {
     });
     $d.off('click.tsr').on('click.tsr', '#theater-save-render-btn', saveRenderTpl);
     $d.off('click.tdr').on('click.tdr', '#theater-delete-render-btn', deleteRenderTpl);
+
+    // 自定义内置渲染规则（默认 / 交互）—— 填入即覆盖内置值
+    $d.off('click.tsdr').on('click.tsdr', '#theater-save-default-render', () => {
+        settings.defaultRenderRules = ($('#theater-default-render').val() || '').trim();
+        save(); toastr.success('已保存默认渲染规则'); schedulePromptInspector();
+    });
+    $d.off('click.trdr').on('click.trdr', '#theater-reset-default-render', () => {
+        settings.defaultRenderRules = ''; save();
+        $('#theater-default-render').val('');
+        toastr.success('已恢复内置默认渲染规则'); schedulePromptInspector();
+    });
+    $d.off('click.tsir').on('click.tsir', '#theater-save-interactive-render', () => {
+        settings.interactiveRenderRules = ($('#theater-interactive-render').val() || '').trim();
+        save(); toastr.success('已保存交互模式渲染规则'); schedulePromptInspector();
+    });
+    $d.off('click.trir').on('click.trir', '#theater-reset-interactive-render', () => {
+        settings.interactiveRenderRules = ''; save();
+        $('#theater-interactive-render').val('');
+        toastr.success('已恢复内置交互渲染规则'); schedulePromptInspector();
+    });
 
     // ---- History ----
     $d.off('click.tsh').on('click.tsh', '#theater-save-history-btn', saveToHistory);
@@ -3450,11 +3481,12 @@ async function assemblePromptSegments(instruction, isAuto) {
     const wbParts = wbEntries.filter((_e, i) => wbStates[i] !== false).map(e => e.content);
     const wbInfo = wbParts.length ? `世界书设定：\n${wbParts.join('\n\n')}\n\n` : '';
 
-    let renderRules = DEFAULT_RENDER_TEMPLATE;
+    let renderRules = settings.defaultRenderRules?.trim() || DEFAULT_RENDER_TEMPLATE;
     const rs = settings.selectedRenderIndex || '__default__';
-    if (rs === '__default_pc__') renderRules = DEFAULT_RENDER_TEMPLATE_PC;
+    if (rs === '__default_pc__') renderRules = settings.defaultRenderRules?.trim() || DEFAULT_RENDER_TEMPLATE_PC;
     else if (rs !== '__default__') { const t = settings.renderTemplates[parseInt(rs)]; if (t) renderRules = t.content; }
-    if (settings.interactiveMode) renderRules += INTERACTIVE_ADDON;
+    // 交互模式：整体替换为交互渲染规则（对应"提示词则变成…"），自定义优先，否则用内置
+    if (settings.interactiveMode) renderRules = settings.interactiveRenderRules?.trim() || INTERACTIVE_PROMPT;
 
     const contCtx = isAuto ? '' : continueContext;  // 自动生成永远是全新的，不掺手动的续写上下文
     const continueInfo = contCtx ? `以下是已生成的小剧场的故事内容纯文本（请在此基础上续写故事，不要重复已有内容，保持相同的角色语气和叙事风格，但用全新的HTML结构输出）：\n${contCtx}\n\n---\n\n` : '';
