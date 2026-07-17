@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '4.2.1';
+const VERSION = '4.2.2';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -993,12 +993,11 @@ function buildPopupHTML() {
                 <div id="theater-delete-render-btn" class="theater-btn danger" style="${selRender !== '__default__' && selRender !== '__default_pc__' ? '' : 'display:none;'}"><i class="fa-solid fa-trash"></i><span>删除当前</span></div>
             </div>
         </div>
-    </div>
 
         <!-- 内置渲染规则（默认 / 交互）自定义 -->
         <div class="theater-section">
             <label class="theater-label"><i class="fa-solid fa-sliders"></i> 内置渲染规则（可自定义）</label>
-            <span class="theater-hint-inline">留空使用内置默认；填入后覆盖对应内置规则</span>
+            <span class="theater-hint-inline">默认与交互规则二选一发送：开启生成页「交互模式」时发送交互规则，否则发送默认规则；留空使用内置值</span>
 
             <label class="theater-label" style="margin-top:14px;">默认渲染规则</label>
             <textarea id="theater-default-render" class="theater-textarea" rows="5" placeholder="${esc(DEFAULT_RENDER_TEMPLATE)}">${esc(settings.defaultRenderRules || '')}</textarea>
@@ -1014,6 +1013,7 @@ function buildPopupHTML() {
                 <div id="theater-reset-interactive-render" class="theater-btn"><i class="fa-solid fa-rotate-left"></i><span>恢复内置</span></div>
             </div>
         </div>
+    </div>
 
     <!-- ===== 4. 历史 ===== -->
     <div class="theater-panel" data-panel="history">
