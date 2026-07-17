@@ -1881,27 +1881,30 @@ html body #theater-floating-ball.theater-ball-generating {
    —— 球体首次引导脉冲 / 计时内嵌球体 / 深度质感
    ============================================================ */
 
-/* —— 内嵌计时标签：生成时显示在火焰中央，随球拖动/吸附自动跟随 —— */
+/* —— 内嵌计时标签：落在火焰下方的"时间药丸"，随球拖动/吸附自动跟随，不遮挡火焰 —— */
 #theater-floating-ball .theater-ball-timer {
     position: absolute;
-    top: 50%;
+    bottom: -15px;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
     font-family: var(--t-font-mono);
     font-size: 0.5rem;
     font-weight: 600;
     line-height: 1;
     color: var(--t-accent);
-    text-shadow: 0 0 6px oklch(99% 0 0 / 0.95), 0 0 3px oklch(99% 0 0 / 0.95);
+    background: oklch(99% 0 0 / 0.92);
+    padding: 2px 6px;
+    border-radius: 999px;
+    box-shadow: 0 1px 5px oklch(0% 0 0 / 0.20);
     white-space: nowrap;
     pointer-events: none;
     display: none;
     z-index: 2;
 }
 #theater-floating-ball.theater-ball-generating .theater-ball-timer { display: block; }
+/* 生成时火焰保持满存在感，仅加暖光"呼吸感"，不再淡出 */
 #theater-floating-ball.theater-ball-generating > svg {
-    opacity: 0.22;
-    transition: opacity var(--t-dur-base) var(--t-ease);
+    filter: drop-shadow(0 0 7px oklch(55% 0.16 42 / 0.65));
 }
 
 /* —— 首次出现引导脉冲：缩放呼吸 + 扩散环，吸引视线（解决"找不到球"） —— */
