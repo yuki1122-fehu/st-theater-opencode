@@ -256,7 +256,7 @@
 
 .theater-popup-header .theater-brand {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: var(--t-space-4);
 }
 
@@ -265,8 +265,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 54px;
-    height: 54px;
+    width: 58px;
+    height: 58px;
     flex-shrink: 0;
     background: var(--t-brass-grad);
     border-radius: var(--t-radius-lg);
@@ -274,6 +274,7 @@
         var(--t-metal-bevel),
         0 6px 16px oklch(58% 0.14 55 / 0.28);
     position: relative;
+    margin-top: 2px;
 }
 /* brushed texture on the ingot */
 .theater-popup-header .theater-logo::after {
@@ -290,8 +291,8 @@
 }
 
 .theater-popup-header .theater-logo svg {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     filter: drop-shadow(0 1px 1px oklch(25% 0.03 45 / 0.35));
 }
 
@@ -303,18 +304,21 @@
 .theater-popup-header .theater-brand-text {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: var(--t-space-1);
+    align-items: flex-start;
+    text-align: left;
 }
 
-/* Main title — engraved */
+/* Main title — engraved, prominent, left-aligned */
 .theater-popup-header .theater-title {
     font-family: var(--t-font-serif);
-    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    font-size: clamp(2.2rem, 5.5vw, 2.8rem);
     font-weight: 700;
-    line-height: 1.1;
+    line-height: 1.05;
     letter-spacing: 0.01em;
     color: var(--t-ink);
     margin: 0;
+    text-align: left;
     text-shadow: 0 1px 0 oklch(99% 0.005 90 / 0.7);
 }
 
@@ -329,8 +333,9 @@
     font-size: var(--t-text-sm);
     font-weight: 400;
     color: var(--t-ink-muted);
-    letter-spacing: 0.02em;
+    letter-spacing: 0.03em;
     margin: 0;
+    text-align: left;
 }
 
 .theater-popup[data-skin="theater"] .theater-popup-header .theater-subtitle,
@@ -1891,9 +1896,9 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     .theater-popup { min-height: 0; }
     .theater-popup-header { padding: var(--t-space-4) var(--t-space-4) var(--t-space-3); }
     .theater-popup-header .theater-brand { gap: var(--t-space-3); }
-    .theater-popup-header .theater-logo { width: 40px; height: 40px; border-radius: var(--t-radius-md); }
-    .theater-popup-header .theater-logo svg { width: 22px; height: 22px; }
-    .theater-popup-header .theater-title { font-size: var(--t-text-lg); }
+    .theater-popup-header .theater-logo { width: 44px; height: 44px; border-radius: var(--t-radius-md); }
+    .theater-popup-header .theater-logo svg { width: 24px; height: 24px; }
+    .theater-popup-header .theater-title { font-size: var(--t-text-xl); }
     .theater-popup-header .theater-subtitle { font-size: var(--t-text-xs); }
     /* hide rivets on small screens — they crowd the narrow header */
     .theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-popup-header::before,
@@ -1927,8 +1932,8 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
 
 @media (max-width: 480px) {
     .theater-popup-header { padding: var(--t-space-3) var(--t-space-4); }
-    .theater-popup-header .theater-logo { width: 36px; height: 36px; }
-    .theater-popup-header .theater-title { font-size: var(--t-text-md); }
+    .theater-popup-header .theater-logo { width: 38px; height: 38px; }
+    .theater-popup-header .theater-title { font-size: var(--t-text-lg); }
     .theater-popup-header .theater-subtitle { display: block; font-size: 10px; }
     .theater-tab { padding: var(--t-space-2) var(--t-space-2); }
     .theater-panel { padding: var(--t-space-3); }

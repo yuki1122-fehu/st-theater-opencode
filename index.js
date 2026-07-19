@@ -829,7 +829,7 @@ function buildPopupHTML() {
             <div id="theater-clear-instruction-btn" class="theater-btn">清空</div>
             <span class="theater-gen-meta" id="theater-gen-meta">${settings.lastGenModel ? esc(settings.lastGenModel) + ' · ' + esc(settings.lastGenDuration) : ''}</span>
         </div>
-        <div class="theater-section" id="theater-output-section" style="display:none; margin-top:var(--t-space-10);">
+        <div class="theater-section" id="theater-output-section" style="display:none; margin-top:var(--t-space-4);">
             <div class="theater-output-toolbar" id="theater-output-toolbar">
                 <label class="theater-label" style="margin-bottom:0;">生成<br>结果</label>
                 <div class="theater-output-tools">
