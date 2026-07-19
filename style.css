@@ -138,14 +138,19 @@
     padding: 0;
     box-sizing: border-box;
     color: var(--t-ink);
+    /* frosted glass body */
     background:
-        radial-gradient(ellipse 90% 55% at 100% 0%, oklch(58% 0.14 55 / 0.06), transparent 60%),
-        radial-gradient(ellipse 70% 45% at 0% 100%, oklch(70% 0.08 250 / 0.04), transparent 60%),
-        var(--t-surface);
+        radial-gradient(ellipse 90% 55% at 100% 0%, oklch(58% 0.14 55 / 0.08), transparent 60%),
+        linear-gradient(160deg, oklch(96% 0.014 88 / 0.78), oklch(93.5% 0.016 86 / 0.68));
+    -webkit-backdrop-filter: blur(18px) saturate(1.15);
+    backdrop-filter: blur(18px) saturate(1.15);
+    border: 1px solid oklch(99% 0.005 90 / 0.55);
     font-family: var(--t-font-sans);
     font-size: var(--t-text-base);
     border-radius: var(--t-radius-xl);
-    box-shadow: var(--t-shadow-popup);
+    box-shadow:
+        var(--t-shadow-popup),
+        inset 0 1px 0 oklch(99% 0.005 90 / 0.7);
 }
 
 .theater-popup *,
@@ -271,8 +276,10 @@
     background: var(--t-brass-grad);
     border-radius: var(--t-radius-lg);
     box-shadow:
-        var(--t-metal-bevel),
-        0 6px 16px oklch(58% 0.14 55 / 0.28);
+        inset 0 2px 1px oklch(99% 0.005 90 / 0.55),
+        inset 0 -2px 3px oklch(28% 0.04 45 / 0.35),
+        0 4px 10px oklch(45% 0.1 50 / 0.35),
+        0 8px 20px oklch(58% 0.14 55 / 0.3);
     position: relative;
     margin-top: 2px;
 }
@@ -394,18 +401,19 @@
 
 .theater-tab:hover {
     color: var(--t-ink);
-    background: var(--t-surface-hover);
-    border-color: var(--t-border);
+    background: oklch(99% 0.005 90 / 0.35);
+    border-color: oklch(99% 0.005 90 / 0.5);
 }
 
-/* Active tab — pressed brass plate */
+/* Active tab — pressed brass plate (frosted) */
 .theater-tab.active {
     color: var(--t-accent-deep);
-    background: linear-gradient(180deg, oklch(58% 0.14 55 / 0.14), oklch(58% 0.14 55 / 0.07));
-    border-color: oklch(58% 0.14 55 / 0.3);
+    background: linear-gradient(180deg, oklch(58% 0.14 55 / 0.2), oklch(58% 0.14 55 / 0.1));
+    border-color: oklch(58% 0.14 55 / 0.35);
     box-shadow:
-        inset 0 1px 3px oklch(45% 0.1 50 / 0.15),
-        inset 0 -1px 0 oklch(99% 0.005 90 / 0.5);
+        inset 0 1px 0 oklch(99% 0.005 90 / 0.5),
+        inset 0 2px 4px oklch(45% 0.1 50 / 0.12),
+        0 2px 6px oklch(58% 0.14 55 / 0.15);
     font-weight: 600;
 }
 
@@ -460,15 +468,20 @@
 }
 
 /* ============================================================
- * SECTIONS — parchment cards
+ * SECTIONS — frosted glass cards
  * ============================================================ */
 .theater-section {
     margin-bottom: var(--t-space-5);
     padding: var(--t-space-6);
-    background: var(--t-surface-card);
-    border: var(--t-rule-thin);
+    background: linear-gradient(160deg, oklch(99.5% 0.004 90 / 0.6), oklch(97% 0.008 88 / 0.42));
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid oklch(99% 0.005 90 / 0.6);
     border-radius: var(--t-radius-lg);
-    box-shadow: var(--t-shadow-card);
+    box-shadow:
+        0 4px 16px oklch(35% 0.03 55 / 0.08),
+        inset 0 1px 0 oklch(99% 0.005 90 / 0.8),
+        inset 0 -1px 0 oklch(80% 0.02 80 / 0.2);
     position: relative;
 }
 
@@ -476,8 +489,11 @@
     margin-bottom: 0;
 }
 
-.theater-popup[data-skin="theater"] .theater-section {
+.theater-popup[data-skin="theater"] .theater-section,
+.theater-popup[data-skin="custom"] .theater-section {
     background: var(--t-surface-1);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
     border: var(--t-rule-thin);
     border-radius: var(--t-radius-md);
     padding: var(--t-space-4);
@@ -533,12 +549,14 @@
     font-size: var(--t-text-base);
     line-height: 1.7;
     color: var(--t-ink);
-    background: var(--t-surface);
-    border: var(--t-rule-thin);
+    background: oklch(96% 0.012 86 / 0.5);
+    border: 1px solid oklch(82% 0.015 80 / 0.7);
     border-radius: var(--t-radius-md);
     resize: vertical;
     outline: none;
-    box-shadow: inset 0 1px 3px oklch(35% 0.03 55 / 0.06);
+    box-shadow:
+        inset 0 2px 5px oklch(35% 0.03 55 / 0.1),
+        inset 0 -1px 0 oklch(99% 0.005 90 / 0.6);
     transition: border-color var(--t-dur-fast) var(--t-ease), box-shadow var(--t-dur-fast) var(--t-ease), background var(--t-dur-fast) var(--t-ease);
 }
 
@@ -548,9 +566,9 @@
 
 .theater-textarea:focus {
     border-color: var(--t-accent);
-    background: var(--t-surface-card);
+    background: oklch(99% 0.005 90 / 0.65);
     box-shadow:
-        inset 0 1px 2px oklch(35% 0.03 55 / 0.04),
+        inset 0 1px 3px oklch(35% 0.03 55 / 0.06),
         0 0 0 3px var(--t-accent-soft);
 }
 
@@ -560,11 +578,13 @@
     font-family: var(--t-font-sans);
     font-size: var(--t-text-base);
     color: var(--t-ink);
-    background: var(--t-surface);
-    border: var(--t-rule-thin);
+    background: oklch(96% 0.012 86 / 0.5);
+    border: 1px solid oklch(82% 0.015 80 / 0.7);
     border-radius: var(--t-radius-md);
     outline: none;
-    box-shadow: inset 0 1px 3px oklch(35% 0.03 55 / 0.06);
+    box-shadow:
+        inset 0 2px 5px oklch(35% 0.03 55 / 0.1),
+        inset 0 -1px 0 oklch(99% 0.005 90 / 0.6);
     transition: border-color var(--t-dur-fast) var(--t-ease), box-shadow var(--t-dur-fast) var(--t-ease), background var(--t-dur-fast) var(--t-ease);
 }
 
@@ -574,9 +594,9 @@
 
 .theater-input:focus {
     border-color: var(--t-accent);
-    background: var(--t-surface-card);
+    background: oklch(99% 0.005 90 / 0.65);
     box-shadow:
-        inset 0 1px 2px oklch(35% 0.03 55 / 0.04),
+        inset 0 1px 3px oklch(35% 0.03 55 / 0.06),
         0 0 0 3px var(--t-accent-soft);
 }
 
@@ -587,24 +607,26 @@
     font-family: var(--t-font-sans);
     font-size: var(--t-text-base);
     color: var(--t-ink);
-    background: var(--t-surface);
+    background: oklch(96% 0.012 86 / 0.5);
     background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23999999' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 14px center;
-    border: var(--t-rule-thin);
+    border: 1px solid oklch(82% 0.015 80 / 0.7);
     border-radius: var(--t-radius-md);
     outline: none;
     -webkit-appearance: none;
     appearance: none;
     cursor: pointer;
-    box-shadow: inset 0 1px 3px oklch(35% 0.03 55 / 0.06);
+    box-shadow:
+        inset 0 2px 5px oklch(35% 0.03 55 / 0.1),
+        inset 0 -1px 0 oklch(99% 0.005 90 / 0.6);
     transition: border-color var(--t-dur-fast) var(--t-ease), box-shadow var(--t-dur-fast) var(--t-ease);
 }
 
 .theater-select:focus {
     border-color: var(--t-accent);
     box-shadow:
-        inset 0 1px 2px oklch(35% 0.03 55 / 0.04),
+        inset 0 1px 3px oklch(35% 0.03 55 / 0.06),
         0 0 0 3px var(--t-accent-soft);
 }
 
@@ -623,7 +645,7 @@
     flex-wrap: wrap;
 }
 
-/* Default button — embossed parchment plate */
+/* Default button — frosted glass plate */
 .theater-btn {
     display: inline-flex;
     align-items: center;
@@ -635,16 +657,19 @@
     font-weight: 500;
     letter-spacing: 0.01em;
     color: var(--t-ink-soft);
-    background: linear-gradient(180deg, var(--t-surface-card), var(--t-surface));
-    border: var(--t-rule-thin);
+    background: linear-gradient(180deg, oklch(99.5% 0.004 90 / 0.65), oklch(95% 0.012 86 / 0.45));
+    border: 1px solid oklch(99% 0.005 90 / 0.65);
     border-radius: var(--t-radius-pill);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
     cursor: pointer;
     transition: all var(--t-dur-fast) var(--t-ease);
     white-space: nowrap;
     user-select: none;
     box-shadow:
-        inset 0 1px 0 oklch(99% 0.005 90 / 0.7),
-        0 1px 2px oklch(35% 0.03 55 / 0.08);
+        0 2px 6px oklch(35% 0.03 55 / 0.1),
+        inset 0 1px 0 oklch(99% 0.005 90 / 0.9),
+        inset 0 -1px 0 oklch(78% 0.018 78 / 0.25);
 }
 
 .theater-btn i {
@@ -653,18 +678,19 @@
 
 .theater-btn:hover {
     color: var(--t-ink);
-    border-color: var(--t-border-strong);
-    background: linear-gradient(180deg, var(--t-surface-card), var(--t-surface-hover));
+    border-color: oklch(99% 0.005 90 / 0.8);
+    background: linear-gradient(180deg, oklch(99.8% 0.002 90 / 0.8), oklch(96% 0.01 88 / 0.55));
     transform: translateY(-1px);
     box-shadow:
-        inset 0 1px 0 oklch(99% 0.005 90 / 0.7),
-        0 3px 8px oklch(35% 0.03 55 / 0.12);
+        0 4px 12px oklch(35% 0.03 55 / 0.14),
+        inset 0 1px 0 oklch(99% 0.005 90 / 1),
+        inset 0 -1px 0 oklch(78% 0.018 78 / 0.2);
 }
 
 .theater-btn:active {
     transform: translateY(0) scale(0.98);
     box-shadow:
-        inset 0 2px 4px oklch(35% 0.03 55 / 0.12);
+        inset 0 2px 5px oklch(35% 0.03 55 / 0.15);
 }
 
 .theater-btn:focus-visible {
@@ -672,27 +698,33 @@
     outline-offset: 2px;
 }
 
-/* Primary — flat brass, low-key */
+/* Primary — embossed brass, restrained */
 .theater-btn.primary {
     color: var(--t-on-accent);
-    background: var(--t-accent);
-    border-color: transparent;
-    text-shadow: none;
-    box-shadow: none;
+    background: linear-gradient(180deg, oklch(66% 0.14 60), oklch(55% 0.145 50));
+    border: 1px solid oklch(45% 0.12 46);
+    text-shadow: 0 1px 1px oklch(30% 0.06 45 / 0.35);
+    box-shadow:
+        inset 0 1px 0 oklch(99% 0.005 90 / 0.4),
+        inset 0 -1px 1px oklch(30% 0.06 45 / 0.3),
+        0 2px 6px oklch(50% 0.12 50 / 0.3);
 }
 
 .theater-btn.primary:hover {
-    background: var(--t-accent-hover);
-    border-color: transparent;
+    background: linear-gradient(180deg, oklch(69% 0.14 62), oklch(58% 0.145 52));
+    border-color: oklch(45% 0.12 46);
     color: var(--t-on-accent);
     transform: none;
-    box-shadow: var(--t-elev-1);
+    box-shadow:
+        inset 0 1px 0 oklch(99% 0.005 90 / 0.45),
+        inset 0 -1px 1px oklch(30% 0.06 45 / 0.28),
+        0 4px 12px oklch(50% 0.12 50 / 0.35);
 }
 
 .theater-btn.primary:active {
-    background: var(--t-accent-deep);
     transform: scale(0.98);
-    box-shadow: none;
+    box-shadow:
+        inset 0 2px 4px oklch(28% 0.05 45 / 0.35);
 }
 
 .theater-btn.danger {
@@ -709,29 +741,36 @@
     pointer-events: none;
 }
 
-/* CTA — generate button: same flat brass, slightly wider */
+/* CTA — generate button: same embossed brass, slightly wider */
 .theater-btn.generate {
     padding: var(--t-space-2) var(--t-space-6);
     min-height: 38px;
     font-size: var(--t-text-sm);
     font-weight: 600;
     color: var(--t-on-accent);
-    background: var(--t-accent);
-    border-color: transparent;
-    text-shadow: none;
+    background: linear-gradient(180deg, oklch(66% 0.14 60), oklch(55% 0.145 50));
+    border: 1px solid oklch(45% 0.12 46);
+    text-shadow: 0 1px 1px oklch(30% 0.06 45 / 0.35);
     width: auto;
-    box-shadow: none;
+    box-shadow:
+        inset 0 1px 0 oklch(99% 0.005 90 / 0.4),
+        inset 0 -1px 1px oklch(30% 0.06 45 / 0.3),
+        0 2px 6px oklch(50% 0.12 50 / 0.3);
 }
 
 .theater-btn.generate:hover {
-    background: var(--t-accent-hover);
+    background: linear-gradient(180deg, oklch(69% 0.14 62), oklch(58% 0.145 52));
     transform: none;
-    box-shadow: var(--t-elev-1);
+    box-shadow:
+        inset 0 1px 0 oklch(99% 0.005 90 / 0.45),
+        inset 0 -1px 1px oklch(30% 0.06 45 / 0.28),
+        0 4px 12px oklch(50% 0.12 50 / 0.35);
 }
 
 .theater-btn.generate:active {
-    background: var(--t-accent-deep);
     transform: scale(0.98);
+    box-shadow:
+        inset 0 2px 4px oklch(28% 0.05 45 / 0.35);
 }
 
 .theater-btn.generate i {
@@ -805,21 +844,23 @@
     letter-spacing: 0.01em;
 }
 
-/* Switch — recessed track + brass knob */
+/* Switch — frosted recessed track + polished knob */
 .theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-toggle-label input[type="checkbox"] {
     -webkit-appearance: none;
     appearance: none;
     width: 40px !important;
     height: 22px !important;
-    background: linear-gradient(180deg, oklch(78% 0.018 75), oklch(84% 0.015 78));
+    background: linear-gradient(180deg, oklch(80% 0.015 78 / 0.6), oklch(86% 0.012 80 / 0.5));
     border-radius: 11px;
     position: relative;
-    border: 1px solid var(--t-border-strong);
+    border: 1px solid oklch(74% 0.02 76 / 0.8);
     cursor: pointer;
     transition: all var(--t-dur-fast) var(--t-ease);
     margin: 0;
     accent-color: auto;
-    box-shadow: inset 0 1px 3px oklch(35% 0.03 55 / 0.15);
+    box-shadow:
+        inset 0 2px 4px oklch(35% 0.03 55 / 0.18),
+        inset 0 -1px 0 oklch(99% 0.005 90 / 0.5);
 }
 
 .theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-toggle-label input[type="checkbox"]::before,
@@ -836,21 +877,22 @@
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: radial-gradient(circle at 32% 28%, oklch(99% 0.005 90), oklch(92% 0.01 85) 70%);
+    background: radial-gradient(circle at 30% 25%, oklch(99.5% 0.002 90), oklch(88% 0.015 82) 75%);
     transition: transform var(--t-dur-fast) var(--t-ease);
     box-shadow:
-        0 1px 3px oklch(30% 0.03 55 / 0.3),
-        inset 0 -1px 1px oklch(70% 0.015 75 / 0.6);
+        0 2px 4px oklch(30% 0.03 55 / 0.35),
+        inset 0 -2px 2px oklch(72% 0.02 76 / 0.5),
+        inset 0 1px 1px oklch(99% 0.005 90 / 0.9);
 }
 
 .theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-toggle-label input[type="checkbox"]:checked {
-    background: var(--t-brass-grad);
-    border-color: oklch(42% 0.11 45);
+    background: linear-gradient(180deg, oklch(62% 0.14 58), oklch(52% 0.145 50));
+    border-color: oklch(45% 0.12 46);
 }
 
 .theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-toggle-label input[type="checkbox"]:checked::after {
     transform: translateX(18px);
-    background: radial-gradient(circle at 32% 28%, oklch(99% 0.005 90), oklch(90% 0.02 80) 70%);
+    background: radial-gradient(circle at 30% 25%, oklch(99.5% 0.002 90), oklch(88% 0.02 80) 75%);
 }
 
 /* Entry checkboxes */
@@ -1441,10 +1483,12 @@
     font-size: var(--t-text-base);
     line-height: 1.7;
     color: var(--t-ink);
-    background: var(--t-surface);
-    border: var(--t-rule-thin);
+    background: oklch(97% 0.008 88 / 0.5);
+    border: 1px solid oklch(99% 0.005 90 / 0.6);
     border-radius: var(--t-radius-md);
-    box-shadow: inset 0 1px 3px oklch(35% 0.03 55 / 0.06);
+    box-shadow:
+        inset 0 2px 6px oklch(35% 0.03 55 / 0.08),
+        inset 0 -1px 0 oklch(99% 0.005 90 / 0.5);
     white-space: pre-wrap;
     word-break: break-word;
 }
@@ -1458,6 +1502,13 @@
     border-radius: var(--t-radius-md);
     overflow: hidden;
     box-shadow: var(--t-elev-1);
+}
+
+/* Output section — amber hearth glow on frosted glass */
+#theater-output-section {
+    background:
+        radial-gradient(ellipse 120% 60% at 50% 0%, oklch(65% 0.15 60 / 0.1), transparent 65%),
+        linear-gradient(160deg, oklch(99.5% 0.004 90 / 0.55), oklch(97% 0.008 88 / 0.38));
 }
 
 .theater-iframe {

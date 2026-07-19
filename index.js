@@ -822,11 +822,11 @@ function buildPopupHTML() {
             <span class="theater-hint-inline">生成可交互的小剧场</span>
         </div>
         <div class="theater-btn-row">
-            <div id="theater-generate-btn" class="theater-btn primary">生成小剧场</div>
-            <div id="theater-stop-btn" class="theater-btn danger" style="display:none;">停止生成</div>
-            <div id="theater-random-btn" class="theater-btn" style="${settings.randomEnabled ? '' : 'display:none;'}">随机抽取</div>
-            <div id="theater-save-instruction-btn" class="theater-btn">存为模板</div>
-            <div id="theater-clear-instruction-btn" class="theater-btn">清空</div>
+            <div id="theater-generate-btn" class="theater-btn primary"><i class="fa-solid fa-hammer"></i><span>生成小剧场</span></div>
+            <div id="theater-stop-btn" class="theater-btn danger" style="display:none;"><i class="fa-solid fa-stop"></i><span>停止生成</span></div>
+            <div id="theater-random-btn" class="theater-btn" style="${settings.randomEnabled ? '' : 'display:none;'}"><i class="fa-solid fa-dice"></i><span>随机抽取</span></div>
+            <div id="theater-save-instruction-btn" class="theater-btn"><i class="fa-solid fa-bookmark"></i><span>存为模板</span></div>
+            <div id="theater-clear-instruction-btn" class="theater-btn"><i class="fa-solid fa-eraser"></i><span>清空</span></div>
             <span class="theater-gen-meta" id="theater-gen-meta">${settings.lastGenModel ? esc(settings.lastGenModel) + ' · ' + esc(settings.lastGenDuration) : ''}</span>
         </div>
         <div class="theater-section" id="theater-output-section" style="display:none; margin-top:var(--t-space-4);">
