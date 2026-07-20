@@ -607,11 +607,6 @@ function createFloatingBall() {
 <stop offset="0.55" stop-color="#ffe89a"/>
 <stop offset="1" stop-color="#ffb43c"/>
 </linearGradient>
-<radialGradient id="flameGlow" cx="0.5" cy="0.55" r="0.55">
-<stop offset="0" stop-color="#ff6a1a" stop-opacity="0.5"/>
-<stop offset="0.55" stop-color="#ff3d0a" stop-opacity="0.16"/>
-<stop offset="1" stop-color="#ff3d0a" stop-opacity="0"/>
-</radialGradient>
 <linearGradient id="flameRim" x1="0" y1="0" x2="0" y2="1">
 <stop offset="0" stop-color="#fff7dd" stop-opacity="1"/>
 <stop offset="0.5" stop-color="#ffe9bd" stop-opacity="0.35"/>
@@ -622,7 +617,6 @@ function createFloatingBall() {
 <stop offset="1" stop-color="#ffffff" stop-opacity="0.15"/>
 </linearGradient>
 </defs>
-<ellipse cx="32" cy="35" rx="30" ry="31" fill="url(#flameGlow)"/>
 <g class="theater-flame-body">
 <path d="M32 57 C 21 57, 13 49, 13 39 C 13 32, 17 26, 21 19 C 24 13, 25 8, 25 4 C 28 10, 33 15, 35 21 C 36 16, 39 12, 43 9 C 42 15, 45 20, 48 26 C 50 30, 51 34, 51 39 C 51 49, 43 57, 32 57 Z" fill="url(#flameOuter)" opacity="0.95" stroke="#ffd9a0" stroke-opacity="0.55" stroke-width="0.8"/>
 <path d="M32 53 C 25 53, 19 47, 19 40 C 19 34, 23 29, 26 23 C 28 19, 29 15, 29 12 C 33 17, 37 22, 39 27 C 40 24, 42 21, 44 19 C 44 24, 46 28, 46 34 C 46 38, 45 42, 43 46 C 40 51, 37 53, 32 53 Z" fill="url(#flameInner)"/>
