@@ -1619,7 +1619,7 @@
     box-shadow: 0 0 26px oklch(64% 0.18 50 / 0.5);
     animation: theater-ember-pulse 1.8s ease-in-out infinite;
 }
-.theater-skeleton-flame {
+.theater-skeleton-ember .theater-lamp-icon {
     width: 40px;
     height: 40px;
     color: oklch(62% 0.17 45);

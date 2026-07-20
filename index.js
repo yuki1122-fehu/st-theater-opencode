@@ -170,8 +170,6 @@ const defaultSettings = Object.freeze({
     recentIndex: 0,         // 当前查看的 recentGenerations 索引
 });
 
-const SKIN_LABELS = { default: '内置默认', theater: '跟随酒馆', custom: '自定义' };
-
 // ============================================================
 // 本地仓库（IndexedDB）
 // settings.json 是整体重写式保存，把大量 HTML 存进去会让保存请求越来越大，
@@ -897,7 +895,7 @@ function buildPopupHTML() {
                 <pre id="theater-stream-text" class="theater-stream-pre" style="display:none;"></pre>
                 <div id="theater-output-container"><iframe id="theater-output-frame" sandbox="allow-scripts allow-same-origin allow-modals" class="theater-iframe"></iframe></div>
                 <div class="theater-output-skeleton" aria-hidden="true">
-                    <div class="theater-skeleton-ember"><svg viewBox="0 0 32 32" class="theater-skeleton-flame" aria-hidden="true"><path fill="currentColor" d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z"/><path fill="currentColor" opacity="0.5" d="M16 12 C17.6 15 20 16.6 20 20 A4 4 0 1 1 12 20 C12 17.4 14 16.4 15 14 C15.5 16 16 16.2 16.5 15 C16.3 13.5 16 12.4 16 12 Z"/><circle cx="16" cy="21.5" r="2.2" fill="currentColor" opacity="0.85"/></svg></div>
+                    <div class="theater-skeleton-ember">${FLAME_SVG_HTML}</div>
                     <div class="theater-skeleton-lines"><span></span><span></span><span></span><span></span><span></span></div>
                     <p class="theater-skeleton-tip">锻炉正在熔炼你的小剧场…</p>
                 </div>
@@ -2507,33 +2505,6 @@ async function loadPresetNameList() {
     if (!names.length) {
         toastr.warning('未找到 Chat Completion 预设，请确认酒馆已导入预设文件');
     }
-}
-
-function parsePromptToEntries(text, prefix) {
-    const entries = [];
-    const regex = /【([^】]+)】/g;
-    let match;
-    const matches = [];
-    while ((match = regex.exec(text)) !== null) {
-        matches.push({ name: match[1], start: match.index, headerEnd: match.index + match[0].length });
-    }
-    if (matches.length === 0) {
-        // No section headers, return as single entry
-        return [{ id: prefix + '_full', name: '完整内容', role: 'system', content: text.trim(), enabledInST: true }];
-    }
-    for (let i = 0; i < matches.length; i++) {
-        const contentStart = matches[i].headerEnd;
-        const contentEnd = i + 1 < matches.length ? matches[i + 1].start : text.length;
-        const content = ('【' + matches[i].name + '】\n' + text.slice(contentStart, contentEnd).trim()).trim();
-        entries.push({
-            id: prefix + '_' + matches[i].name,
-            name: matches[i].name,
-            role: 'system',
-            content,
-            enabledInST: true,
-        });
-    }
-    return entries;
 }
 
 async function fetchPresetByName(name) {
