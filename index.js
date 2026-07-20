@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '4.2.9';
+const VERSION = '4.3.0';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -591,24 +591,24 @@ function createFloatingBall() {
         ball.innerHTML = `<svg viewBox="0 0 64 64" aria-hidden="true" class="theater-ball-svg" style="width:64px;height:64px;display:block;overflow:visible;">
 <defs>
 <linearGradient id="flameOuter" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#ffb347"/>
-<stop offset="0.35" stop-color="#ff7a1f"/>
-<stop offset="0.7" stop-color="#ef451c"/>
-<stop offset="1" stop-color="#b81b0e"/>
+<stop offset="0" stop-color="#f2ab5e"/>
+<stop offset="0.35" stop-color="#e8823f"/>
+<stop offset="0.7" stop-color="#d9552f"/>
+<stop offset="1" stop-color="#a83a30"/>
 </linearGradient>
 <linearGradient id="flameInner" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#ffe07a"/>
-<stop offset="0.5" stop-color="#ffae33"/>
-<stop offset="1" stop-color="#f0521c"/>
+<stop offset="0" stop-color="#e9cf8a"/>
+<stop offset="0.5" stop-color="#e3a857"/>
+<stop offset="1" stop-color="#d35c38"/>
 </linearGradient>
 <linearGradient id="flameCore" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#fffdf2"/>
-<stop offset="0.55" stop-color="#fff0ad"/>
-<stop offset="1" stop-color="#ffc24d"/>
+<stop offset="0" stop-color="#fbf3e0"/>
+<stop offset="0.55" stop-color="#f3e2b3"/>
+<stop offset="1" stop-color="#e6bd75"/>
 </linearGradient>
 <radialGradient id="flameGlow" cx="0.5" cy="0.55" r="0.55">
-<stop offset="0" stop-color="#ff7a1f" stop-opacity="0.42"/>
-<stop offset="0.55" stop-color="#ff5a1a" stop-opacity="0.12"/>
+<stop offset="0" stop-color="#ff7a1f" stop-opacity="0.36"/>
+<stop offset="0.55" stop-color="#ff5a1a" stop-opacity="0.1"/>
 <stop offset="1" stop-color="#ff5a1a" stop-opacity="0"/>
 </radialGradient>
 <linearGradient id="flameRim" x1="0" y1="0" x2="0" y2="1">
@@ -618,13 +618,13 @@ function createFloatingBall() {
 </linearGradient>
 </defs>
 <ellipse cx="32" cy="36" rx="30" ry="30" fill="url(#flameGlow)"/>
-<path d="M18 57 C 14 49, 17 41, 22 35 C 25 31, 24 26, 28 21 C 30 18, 30 12, 33 6 C 35 12, 38 17, 40 23 C 43 30, 45 37, 46 44 C 47 49, 49 52, 46 57 C 41 62, 23 62, 18 57 Z" fill="url(#flameOuter)" opacity="0.9" stroke="#ffe1b0" stroke-opacity="0.55" stroke-width="0.8"/>
-<path d="M26 53 C 23 47, 25 41, 29 35 C 31 31, 31 26, 33 20 C 35 26, 37 31, 39 36 C 41 42, 40 48, 37 52 C 34 56, 29 56, 26 53 Z" fill="url(#flameInner)"/>
-<path d="M30 50 C 28 45, 29 40, 31 35 C 32 32, 32 30, 33 26 C 34 30, 35 34, 36 38 C 37 43, 36 47, 34 50 C 33 52, 31 52, 30 50 Z" fill="url(#flameCore)"/>
-<ellipse cx="25.5" cy="23" rx="2" ry="5.2" fill="#ffffff" opacity="0.84" transform="rotate(-22 25.5 23)"/>
-<ellipse cx="28.5" cy="17" rx="1" ry="2.1" fill="#ffffff" opacity="0.92" transform="rotate(-16 28.5 17)"/>
-<circle cx="39.5" cy="34" r="1.4" fill="#fff6d8" opacity="0.75"/>
-<path d="M18 57 C 14 49, 17 41, 22 35 C 25 31, 24 26, 28 21 C 30 18, 30 12, 33 6" fill="none" stroke="url(#flameRim)" stroke-width="1.5" stroke-linecap="round"/>
+<path d="M32 57 C 24 57, 19 52, 19 44 C 19 37, 22 31, 25 25 C 27 20, 28 14, 31 8 C 33 13, 36 18, 39 24 C 42 30, 45 36, 45 44 C 45 52, 40 57, 32 57 Z" fill="url(#flameOuter)" opacity="0.9" stroke="#ffe1b0" stroke-opacity="0.5" stroke-width="0.8"/>
+<path d="M32 53 C 27 53, 23 49, 23 42 C 23 36, 26 31, 29 26 C 31 22, 31 18, 33 14 C 35 18, 38 23, 40 29 C 42 35, 42 42, 40 48 C 38 52, 37 53, 32 53 Z" fill="url(#flameInner)"/>
+<path d="M32 50 C 29 50, 27 47, 27 42 C 27 38, 29 34, 31 30 C 32 27, 32 24, 33 21 C 34 24, 36 28, 37 32 C 38 37, 38 43, 36 47 C 35 49, 34 50, 32 50 Z" fill="url(#flameCore)"/>
+<ellipse cx="25.5" cy="23" rx="1.6" ry="4.5" fill="#ffffff" opacity="0.78" transform="rotate(-22 25.5 23)"/>
+<ellipse cx="28" cy="18" rx="0.9" ry="1.8" fill="#ffffff" opacity="0.88" transform="rotate(-16 28 18)"/>
+<circle cx="39.5" cy="34" r="1.3" fill="#fff6d8" opacity="0.7"/>
+<path d="M32 57 C 24 57, 19 52, 19 44 C 19 37, 22 31, 25 25 C 27 20, 28 14, 31 8" fill="none" stroke="url(#flameRim)" stroke-width="1.5" stroke-linecap="round"/>
 </svg>` +
             '<span class="theater-ball-timer" aria-hidden="true"></span>';
 
