@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '4.9.3';
+const VERSION = '4.10.0';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -846,6 +846,7 @@ function buildPopupHTML() {
         </div>
     </div>
     <div class="theater-tabs">
+        <div class="theater-tabs-indicator" aria-hidden="true"></div>
         <div class="theater-tab active" data-tab="generate"><i class="fa-solid fa-wand-sparkles"></i><span>生成</span></div>
         <div class="theater-tab" data-tab="setting"><i class="fa-solid fa-sliders"></i><span>设定</span></div>
         <div class="theater-tab" data-tab="dialogue"><i class="fa-solid fa-comments"></i><span>对话</span></div>
@@ -1619,6 +1620,7 @@ async function openTheaterPopup() {
     const popup = new Popup(buildPopupHTML(), POPUP_TYPE.TEXT, '', { wide: true, okButton: 'Close', allowVerticalScrolling: true });
     const p = popup.show();
     await new Promise(r => setTimeout(r, 50));
+    try { moveTabIndicator(); } catch (e) {}   // 初始化玻璃滑块位置
     setBallDot(false);  // 看过了，红点熄灭
     // 搜索框是重建的空框，过滤词也要跟着清，不然看起来"列表少了一截"
     wbSearch = '';
@@ -1672,6 +1674,25 @@ async function openTheaterPopup() {
 }
 
 // ============================================================
+// Tab 玻璃滑块指示器：跟随 active tab 平滑滑动
+// ============================================================
+function moveTabIndicator() {
+    const tabs = document.querySelector('.theater-tabs');
+    if (!tabs) return;
+    const active = tabs.querySelector('.theater-tab.active');
+    const ind = tabs.querySelector('.theater-tabs-indicator');
+    if (!active || !ind) return;
+    ind.style.width = active.offsetWidth + 'px';
+    ind.style.transform = `translateX(${active.offsetLeft}px)`;
+}
+
+// 字体加载完成 / 窗口变化后重新定位（offset 会因字体回流改变）
+if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => { try { moveTabIndicator(); } catch (e) {} });
+}
+window.addEventListener('resize', () => { try { moveTabIndicator(); } catch (e) {} });
+
+// ============================================================
 // Events
 // ============================================================
 function bindEvents() {
@@ -1682,6 +1703,9 @@ function bindEvents() {
         const t = $(this).data('tab');
         $('.theater-tab').removeClass('active'); $(this).addClass('active');
         $('.theater-panel').removeClass('active'); $(`.theater-panel[data-panel="${t}"]`).addClass('active');
+        moveTabIndicator();
+        // 若 tab 被横向滚动隐藏，滚回可视区
+        this.scrollIntoView({ inline: 'nearest', block: 'nearest' });
         if (t === 'diagnostics') renderErrorLog();
         if (t === 'prompt') renderPromptInspector();
     });

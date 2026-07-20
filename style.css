@@ -138,19 +138,26 @@
     padding: 0;
     box-sizing: border-box;
     color: var(--t-ink);
-    /* frosted glass body */
+    /* frosted glass body — 分层渐变 + 暖铜光晕 + 顶部高光带（作为背景层，不覆盖内容） */
     background:
-        radial-gradient(ellipse 90% 55% at 100% 0%, oklch(58% 0.14 55 / 0.08), transparent 60%),
-        linear-gradient(160deg, oklch(96% 0.014 88 / 0.78), oklch(93.5% 0.016 86 / 0.68));
-    -webkit-backdrop-filter: blur(18px) saturate(1.15);
-    backdrop-filter: blur(18px) saturate(1.15);
-    border: 1px solid oklch(99% 0.005 90 / 0.55);
+        radial-gradient(ellipse 110% 60% at 100% 0%, oklch(58% 0.14 55 / 0.12), transparent 58%),
+        radial-gradient(ellipse 80% 50% at 0% 100%, oklch(58% 0.1 60 / 0.08), transparent 55%),
+        linear-gradient(180deg, oklch(99% 0.01 90 / 0.3), transparent 34%),
+        linear-gradient(160deg, oklch(96.5% 0.014 88 / 0.82), oklch(93% 0.016 86 / 0.72));
+    /* 更强的高斯模糊 + 提饱和，玻璃更通透 */
+    -webkit-backdrop-filter: blur(26px) saturate(1.35) brightness(1.04);
+    backdrop-filter: blur(26px) saturate(1.35) brightness(1.04);
+    border: 1px solid oklch(99% 0.01 90 / 0.6);
     font-family: var(--t-font-sans);
     font-size: var(--t-text-base);
     border-radius: var(--t-radius-xl);
     box-shadow:
         var(--t-shadow-popup),
-        inset 0 1px 0 oklch(99% 0.005 90 / 0.7);
+        /* 顶部高光描边（specular） */
+        inset 0 1.5px 0 oklch(99% 0.01 90 / 0.85),
+        inset 0 -1px 2px oklch(30% 0.03 50 / 0.1),
+        /* 内部柔和暗角，增加厚度 */
+        inset 0 0 0 1px oklch(99% 0.01 90 / 0.05);
     /* 高度完全由外层 dialog 控制，自身只负责 flex 填充 */
     display: flex;
     flex-direction: column;
@@ -158,6 +165,20 @@
     max-height: 100%;
     min-height: 0;
     overflow: hidden;
+    position: relative;
+}
+
+/* 极淡噪点：消除渐变色带，让玻璃更"真"（不覆盖内容） */
+.theater-popup::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 160px 160px;
+    opacity: 0.035;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: 3;
 }
 
 .theater-popup *,
@@ -364,9 +385,10 @@
 }
 
 /* ============================================================
- * TABS — metal selector pills
+ * TABS — glass sliding indicator
  * ============================================================ */
 .theater-tabs {
+    position: relative;
     display: flex;
     align-items: center;
     gap: var(--t-space-1);
@@ -383,8 +405,32 @@
     display: none;
 }
 
+/* 玻璃滑块指示器：磨砂药丸，平滑滑动到 active tab 下方 */
+.theater-tabs-indicator {
+    position: absolute;
+    top: var(--t-space-3);
+    bottom: var(--t-space-3);
+    left: 0;
+    width: 0;
+    border-radius: var(--t-radius-pill);
+    background:
+        linear-gradient(180deg, oklch(99% 0.01 90 / 0.55), oklch(97% 0.01 90 / 0.32));
+    -webkit-backdrop-filter: blur(10px) saturate(1.3);
+    backdrop-filter: blur(10px) saturate(1.3);
+    border: 1px solid oklch(99% 0.01 90 / 0.6);
+    box-shadow:
+        inset 0 1px 0 oklch(99% 0.01 90 / 0.8),
+        0 2px 8px oklch(35% 0.03 55 / 0.12),
+        0 0 0 1px oklch(58% 0.14 55 / 0.06);
+    transform: translateX(0);
+    transition: transform var(--t-dur-base) var(--t-ease), width var(--t-dur-base) var(--t-ease);
+    pointer-events: none;
+    z-index: 0;
+}
+
 .theater-tab {
     position: relative;
+    z-index: 1;
     padding: var(--t-space-2) var(--t-space-4);
     font-family: var(--t-font-sans);
     font-size: var(--t-text-sm);
@@ -396,7 +442,7 @@
     border: 1px solid transparent;
     background: none;
     border-radius: var(--t-radius-pill);
-    transition: all var(--t-dur-fast) var(--t-ease);
+    transition: color var(--t-dur-fast) var(--t-ease), transform var(--t-dur-fast) var(--t-ease);
     display: inline-flex;
     align-items: center;
     gap: var(--t-space-2);
@@ -406,23 +452,16 @@
 .theater-tab i {
     font-size: 0.85em;
     opacity: 0.75;
+    transition: opacity var(--t-dur-fast) var(--t-ease);
 }
 
 .theater-tab:hover {
     color: var(--t-ink);
-    background: oklch(99% 0.005 90 / 0.35);
-    border-color: oklch(99% 0.005 90 / 0.5);
 }
 
-/* Active tab — pressed brass plate (frosted) */
+/* Active tab — 文字高亮，背景由玻璃滑块提供 */
 .theater-tab.active {
     color: var(--t-accent-deep);
-    background: linear-gradient(180deg, oklch(58% 0.14 55 / 0.2), oklch(58% 0.14 55 / 0.1));
-    border-color: oklch(58% 0.14 55 / 0.35);
-    box-shadow:
-        inset 0 1px 0 oklch(99% 0.005 90 / 0.5),
-        inset 0 2px 4px oklch(45% 0.1 50 / 0.12),
-        0 2px 6px oklch(58% 0.14 55 / 0.15);
     font-weight: 600;
 }
 
