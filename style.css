@@ -504,16 +504,17 @@
 .theater-panel {
     display: none;
     padding: var(--t-space-8) var(--t-space-10);
-    animation: softFadeIn var(--t-dur-base) var(--t-ease);
 }
 
 .theater-panel.active {
     display: block;
+    /* 仅位移、不改 opacity，杜绝 display 切换时的首帧满亮闪 + backdrop-filter 重绘闪 */
+    animation: panelRise var(--t-dur-base) var(--t-ease);
 }
 
-@keyframes softFadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
+@keyframes panelRise {
+    from { transform: translateY(6px); }
+    to   { transform: translateY(0); }
 }
 
 /* ============================================================
