@@ -603,6 +603,11 @@ function createFloatingBall() {
 <stop offset="60%" stop-color="#ff7a33" stop-opacity="0.16"/>
 <stop offset="100%" stop-color="#ff5a1f" stop-opacity="0"/>
 </radialGradient>
+<radialGradient id="tGlassInner" cx="50%" cy="72%" r="60%">
+<stop offset="0%" stop-color="#fff6dc" stop-opacity="1"/>
+<stop offset="42%" stop-color="#ffc472" stop-opacity="0.96"/>
+<stop offset="100%" stop-color="#ff7a2e" stop-opacity="0.82"/>
+</radialGradient>
 <filter id="tGlassGoo" x="-30%" y="-30%" width="160%" height="160%">
 <feGaussianBlur in="SourceGraphic" stdDeviation="0.55" result="blur"/>
 <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1.1 0"/>
@@ -616,7 +621,7 @@ function createFloatingBall() {
 </g>
 <path d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z" fill="url(#tGlassBody)" stroke="#ffe2c2" stroke-opacity="0.70" stroke-width="0.55"/>
 <path d="M16 12 C17.6 15 20 16.6 20 20 A4 4 0 1 1 12 20 C12 17.4 14 16.4 15 14 C15.5 16 16 16.2 16.5 15 C16.3 13.5 16 12.4 16 12 Z" fill="url(#tGlassCore)"/>
-<circle cx="16" cy="21.5" r="2.2" fill="#ff8a3d" opacity="0.85"/>
+<path d="M16 14 C16.9 16.3 18.4 17.7 18.4 19.5 A2.5 2.5 0 1 1 13.4 19.5 C13.4 17.6 14.7 16.6 15.6 15 C15.9 16.2 16.1 16.2 16.4 15.4 C16.2 14.9 16 14.4 16 14 Z" fill="url(#tGlassInner)" stroke="#ffe7c4" stroke-opacity="0.6" stroke-width="0.4"/>
 <path d="M16 4.5 C18.2 8.8 22.4 11 22.4 17 C22.4 17.9 22.2 18.8 21.9 19.6 C20.6 16.4 18.5 14.8 16.8 11.6 C16.4 11.8 16 11.6 15.8 11.2 C15.6 8.8 15.4 6.4 16 4.5 Z" fill="url(#tGlassSpec)"/>
 <ellipse cx="13.2" cy="19.5" rx="1.1" ry="2.6" fill="#ffffff" opacity="0.7" transform="rotate(-22 13.2 19.5)"/>
 <ellipse cx="18.4" cy="17.2" rx="0.6" ry="1.3" fill="#ffffff" opacity="0.5" transform="rotate(18 18.4 17.2)"/>
