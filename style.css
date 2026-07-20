@@ -1915,27 +1915,36 @@
     background: var(--t-error);
 }
 
-/* ST outer container overrides */
+/* ST outer container overrides — 彻底接管 SillyTavern dialog 外壳 */
 body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])),
 body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])) {
-    background: var(--t-surface) !important;
+    /* 去黑框：无边框、无轮廓、无默认背景 */
+    background: transparent !important;
     color: var(--t-ink) !important;
-    border: 1px solid var(--t-border) !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+
+    /* 圆角 + 裁切，确保滚动时不会露出方角 */
     border-radius: var(--t-radius-xl) !important;
-    box-shadow: var(--t-shadow-popup) !important;
-    overflow: hidden;
-    /* 让外层 dialog 高度跟随内部固定高度的 popup，圆角裁切 */
-    max-height: 88vh !important;
+    overflow: hidden !important;
+
+    /* 高度跟随内部固定高度的 popup */
+    max-height: 90vh !important;
     height: auto !important;
     padding: 0 !important;
+    margin: 0 !important;
 }
 
+/* popup-body 是 theater-popup 和 popup-controls 的直接父级 */
 body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])) .popup-body {
     background: transparent !important; padding: 0 !important;
     display: flex !important;
     flex-direction: column !important;
     flex: 1 1 auto !important;
     min-height: 0 !important;
+    overflow: hidden !important;
+    border-radius: inherit;
 }
 
 body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])) .popup-controls {
@@ -1954,6 +1963,11 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
 
 body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]))::backdrop {
     background: oklch(0% 0 0 / 0.45); backdrop-filter: blur(4px);
+}
+
+/* theater-popup 自身也要确保裁切不漏 */
+.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) {
+    border-radius: var(--t-radius-xl) !important;
 }
 
 /* Scrollbars */
