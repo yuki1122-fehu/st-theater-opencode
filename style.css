@@ -2087,57 +2087,28 @@ html body #theater-floating-ball.theater-ball-generating {
 }
 
 /* ============================================================
-   内嵌计时标签 / 首次引导脉冲 — 液态玻璃胶囊
+   内嵌计时标签 / 首次引导脉冲 — 悬浮发光数字
    ============================================================ */
 #theater-floating-ball .theater-ball-timer {
     position: absolute;
-    bottom: -17px;
+    bottom: -15px;
     left: 50%;
     transform: translateX(-50%);
     font-family: var(--t-font-mono);
-    font-size: 0.5rem;
-    font-weight: 600;
+    font-size: 0.625rem;
+    font-weight: 700;
     line-height: 1;
-    color: oklch(24% 0.06 45);
-    letter-spacing: 0.06em;
-    background:
-        linear-gradient(180deg, oklch(99% 0 0 / 0.90) 0%, oklch(97% 0.02 55 / 0.75) 40%, oklch(93% 0.04 55 / 0.58) 100%);
-    padding: 3px 10px 3px 10px;
-    border-radius: 999px;
-    border: 0.5px solid oklch(82% 0.07 55 / 0.60);
-    box-shadow:
-        0 2px 6px oklch(55% 0.16 45 / 0.24),
-        0 0 0 1px oklch(99% 0 0 / 0.15),
-        inset 0 1px 0 oklch(99% 0 0 / 0.98),
-        inset 0 -1px 1px oklch(78% 0.07 55 / 0.30);
-    backdrop-filter: blur(8px) saturate(1.5);
-    -webkit-backdrop-filter: blur(8px) saturate(1.5);
+    letter-spacing: 0.1em;
+    background: linear-gradient(180deg, #fff3d6 0%, #ffc472 52%, #ff8a3d 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    filter: drop-shadow(0 0 4px oklch(82% 0.13 50 / 0.65)) drop-shadow(0 1px 1px oklch(50% 0.16 45 / 0.45));
     white-space: nowrap;
     pointer-events: none;
     display: none;
     z-index: 2;
-    overflow: hidden;
-    transition: box-shadow 0.25s ease, transform 0.25s cubic-bezier(.2,.8,.2,1);
-}
-/* 顶部高光带 */
-#theater-floating-ball .theater-ball-timer::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 10%; right: 10%;
-    height: 40%;
-    border-radius: 999px;
-    background: linear-gradient(180deg, oklch(99% 0 0 / 0.90) 0%, oklch(99% 0 0 / 0) 100%);
-    pointer-events: none;
-}
-/* 左下柔光 — 增强玻璃折射感 */
-#theater-floating-ball .theater-ball-timer::after {
-    content: '';
-    position: absolute;
-    bottom: 6%; left: 7%;
-    width: 30%; height: 48%;
-    border-radius: 50%;
-    background: radial-gradient(circle at 40% 40%, oklch(82% 0.12 55 / 0.50) 0%, oklch(82% 0.12 55 / 0) 70%);
-    pointer-events: none;
 }
 #theater-floating-ball.theater-ball-generating .theater-ball-timer {
     display: block;
@@ -2145,20 +2116,10 @@ html body #theater-floating-ball.theater-ball-generating {
 }
 @keyframes theater-timer-breathe {
     0%, 100% {
-        box-shadow:
-            0 2px 6px oklch(55% 0.16 45 / 0.24),
-            0 0 0 1px oklch(99% 0 0 / 0.15),
-            inset 0 1px 0 oklch(99% 0 0 / 0.98),
-            inset 0 -1px 1px oklch(78% 0.07 55 / 0.30),
-            0 0 10px oklch(72% 0.14 55 / 0.22);
+        filter: drop-shadow(0 0 4px oklch(82% 0.13 50 / 0.6)) drop-shadow(0 1px 1px oklch(50% 0.16 45 / 0.45));
     }
     50% {
-        box-shadow:
-            0 2px 9px oklch(55% 0.16 45 / 0.32),
-            0 0 0 1px oklch(99% 0 0 / 0.20),
-            inset 0 1px 0 oklch(99% 0 0 / 1),
-            inset 0 -1px 1px oklch(78% 0.07 55 / 0.35),
-            0 0 16px oklch(72% 0.14 55 / 0.50);
+        filter: drop-shadow(0 0 9px oklch(84% 0.13 48 / 0.9)) drop-shadow(0 1px 2px oklch(50% 0.16 45 / 0.55));
     }
 }
 #theater-floating-ball.theater-ball-generating > svg {
