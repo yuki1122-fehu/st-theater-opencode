@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '4.3.0';
+const VERSION = '4.4.0';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -618,13 +618,13 @@ function createFloatingBall() {
 </linearGradient>
 </defs>
 <ellipse cx="32" cy="36" rx="30" ry="30" fill="url(#flameGlow)"/>
-<path d="M32 57 C 24 57, 19 52, 19 44 C 19 37, 22 31, 25 25 C 27 20, 28 14, 31 8 C 33 13, 36 18, 39 24 C 42 30, 45 36, 45 44 C 45 52, 40 57, 32 57 Z" fill="url(#flameOuter)" opacity="0.9" stroke="#ffe1b0" stroke-opacity="0.5" stroke-width="0.8"/>
-<path d="M32 53 C 27 53, 23 49, 23 42 C 23 36, 26 31, 29 26 C 31 22, 31 18, 33 14 C 35 18, 38 23, 40 29 C 42 35, 42 42, 40 48 C 38 52, 37 53, 32 53 Z" fill="url(#flameInner)"/>
-<path d="M32 50 C 29 50, 27 47, 27 42 C 27 38, 29 34, 31 30 C 32 27, 32 24, 33 21 C 34 24, 36 28, 37 32 C 38 37, 38 43, 36 47 C 35 49, 34 50, 32 50 Z" fill="url(#flameCore)"/>
-<ellipse cx="25.5" cy="23" rx="1.6" ry="4.5" fill="#ffffff" opacity="0.78" transform="rotate(-22 25.5 23)"/>
-<ellipse cx="28" cy="18" rx="0.9" ry="1.8" fill="#ffffff" opacity="0.88" transform="rotate(-16 28 18)"/>
-<circle cx="39.5" cy="34" r="1.3" fill="#fff6d8" opacity="0.7"/>
-<path d="M32 57 C 24 57, 19 52, 19 44 C 19 37, 22 31, 25 25 C 27 20, 28 14, 31 8" fill="none" stroke="url(#flameRim)" stroke-width="1.5" stroke-linecap="round"/>
+<path d="M32 56 C 20 56, 16 50, 16 42 C 16 34, 22 28, 24 20 C 25 14, 27 8, 30 4 C 31 10, 33 16, 34 22 C 35 18, 37 12, 40 8 C 42 12, 44 20, 45 28 C 46 38, 48 48, 44 54 C 40 58, 24 58, 32 56 Z" fill="url(#flameOuter)" opacity="0.9" stroke="#ffe1b0" stroke-opacity="0.5" stroke-width="0.8"/>
+<path d="M32 52 C 24 52, 22 46, 24 40 C 26 34, 28 30, 30 24 C 31 20, 32 18, 33 20 C 35 26, 38 32, 40 38 C 42 44, 40 50, 32 52 Z" fill="url(#flameInner)"/>
+<path d="M32 48 C 28 48, 26 44, 27 40 C 28 36, 30 32, 31 28 C 32 30, 33 34, 34 38 C 36 42, 36 46, 32 48 Z" fill="url(#flameCore)"/>
+<ellipse cx="27" cy="22" rx="1.6" ry="4.5" fill="#ffffff" opacity="0.78" transform="rotate(-22 27 22)"/>
+<ellipse cx="30" cy="15" rx="0.9" ry="1.8" fill="#ffffff" opacity="0.88" transform="rotate(-16 30 15)"/>
+<circle cx="41" cy="34" r="1.3" fill="#fff6d8" opacity="0.7"/>
+<path d="M32 56 C 20 56, 16 50, 16 42 C 16 34, 22 28, 24 20 C 25 14, 27 8, 30 4" fill="none" stroke="url(#flameRim)" stroke-width="1.5" stroke-linecap="round"/>
 </svg>` +
             '<span class="theater-ball-timer" aria-hidden="true"></span>';
 
