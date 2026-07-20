@@ -1925,9 +1925,12 @@ body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="
     outline: none !important;
     box-shadow: none !important;
 
-    /* 圆角 + 裁切，确保滚动时不会露出方角 */
-    border-radius: var(--t-radius-xl) !important;
+    /* 圆角 + 裁切：mask 强制所有子层都按此圆角裁切（修复移动端滚动方角） */
+    --t-popup-r: var(--t-radius-xl);
+    border-radius: var(--t-popup-r) !important;
     overflow: hidden !important;
+    -webkit-mask-image: -webkit-radial-gradient(white, white);
+    mask-image: radial-gradient(white, white);
 
     /* 高度跟随内部固定高度的 popup */
     max-height: 90vh !important;
@@ -1945,6 +1948,9 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     min-height: 0 !important;
     overflow: hidden !important;
     border-radius: inherit;
+    /* mask 确保内部滚动内容不会突破圆角 */
+    -webkit-mask-image: -webkit-radial-gradient(white, white);
+    mask-image: radial-gradient(white, white);
 }
 
 body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])) .popup-controls {
@@ -1965,9 +1971,16 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     background: oklch(0% 0 0 / 0.45); backdrop-filter: blur(4px);
 }
 
-/* theater-popup 自身也要确保裁切不漏 */
+/* theater-popup 自身也要确保裁切不漏 — mask 强制圆角裁切 */
 .theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) {
     border-radius: var(--t-radius-xl) !important;
+    -webkit-mask-image: -webkit-radial-gradient(white, white);
+    mask-image: radial-gradient(white, white);
+}
+
+/* panels-wrapper 滚动容器：mask 防止子内容突破圆角 */
+.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-panels-wrapper {
+    border-radius: inherit;
 }
 
 /* Scrollbars */
