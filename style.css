@@ -1878,10 +1878,10 @@
 }
 
 #theater-floating-ball:hover {
-    filter: drop-shadow(0 0 16px oklch(72% 0.15 55 / 0.75)) drop-shadow(0 0 6px oklch(78% 0.13 40 / 0.85)) drop-shadow(0 3px 5px oklch(55% 0.16 45 / 0.40)) !important;
+    filter: drop-shadow(0 6px 12px oklch(28% 0.03 50 / 0.40)) !important;
 }
 #theater-floating-ball:hover .theater-ball-svg {
-    filter: brightness(1.08) saturate(1.12) contrast(1.02);
+    filter: brightness(1.05) saturate(1.06) contrast(1.03);
 }
 
 #theater-floating-ball .theater-ball-dot {
@@ -2017,11 +2017,11 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     animation: theater-ball-ripple 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
 }
 #theater-floating-ball.theater-ball-generating::before {
-    border: 2.5px solid oklch(70% 0.14 55 / 0.55);
-    box-shadow: 0 0 8px oklch(72% 0.15 55 / 0.35), inset 0 0 6px oklch(80% 0.10 40 / 0.25);
+    border: 2.5px solid oklch(88% 0.03 80 / 0.55);
+    box-shadow: 0 0 8px oklch(90% 0.02 80 / 0.30), inset 0 0 6px oklch(92% 0.02 80 / 0.20);
 }
 #theater-floating-ball.theater-ball-generating::after {
-    border: 2px solid oklch(75% 0.12 40 / 0.40);
+    border: 2px solid oklch(90% 0.02 80 / 0.40);
     animation-delay: 0.8s;
 }
 
@@ -2118,12 +2118,11 @@ html body #theater-floating-ball.theater-ball-generating {
     50% { opacity: 0.55; }
 }
 #theater-floating-ball.theater-ball-generating > svg {
-    filter: drop-shadow(0 0 8px oklch(72% 0.15 55 / 0.65)) drop-shadow(0 0 3px oklch(78% 0.13 40 / 0.70));
     animation: theater-glass-shimmer 3s ease-in-out infinite;
 }
 @keyframes theater-glass-shimmer {
-    0%, 100% { filter: drop-shadow(0 0 8px oklch(72% 0.15 55 / 0.65)) drop-shadow(0 0 3px oklch(78% 0.13 40 / 0.70)) brightness(1); }
-    50% { filter: drop-shadow(0 0 10px oklch(75% 0.14 50 / 0.75)) drop-shadow(0 0 4px oklch(80% 0.12 40 / 0.80)) brightness(1.06) saturate(1.08); }
+    0%, 100% { filter: brightness(1) saturate(1); }
+    50% { filter: brightness(1.05) saturate(1.05); }
 }
 
 #theater-floating-ball.theater-ball-attention {

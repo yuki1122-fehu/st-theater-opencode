@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '4.2.3';
+const VERSION = '4.2.6';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -606,11 +606,6 @@ function createFloatingBall() {
 <stop offset="55%" stop-color="#ffffff" stop-opacity="0.32"/>
 <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
 </radialGradient>
-<radialGradient id="tGlassHalo" cx="50%" cy="50%" r="55%">
-<stop offset="0%" stop-color="#ffb267" stop-opacity="0.42"/>
-<stop offset="60%" stop-color="#ff7a33" stop-opacity="0.16"/>
-<stop offset="100%" stop-color="#ff5a1f" stop-opacity="0"/>
-</radialGradient>
 <radialGradient id="tGlassInner" cx="50%" cy="72%" r="60%">
 <stop offset="0%" stop-color="#fff6dc" stop-opacity="1"/>
 <stop offset="42%" stop-color="#ffc472" stop-opacity="0.96"/>
@@ -620,14 +615,8 @@ function createFloatingBall() {
 <feGaussianBlur in="SourceGraphic" stdDeviation="0.55" result="blur"/>
 <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1.1 0"/>
 </filter>
-<filter id="tGlassSoft" x="-50%" y="-50%" width="200%" height="200%">
-<feGaussianBlur stdDeviation="0.4"/>
-</filter>
 </defs>
-<g filter="url(#tGlassSoft)">
-<path d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z" fill="url(#tGlassHalo)" transform="scale(1.06) translate(-0.96 -0.96)"/>
-</g>
-<path d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z" fill="url(#tGlassBody)" stroke="#ffe2c2" stroke-opacity="0.70" stroke-width="0.55"/>
+<path d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z" fill="url(#tGlassBody)" stroke="#fff3e0" stroke-opacity="0.9" stroke-width="0.6"/>
 <path d="M16 12 C17.6 15 20 16.6 20 20 A4 4 0 1 1 12 20 C12 17.4 14 16.4 15 14 C15.5 16 16 16.2 16.5 15 C16.3 13.5 16 12.4 16 12 Z" fill="url(#tGlassCore)"/>
 <path d="M16 14 C16.9 16.3 18.4 17.7 18.4 19.5 A2.5 2.5 0 1 1 13.4 19.5 C13.4 17.6 14.7 16.6 15.6 15 C15.9 16.2 16.1 16.2 16.4 15.4 C16.2 14.9 16 14.4 16 14 Z" fill="url(#tGlassInner)" stroke="#ffe7c4" stroke-opacity="0.6" stroke-width="0.4"/>
 <path d="M16 4.5 C18.2 8.8 22.4 11 22.4 17 C22.4 17.9 22.2 18.8 21.9 19.6 C20.6 16.4 18.5 14.8 16.8 11.6 C16.4 11.8 16 11.6 15.8 11.2 C15.6 8.8 15.4 6.4 16 4.5 Z" fill="url(#tGlassSpec)"/>
@@ -708,7 +697,7 @@ function createFloatingBall() {
             '-webkit-user-select:none !important',
             'user-select:none !important',
             'pointer-events:auto !important',
-            'filter:drop-shadow(0 0 10px oklch(70% 0.14 55 / 0.55)) drop-shadow(0 0 4px oklch(75% 0.12 40 / 0.65)) drop-shadow(0 2px 3px oklch(55% 0.16 45 / 0.30))',
+            'filter:drop-shadow(0 3px 6px oklch(28% 0.03 50 / 0.32))',
         ].join(';'));
 
         let isDragging = false;
