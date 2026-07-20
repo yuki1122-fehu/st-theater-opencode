@@ -580,7 +580,47 @@ function createFloatingBall() {
         ball.id = 'theater-floating-ball';
         ball.title = '打开拾光锻匣';
         // 纯火焰 SVG + 内嵌计时标签（生成时随球移动，不再用独立浮层）
-        ball.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true" style="width:40px;height:40px;display:block;"><path d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z" fill="#ffffff"/><path d="M16 12 C17.6 15 20 16.6 20 20 A4 4 0 1 1 12 20 C12 17.4 14 16.4 15 14 C15.5 16 16 16.2 16.5 15 C16.3 13.5 16 12.4 16 12 Z" fill="#f3c89a"/><circle cx="16" cy="21.5" r="2.2" fill="#e8743b"/></svg>' +
+        ball.innerHTML = `<svg viewBox="0 0 32 32" aria-hidden="true" class="theater-ball-svg" style="width:44px;height:44px;display:block;overflow:visible;">
+<defs>
+<radialGradient id="tGlassBody" cx="50%" cy="62%" r="62%">
+<stop offset="0%" stop-color="#ffffff" stop-opacity="0.92"/>
+<stop offset="42%" stop-color="#ffe9c7" stop-opacity="0.78"/>
+<stop offset="78%" stop-color="#ffb06a" stop-opacity="0.55"/>
+<stop offset="100%" stop-color="#f3813d" stop-opacity="0.32"/>
+</radialGradient>
+<radialGradient id="tGlassCore" cx="50%" cy="68%" r="40%">
+<stop offset="0%" stop-color="#fff6e2" stop-opacity="0.95"/>
+<stop offset="60%" stop-color="#ffd29a" stop-opacity="0.35"/>
+<stop offset="100%" stop-color="#ff8a3d" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="tGlassSpec" cx="38%" cy="26%" r="34%">
+<stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+<stop offset="55%" stop-color="#ffffff" stop-opacity="0.32"/>
+<stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="tGlassHalo" cx="50%" cy="50%" r="55%">
+<stop offset="0%" stop-color="#ffb267" stop-opacity="0.42"/>
+<stop offset="60%" stop-color="#ff7a33" stop-opacity="0.16"/>
+<stop offset="100%" stop-color="#ff5a1f" stop-opacity="0"/>
+</radialGradient>
+<filter id="tGlassGoo" x="-30%" y="-30%" width="160%" height="160%">
+<feGaussianBlur in="SourceGraphic" stdDeviation="0.55" result="blur"/>
+<feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1.1 0"/>
+</filter>
+<filter id="tGlassSoft" x="-50%" y="-50%" width="200%" height="200%">
+<feGaussianBlur stdDeviation="0.4"/>
+</filter>
+</defs>
+<g filter="url(#tGlassSoft)">
+<path d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z" fill="url(#tGlassHalo)" transform="scale(1.06) translate(-0.96 -0.96)"/>
+</g>
+<path d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z" fill="url(#tGlassBody)" stroke="#ffe2c2" stroke-opacity="0.70" stroke-width="0.55"/>
+<path d="M16 12 C17.6 15 20 16.6 20 20 A4 4 0 1 1 12 20 C12 17.4 14 16.4 15 14 C15.5 16 16 16.2 16.5 15 C16.3 13.5 16 12.4 16 12 Z" fill="url(#tGlassCore)"/>
+<circle cx="16" cy="21.5" r="2.2" fill="#ff8a3d" opacity="0.85"/>
+<path d="M16 4.5 C18.2 8.8 22.4 11 22.4 17 C22.4 17.9 22.2 18.8 21.9 19.6 C20.6 16.4 18.5 14.8 16.8 11.6 C16.4 11.8 16 11.6 15.8 11.2 C15.6 8.8 15.4 6.4 16 4.5 Z" fill="url(#tGlassSpec)"/>
+<ellipse cx="13.2" cy="19.5" rx="1.1" ry="2.6" fill="#ffffff" opacity="0.7" transform="rotate(-22 13.2 19.5)"/>
+<ellipse cx="18.4" cy="17.2" rx="0.6" ry="1.3" fill="#ffffff" opacity="0.5" transform="rotate(18 18.4 17.2)"/>
+</svg>` +
             '<span class="theater-ball-timer" aria-hidden="true"></span>';
 
         const initLeft = window.innerWidth - 66;
@@ -655,7 +695,7 @@ function createFloatingBall() {
             '-webkit-user-select:none !important',
             'user-select:none !important',
             'pointer-events:auto !important',
-            'filter:drop-shadow(0 0 8px oklch(55% 0.16 40 / 0.55)) drop-shadow(0 0 3px oklch(52% 0.17 35 / 0.60))',
+            'filter:drop-shadow(0 0 10px oklch(70% 0.14 55 / 0.55)) drop-shadow(0 0 4px oklch(75% 0.12 40 / 0.65)) drop-shadow(0 2px 3px oklch(55% 0.16 45 / 0.30))',
         ].join(';'));
 
         let isDragging = false;
@@ -736,12 +776,12 @@ function createFloatingBall() {
             cancelTuck();
             ball.style.opacity = '1';
             ball.style.transform = 'scale(1.1) rotate(-8deg)';
-            ball.style.boxShadow = '0 10px 24px rgba(140, 90, 47, 0.32), inset 0 1px 0 rgba(255,255,255,0.7)';
+
         });
         ball.addEventListener('mouseleave', () => {
             ball.style.opacity = '0.92';
             ball.style.transform = 'scale(1) rotate(0)';
-            ball.style.boxShadow = '0 6px 18px rgba(140, 90, 47, 0.22), inset 0 1px 0 rgba(255,255,255,0.6)';
+
             scheduleTuck();
         });
 

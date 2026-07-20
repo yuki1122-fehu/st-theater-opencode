@@ -1870,11 +1870,18 @@
 #theater-wand-btn .theater-lamp-icon { transform: scale(1.5) rotate(8deg); }
 #theater-open-btn .theater-lamp-icon { width: 1.2em; height: 1.2em; }
 
-/* 异形悬浮球 */
+/* 异形悬浮球 — 液态玻璃质感 */
 #theater-floating-ball { pointer-events: auto !important; }
 
+#theater-floating-ball .theater-ball-svg {
+    transition: filter 0.25s cubic-bezier(.2,.8,.2,1), transform 0.25s cubic-bezier(.2,.8,.2,1);
+}
+
 #theater-floating-ball:hover {
-    filter: drop-shadow(0 0 14px oklch(55% 0.16 42 / 0.65)) drop-shadow(0 0 5px oklch(52% 0.17 38 / 0.80)) !important;
+    filter: drop-shadow(0 0 16px oklch(72% 0.15 55 / 0.75)) drop-shadow(0 0 6px oklch(78% 0.13 40 / 0.85)) drop-shadow(0 3px 5px oklch(55% 0.16 45 / 0.40)) !important;
+}
+#theater-floating-ball:hover .theater-ball-svg {
+    filter: brightness(1.08) saturate(1.12) contrast(1.02);
 }
 
 #theater-floating-ball .theater-ball-dot {
@@ -2010,10 +2017,11 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     animation: theater-ball-ripple 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
 }
 #theater-floating-ball.theater-ball-generating::before {
-    border: 2.5px solid oklch(55% 0.16 42 / 0.50);
+    border: 2.5px solid oklch(70% 0.14 55 / 0.55);
+    box-shadow: 0 0 8px oklch(72% 0.15 55 / 0.35), inset 0 0 6px oklch(80% 0.10 40 / 0.25);
 }
 #theater-floating-ball.theater-ball-generating::after {
-    border: 2px solid oklch(58% 0.14 45 / 0.35);
+    border: 2px solid oklch(75% 0.12 40 / 0.40);
     animation-delay: 0.8s;
 }
 
@@ -2079,30 +2087,87 @@ html body #theater-floating-ball.theater-ball-generating {
 }
 
 /* ============================================================
-   内嵌计时标签 / 首次引导脉冲
+   内嵌计时标签 / 首次引导脉冲 — 液态玻璃胶囊
    ============================================================ */
 #theater-floating-ball .theater-ball-timer {
     position: absolute;
-    bottom: -15px;
+    bottom: -17px;
     left: 50%;
     transform: translateX(-50%);
     font-family: var(--t-font-mono);
     font-size: 0.5rem;
     font-weight: 600;
     line-height: 1;
-    color: var(--t-accent);
-    background: oklch(99% 0 0 / 0.92);
-    padding: 2px 6px;
+    color: oklch(24% 0.06 45);
+    letter-spacing: 0.06em;
+    background:
+        linear-gradient(180deg, oklch(99% 0 0 / 0.90) 0%, oklch(97% 0.02 55 / 0.75) 40%, oklch(93% 0.04 55 / 0.58) 100%);
+    padding: 3px 10px 3px 10px;
     border-radius: 999px;
-    box-shadow: 0 1px 5px oklch(0% 0 0 / 0.20);
+    border: 0.5px solid oklch(82% 0.07 55 / 0.60);
+    box-shadow:
+        0 2px 6px oklch(55% 0.16 45 / 0.24),
+        0 0 0 1px oklch(99% 0 0 / 0.15),
+        inset 0 1px 0 oklch(99% 0 0 / 0.98),
+        inset 0 -1px 1px oklch(78% 0.07 55 / 0.30);
+    backdrop-filter: blur(8px) saturate(1.5);
+    -webkit-backdrop-filter: blur(8px) saturate(1.5);
     white-space: nowrap;
     pointer-events: none;
     display: none;
     z-index: 2;
+    overflow: hidden;
+    transition: box-shadow 0.25s ease, transform 0.25s cubic-bezier(.2,.8,.2,1);
 }
-#theater-floating-ball.theater-ball-generating .theater-ball-timer { display: block; }
+/* 顶部高光带 */
+#theater-floating-ball .theater-ball-timer::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 10%; right: 10%;
+    height: 40%;
+    border-radius: 999px;
+    background: linear-gradient(180deg, oklch(99% 0 0 / 0.90) 0%, oklch(99% 0 0 / 0) 100%);
+    pointer-events: none;
+}
+/* 左下柔光 — 增强玻璃折射感 */
+#theater-floating-ball .theater-ball-timer::after {
+    content: '';
+    position: absolute;
+    bottom: 6%; left: 7%;
+    width: 30%; height: 48%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 40%, oklch(82% 0.12 55 / 0.50) 0%, oklch(82% 0.12 55 / 0) 70%);
+    pointer-events: none;
+}
+#theater-floating-ball.theater-ball-generating .theater-ball-timer {
+    display: block;
+    animation: theater-timer-breathe 2.4s ease-in-out infinite;
+}
+@keyframes theater-timer-breathe {
+    0%, 100% {
+        box-shadow:
+            0 2px 6px oklch(55% 0.16 45 / 0.24),
+            0 0 0 1px oklch(99% 0 0 / 0.15),
+            inset 0 1px 0 oklch(99% 0 0 / 0.98),
+            inset 0 -1px 1px oklch(78% 0.07 55 / 0.30),
+            0 0 10px oklch(72% 0.14 55 / 0.22);
+    }
+    50% {
+        box-shadow:
+            0 2px 9px oklch(55% 0.16 45 / 0.32),
+            0 0 0 1px oklch(99% 0 0 / 0.20),
+            inset 0 1px 0 oklch(99% 0 0 / 1),
+            inset 0 -1px 1px oklch(78% 0.07 55 / 0.35),
+            0 0 16px oklch(72% 0.14 55 / 0.50);
+    }
+}
 #theater-floating-ball.theater-ball-generating > svg {
-    filter: drop-shadow(0 0 7px oklch(55% 0.16 42 / 0.65));
+    filter: drop-shadow(0 0 8px oklch(72% 0.15 55 / 0.65)) drop-shadow(0 0 3px oklch(78% 0.13 40 / 0.70));
+    animation: theater-glass-shimmer 3s ease-in-out infinite;
+}
+@keyframes theater-glass-shimmer {
+    0%, 100% { filter: drop-shadow(0 0 8px oklch(72% 0.15 55 / 0.65)) drop-shadow(0 0 3px oklch(78% 0.13 40 / 0.70)) brightness(1); }
+    50% { filter: drop-shadow(0 0 10px oklch(75% 0.14 50 / 0.75)) drop-shadow(0 0 4px oklch(80% 0.12 40 / 0.80)) brightness(1.06) saturate(1.08); }
 }
 
 #theater-floating-ball.theater-ball-attention {
@@ -2113,7 +2178,7 @@ html body #theater-floating-ball.theater-ball-generating {
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    border: 2px solid oklch(55% 0.16 42 / 0.85);
+    border: 2px solid oklch(72% 0.15 55 / 0.85);
     pointer-events: none;
     animation: theater-ball-attention 1.2s cubic-bezier(.2, .8, .2, 1) 2;
 }
