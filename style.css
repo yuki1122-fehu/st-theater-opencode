@@ -405,7 +405,10 @@
     display: none;
 }
 
-/* 玻璃滑块指示器：磨砂药丸，平滑滑动到 active tab 下方 */
+/* 玻璃滑块指示器：磨砂药丸，平滑滑动到 active tab 下方
+   注意：不能用 backdrop-filter —— 带背景模糊的元素在 transform 滑动时
+   会让扫过的区域短暂显示未处理的浅色像素，造成上半部分"闪一下"。
+   改用伪玻璃半透明填充 + 内嵌高光，观感一致但滑动零闪动。 */
 .theater-tabs-indicator {
     position: absolute;
     top: var(--t-space-3);
@@ -414,16 +417,16 @@
     width: 0;
     border-radius: var(--t-radius-pill);
     background:
-        linear-gradient(180deg, oklch(99% 0.01 90 / 0.55), oklch(97% 0.01 90 / 0.32));
-    -webkit-backdrop-filter: blur(10px) saturate(1.3);
-    backdrop-filter: blur(10px) saturate(1.3);
-    border: 1px solid oklch(99% 0.01 90 / 0.6);
+        linear-gradient(180deg, oklch(99% 0.01 90 / 0.7), oklch(96% 0.01 90 / 0.45));
+    border: 1px solid oklch(99% 0.01 90 / 0.75);
     box-shadow:
-        inset 0 1px 0 oklch(99% 0.01 90 / 0.8),
-        0 2px 8px oklch(35% 0.03 55 / 0.12),
-        0 0 0 1px oklch(58% 0.14 55 / 0.06);
+        inset 0 1px 0 oklch(99% 0.01 90 / 0.9),
+        inset 0 -1px 1px oklch(45% 0.05 50 / 0.12),
+        0 2px 8px oklch(35% 0.03 55 / 0.14),
+        0 0 0 1px oklch(58% 0.14 55 / 0.08);
     transform: translateX(0);
     transition: transform var(--t-dur-base) var(--t-ease), width var(--t-dur-base) var(--t-ease);
+    will-change: transform, width;
     pointer-events: none;
     z-index: 0;
 }
