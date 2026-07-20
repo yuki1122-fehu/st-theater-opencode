@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '4.2.6';
+const VERSION = '4.2.7';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -611,17 +611,30 @@ function createFloatingBall() {
 <stop offset="42%" stop-color="#ffc472" stop-opacity="0.96"/>
 <stop offset="100%" stop-color="#ff7a2e" stop-opacity="0.82"/>
 </radialGradient>
+<radialGradient id="tGlassRefract" cx="63%" cy="37%" r="58%">
+<stop offset="0%" stop-color="#cfe8ff" stop-opacity="0.20"/>
+<stop offset="48%" stop-color="#a9d2f2" stop-opacity="0.07"/>
+<stop offset="100%" stop-color="#7fb8e8" stop-opacity="0"/>
+</radialGradient>
+<linearGradient id="tGlassRim" x1="50%" y1="2%" x2="50%" y2="100%">
+<stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+<stop offset="36%" stop-color="#ffffff" stop-opacity="0.34"/>
+<stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+</linearGradient>
 <filter id="tGlassGoo" x="-30%" y="-30%" width="160%" height="160%">
 <feGaussianBlur in="SourceGraphic" stdDeviation="0.55" result="blur"/>
 <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1.1 0"/>
 </filter>
 </defs>
 <path d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z" fill="url(#tGlassBody)" stroke="#fff3e0" stroke-opacity="0.9" stroke-width="0.6"/>
+<path d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z" fill="url(#tGlassRefract)"/>
 <path d="M16 12 C17.6 15 20 16.6 20 20 A4 4 0 1 1 12 20 C12 17.4 14 16.4 15 14 C15.5 16 16 16.2 16.5 15 C16.3 13.5 16 12.4 16 12 Z" fill="url(#tGlassCore)"/>
 <path d="M16 14 C16.9 16.3 18.4 17.7 18.4 19.5 A2.5 2.5 0 1 1 13.4 19.5 C13.4 17.6 14.7 16.6 15.6 15 C15.9 16.2 16.1 16.2 16.4 15.4 C16.2 14.9 16 14.4 16 14 Z" fill="url(#tGlassInner)" stroke="#ffe7c4" stroke-opacity="0.6" stroke-width="0.4"/>
 <path d="M16 4.5 C18.2 8.8 22.4 11 22.4 17 C22.4 17.9 22.2 18.8 21.9 19.6 C20.6 16.4 18.5 14.8 16.8 11.6 C16.4 11.8 16 11.6 15.8 11.2 C15.6 8.8 15.4 6.4 16 4.5 Z" fill="url(#tGlassSpec)"/>
 <ellipse cx="13.2" cy="19.5" rx="1.1" ry="2.6" fill="#ffffff" opacity="0.7" transform="rotate(-22 13.2 19.5)"/>
 <ellipse cx="18.4" cy="17.2" rx="0.6" ry="1.3" fill="#ffffff" opacity="0.5" transform="rotate(18 18.4 17.2)"/>
+<path d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z" fill="none" stroke="url(#tGlassRim)" stroke-width="0.5" stroke-opacity="0.95" transform="translate(16 16) scale(0.9) translate(-16 -16)"/>
+<ellipse cx="16" cy="5.1" rx="0.8" ry="1.5" fill="#ffffff" opacity="0.82" transform="rotate(-8 16 5.1)"/>
 </svg>` +
             '<span class="theater-ball-timer" aria-hidden="true"></span>';
 
