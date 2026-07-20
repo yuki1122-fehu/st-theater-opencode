@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '4.6.0';
+const VERSION = '4.6.1';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -618,8 +618,8 @@ function createFloatingBall() {
 </linearGradient>
 </defs>
 <ellipse cx="32" cy="36" rx="30" ry="30" fill="url(#flameGlow)"/>
-<path d="M32 57 C 24 57, 19 52, 19 44 C 19 37, 22 30, 24 22 C 25 18, 27 14, 29 12 C 28 17, 28 23, 30 26 C 31 24, 33 22, 36 20 C 38 22, 39 26, 42 32 C 45 42, 46 50, 42 54 C 38 58, 24 58, 32 57 Z" fill="url(#flameOuter)" opacity="0.88" stroke="#ffe1b0" stroke-opacity="0.5" stroke-width="0.8"/>
-<path d="M32 53 C 27 53, 23 49, 24 43 C 25 39, 27 35, 28 31 C 29 27, 30 23, 31 20 C 32 23, 33 29, 34 31 C 35 30, 35.5 29, 36 30 C 36.5 34, 37 38, 37 42 C 38 46, 38 51, 32 53 Z" fill="url(#flameInner)"/>
+<path d="M32 57 C 24 57, 19 52, 19 44 C 19 37, 22 30, 24 22 C 25 18, 27 14, 29 12 C 28 17, 28 23, 30 26 C 31 22, 32 18, 33 16 C 34 20, 35 24, 37 30 C 40 40, 42 50, 42 54 C 38 58, 24 58, 32 57 Z" fill="url(#flameOuter)" opacity="0.88" stroke="#ffe1b0" stroke-opacity="0.5" stroke-width="0.8"/>
+<path d="M32 53 C 27 53, 23 49, 24 43 C 25 39, 27 35, 28 31 C 29 27, 30 23, 31 20 C 32 23, 33 29, 34 31 C 35 30, 35.5 28, 36 28 C 36.5 31, 37 34, 38 38 C 38 44, 38 51, 32 53 Z" fill="url(#flameInner)"/>
 <path d="M32 50 C 29 50, 27 46, 28 42 C 29 38, 31 34, 32 31 C 33 34, 35 38, 36 42 C 37 46, 35 50, 32 50 Z" fill="url(#flameCore)"/>
 <ellipse cx="27" cy="26" rx="1.6" ry="4.5" fill="#ffffff" opacity="0.78" transform="rotate(-22 27 26)"/>
 <ellipse cx="29" cy="19" rx="0.9" ry="1.8" fill="#ffffff" opacity="0.88" transform="rotate(-16 29 19)"/>
