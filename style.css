@@ -2099,19 +2099,11 @@ html body #theater-floating-ball.theater-ball-generating {
     font-weight: 800;
     line-height: 1;
     letter-spacing: 0.04em;
-    background: linear-gradient(180deg,
-        #b9823a 0%,
-        #f3d28c 32%,
-        #fff7e4 47%,
-        #e9bb6e 55%,
-        #c8914a 74%,
-        #8f5e2c 100%);
+    background: linear-gradient(180deg, #7a3f1a 0%, #b5651d 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    -webkit-text-stroke: 0.3px rgba(255, 238, 198, 0.4);
-    filter: drop-shadow(0 0 5px oklch(85% 0.11 78 / 0.7)) drop-shadow(0 1px 1px oklch(72% 0.09 62 / 0.45));
     white-space: nowrap;
     pointer-events: none;
     display: none;
@@ -2122,12 +2114,8 @@ html body #theater-floating-ball.theater-ball-generating {
     animation: theater-timer-breathe 2.4s ease-in-out infinite;
 }
 @keyframes theater-timer-breathe {
-    0%, 100% {
-        filter: drop-shadow(0 0 5px oklch(85% 0.11 78 / 0.65)) drop-shadow(0 1px 1px oklch(72% 0.09 62 / 0.45));
-    }
-    50% {
-        filter: drop-shadow(0 0 11px oklch(87% 0.11 74 / 0.95)) drop-shadow(0 1px 2px oklch(74% 0.09 62 / 0.55));
-    }
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
 }
 #theater-floating-ball.theater-ball-generating > svg {
     filter: drop-shadow(0 0 8px oklch(72% 0.15 55 / 0.65)) drop-shadow(0 0 3px oklch(78% 0.13 40 / 0.70));
