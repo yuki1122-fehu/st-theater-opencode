@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '4.6.1';
+const VERSION = '4.6.2';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -618,13 +618,13 @@ function createFloatingBall() {
 </linearGradient>
 </defs>
 <ellipse cx="32" cy="36" rx="30" ry="30" fill="url(#flameGlow)"/>
-<path d="M32 57 C 24 57, 19 52, 19 44 C 19 37, 22 30, 24 22 C 25 18, 27 14, 29 12 C 28 17, 28 23, 30 26 C 31 22, 32 18, 33 16 C 34 20, 35 24, 37 30 C 40 40, 42 50, 42 54 C 38 58, 24 58, 32 57 Z" fill="url(#flameOuter)" opacity="0.88" stroke="#ffe1b0" stroke-opacity="0.5" stroke-width="0.8"/>
-<path d="M32 53 C 27 53, 23 49, 24 43 C 25 39, 27 35, 28 31 C 29 27, 30 23, 31 20 C 32 23, 33 29, 34 31 C 35 30, 35.5 28, 36 28 C 36.5 31, 37 34, 38 38 C 38 44, 38 51, 32 53 Z" fill="url(#flameInner)"/>
+<path d="M32 57 C 24 57, 19 52, 19 44 C 19 37, 22 30, 24 22 C 25 18, 28 13, 30 10 C 31 14, 31 20, 29 26 C 31 24, 33 19, 34 17 C 35 21, 34 26, 32 30 C 35 32, 38 36, 40 42 C 43 48, 43 54, 42 54 C 38 58, 24 58, 32 57 Z" fill="url(#flameOuter)" opacity="0.88" stroke="#ffe1b0" stroke-opacity="0.5" stroke-width="0.8"/>
+<path d="M32 53 C 27 53, 23 49, 24 43 C 25 39, 27 35, 28 31 C 29 27, 30 23, 31 20 C 32 23, 33 29, 34 31 C 35 30, 36 27, 36 26 C 36 30, 36 33, 35 36 C 37 38, 38 41, 38 44 C 38 49, 38 51, 32 53 Z" fill="url(#flameInner)"/>
 <path d="M32 50 C 29 50, 27 46, 28 42 C 29 38, 31 34, 32 31 C 33 34, 35 38, 36 42 C 37 46, 35 50, 32 50 Z" fill="url(#flameCore)"/>
 <ellipse cx="27" cy="26" rx="1.6" ry="4.5" fill="#ffffff" opacity="0.78" transform="rotate(-22 27 26)"/>
 <ellipse cx="29" cy="19" rx="0.9" ry="1.8" fill="#ffffff" opacity="0.88" transform="rotate(-16 29 19)"/>
 <circle cx="40" cy="36" r="1.3" fill="#fff6d8" opacity="0.7"/>
-<path d="M32 57 C 24 57, 19 52, 19 44 C 19 37, 22 30, 24 22 C 25 18, 27 14, 29 12 C 28 17, 28 23, 30 26" fill="none" stroke="url(#flameRim)" stroke-width="1.5" stroke-linecap="round"/>
+<path d="M32 57 C 24 57, 19 52, 19 44 C 19 37, 22 30, 24 22 C 25 18, 28 13, 30 10 C 31 14, 31 20, 29 26" fill="none" stroke="url(#flameRim)" stroke-width="1.5" stroke-linecap="round"/>
 </svg>` +
             '<span class="theater-ball-timer" aria-hidden="true"></span>';
 
