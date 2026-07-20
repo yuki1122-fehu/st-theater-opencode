@@ -151,6 +151,12 @@
     box-shadow:
         var(--t-shadow-popup),
         inset 0 1px 0 oklch(99% 0.005 90 / 0.7);
+    /* 手机式固定视口高度：内容少不少都保持同一高度，内部滚动 */
+    display: flex;
+    flex-direction: column;
+    height: clamp(560px, 86vh, 880px);
+    max-height: 86vh;
+    overflow: hidden;
 }
 
 .theater-popup *,
@@ -226,6 +232,7 @@
     position: relative;
     padding: var(--t-space-8) var(--t-space-10) var(--t-space-6);
     border-bottom: 1px solid var(--t-border);
+    flex-shrink: 0;
     background:
         /* brushed metal streaks */
         repeating-linear-gradient(90deg,
@@ -367,6 +374,7 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     flex-wrap: nowrap;
+    flex-shrink: 0;
     background: linear-gradient(180deg, transparent, oklch(35% 0.03 55 / 0.025));
 }
 
@@ -441,11 +449,12 @@
  * PANELS
  * ============================================================ */
 .theater-panels-wrapper {
-    flex: 1;
+    flex: 1 1 auto;
     overflow-y: auto;
-    max-height: clamp(520px, 72vh, 780px);
-    min-height: 380px;
+    overflow-x: hidden;
+    min-height: 0;          /* flex 子项必须设 0 才能正确收缩滚动 */
     scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
 }
 
 .theater-popup[data-skin="theater"] .theater-panels-wrapper {
@@ -1915,16 +1924,25 @@ body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="
     border-radius: var(--t-radius-xl) !important;
     box-shadow: var(--t-shadow-popup) !important;
     overflow: hidden;
+    /* 让外层 dialog 高度跟随内部固定高度的 popup，圆角裁切 */
+    max-height: 88vh !important;
+    height: auto !important;
+    padding: 0 !important;
 }
 
 body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])) .popup-body {
     background: transparent !important; padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
 }
 
 body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])) .popup-controls {
     background: transparent !important;
     border-top: var(--t-rule-thin);
     padding: var(--t-space-3) var(--t-space-6);
+    flex-shrink: 0;
 }
 
 body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])) .popup-button-close,
@@ -1980,7 +1998,8 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     .theater-tabs { padding: var(--t-space-2) var(--t-space-3); }
     .theater-tab { padding: var(--t-space-2) var(--t-space-3); font-size: var(--t-text-xs); }
     .theater-panel { padding: var(--t-space-4); }
-    .theater-panels-wrapper { max-height: calc(100dvh - 180px); min-height: 360px; }
+    .theater-panels-wrapper { max-height: none; min-height: 0; }
+    .theater-popup { height: 92vh; max-height: 92vh; }
     .theater-section { margin-bottom: var(--t-space-4); padding: var(--t-space-4); }
     .theater-textarea { min-height: 120px; }
     .theater-btn { min-height: 38px; }
