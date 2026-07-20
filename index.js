@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '4.10.0';
+const VERSION = '4.10.1';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -1704,8 +1704,12 @@ function bindEvents() {
         $('.theater-tab').removeClass('active'); $(this).addClass('active');
         $('.theater-panel').removeClass('active'); $(`.theater-panel[data-panel="${t}"]`).addClass('active');
         moveTabIndicator();
-        // 若 tab 被横向滚动隐藏，滚回可视区
-        this.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+        // 仅横向滚动 tabs 容器把当前 tab 带回可视区，避免 scrollIntoView 带动整页造成闪动
+        const tabsBox = this.closest('.theater-tabs');
+        if (tabsBox) {
+            const target = this.offsetLeft - tabsBox.clientWidth / 2 + this.offsetWidth / 2;
+            tabsBox.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
+        }
         if (t === 'diagnostics') renderErrorLog();
         if (t === 'prompt') renderPromptInspector();
     });
