@@ -1875,13 +1875,29 @@
 
 #theater-floating-ball .theater-ball-svg {
     transition: filter 0.25s cubic-bezier(.2,.8,.2,1), transform 0.25s cubic-bezier(.2,.8,.2,1);
+    /* 金红光晕，让火焰在任何背景上都清晰可读 */
+    filter: drop-shadow(0 0 6px oklch(62% 0.20 40 / 0.55)) drop-shadow(0 3px 8px oklch(45% 0.15 35 / 0.35));
+}
+
+/* 火苗本体：液态玻璃般的轻微摆动 + 呼吸 */
+#theater-floating-ball .theater-flame-body {
+    transform-origin: 32px 52px;
+    animation: theater-flame-sway 2.6s ease-in-out infinite;
+}
+@keyframes theater-flame-sway {
+    0%, 100% { transform: rotate(-2.2deg) scale(1, 1); }
+    30%      { transform: rotate(1.6deg) scale(0.985, 1.02); }
+    60%      { transform: rotate(-1.2deg) scale(1.015, 0.99); }
 }
 
 #theater-floating-ball:hover {
-    filter: drop-shadow(0 6px 12px oklch(28% 0.03 50 / 0.40)) !important;
+    filter: none !important;
 }
 #theater-floating-ball:hover .theater-ball-svg {
-    filter: brightness(1.05) saturate(1.06) contrast(1.03);
+    filter: drop-shadow(0 0 10px oklch(66% 0.22 42 / 0.75)) drop-shadow(0 5px 12px oklch(48% 0.16 35 / 0.45)) brightness(1.1) saturate(1.12);
+}
+#theater-floating-ball:hover .theater-flame-body {
+    animation-duration: 1.3s;
 }
 
 #theater-floating-ball .theater-ball-dot {

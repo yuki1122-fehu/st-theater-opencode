@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '4.7.0';
+const VERSION = '4.8.0';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -587,44 +587,53 @@ function createFloatingBall() {
         const ball = document.createElement('div');
         ball.id = 'theater-floating-ball';
         ball.title = '打开拾光锻匣';
-        // 纯火焰 SVG + 内嵌计时标签（生成时随球移动，不再用独立浮层）
+        // 液态玻璃火焰 SVG + 内嵌计时标签（生成时随球移动，不再用独立浮层）
+        // 三层结构：外层深红火苗轮廓（多舌）→ 中层金橙 → 内核亮金，叠加玻璃高光与边缘描光
         ball.innerHTML = `<svg viewBox="0 0 64 64" aria-hidden="true" class="theater-ball-svg" style="width:64px;height:64px;display:block;overflow:visible;">
 <defs>
 <linearGradient id="flameOuter" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#f2ab5e"/>
-<stop offset="0.35" stop-color="#e8823f"/>
-<stop offset="0.7" stop-color="#d9552f"/>
-<stop offset="1" stop-color="#a83a30"/>
+<stop offset="0" stop-color="#ffb03a"/>
+<stop offset="0.38" stop-color="#f9661d"/>
+<stop offset="0.72" stop-color="#dd2f12"/>
+<stop offset="1" stop-color="#a80f0f"/>
 </linearGradient>
 <linearGradient id="flameInner" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#e9cf8a"/>
-<stop offset="0.5" stop-color="#e3a857"/>
-<stop offset="1" stop-color="#d35c38"/>
+<stop offset="0" stop-color="#ffd76e"/>
+<stop offset="0.5" stop-color="#ff9a2e"/>
+<stop offset="1" stop-color="#f04a10"/>
 </linearGradient>
 <linearGradient id="flameCore" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#fbf3e0"/>
-<stop offset="0.55" stop-color="#f3e2b3"/>
-<stop offset="1" stop-color="#e6bd75"/>
+<stop offset="0" stop-color="#fffbe8"/>
+<stop offset="0.55" stop-color="#ffe89a"/>
+<stop offset="1" stop-color="#ffb43c"/>
 </linearGradient>
 <radialGradient id="flameGlow" cx="0.5" cy="0.55" r="0.55">
-<stop offset="0" stop-color="#ff7a1f" stop-opacity="0.36"/>
-<stop offset="0.55" stop-color="#ff5a1a" stop-opacity="0.1"/>
-<stop offset="1" stop-color="#ff5a1a" stop-opacity="0"/>
+<stop offset="0" stop-color="#ff6a1a" stop-opacity="0.5"/>
+<stop offset="0.55" stop-color="#ff3d0a" stop-opacity="0.16"/>
+<stop offset="1" stop-color="#ff3d0a" stop-opacity="0"/>
 </radialGradient>
 <linearGradient id="flameRim" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#fff4d6" stop-opacity="0.95"/>
-<stop offset="0.5" stop-color="#fff4d6" stop-opacity="0.25"/>
-<stop offset="1" stop-color="#fff4d6" stop-opacity="0"/>
+<stop offset="0" stop-color="#fff7dd" stop-opacity="1"/>
+<stop offset="0.5" stop-color="#ffe9bd" stop-opacity="0.35"/>
+<stop offset="1" stop-color="#ffe9bd" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="flameGlass" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#ffffff" stop-opacity="0.95"/>
+<stop offset="1" stop-color="#ffffff" stop-opacity="0.15"/>
 </linearGradient>
 </defs>
-<ellipse cx="32" cy="36" rx="30" ry="30" fill="url(#flameGlow)"/>
-<path d="M32 56 C 22 56, 15 49, 15 40 C 15 32, 20 25, 24 18 C 26 14, 27 10, 27 6 C 28 12, 31 18, 34 24 C 37 30, 41 36, 45 40 C 43 40, 41 38, 39 37 C 41 40, 42 43, 43 46 C 44 51, 40 56, 32 56 Z" fill="url(#flameOuter)" opacity="0.88" stroke="#ffe1b0" stroke-opacity="0.5" stroke-width="0.8"/>
-<path d="M32 52 C 27 52, 23 49, 23 44 C 23 39, 26 34, 29 28 C 30 25, 31 22, 32 20 C 33 24, 35 29, 37 33 C 39 37, 41 41, 41 44 C 41 49, 38 52, 32 52 Z" fill="url(#flameInner)"/>
-<path d="M32 49 C 28 49, 26 45, 27 41 C 28 37, 30 33, 31 30 C 32 33, 34 37, 35 41 C 36 45, 35 49, 32 49 Z" fill="url(#flameCore)"/>
-<ellipse cx="27" cy="28" rx="1.6" ry="4.5" fill="#ffffff" opacity="0.78" transform="rotate(-22 27 28)"/>
-<ellipse cx="29" cy="20" rx="0.9" ry="1.8" fill="#ffffff" opacity="0.88" transform="rotate(-16 29 20)"/>
-<circle cx="40" cy="38" r="1.3" fill="#fff6d8" opacity="0.7"/>
-<path d="M32 56 C 22 56, 15 49, 15 40 C 15 32, 20 25, 24 18 C 26 14, 27 10, 27 6 C 28 12, 31 18, 34 24" fill="none" stroke="url(#flameRim)" stroke-width="1.5" stroke-linecap="round"/>
+<ellipse cx="32" cy="35" rx="30" ry="31" fill="url(#flameGlow)"/>
+<g class="theater-flame-body">
+<path d="M32 57 C 21 57, 13 49, 13 39 C 13 32, 17 26, 21 19 C 24 13, 25 8, 25 4 C 28 10, 33 15, 35 21 C 36 16, 39 12, 43 9 C 42 15, 45 20, 48 26 C 50 30, 51 34, 51 39 C 51 49, 43 57, 32 57 Z" fill="url(#flameOuter)" opacity="0.95" stroke="#ffd9a0" stroke-opacity="0.55" stroke-width="0.8"/>
+<path d="M32 53 C 25 53, 19 47, 19 40 C 19 34, 23 29, 26 23 C 28 19, 29 15, 29 12 C 33 17, 37 22, 39 27 C 40 24, 42 21, 44 19 C 44 24, 46 28, 46 34 C 46 38, 45 42, 43 46 C 40 51, 37 53, 32 53 Z" fill="url(#flameInner)"/>
+<path d="M32 50 C 27 50, 24 46, 24 41 C 24 36, 27 32, 30 27 C 31 25, 32 23, 32 21 C 34 25, 37 29, 38 33 C 39 35, 40 38, 40 41 C 40 46, 37 50, 32 50 Z" fill="url(#flameCore)"/>
+<ellipse cx="32" cy="44" rx="4.2" ry="5" fill="#fffdf2" opacity="0.9"/>
+<ellipse cx="24" cy="26" rx="2" ry="6.5" fill="url(#flameGlass)" opacity="0.85" transform="rotate(-18 24 26)"/>
+<ellipse cx="27.5" cy="15" rx="1" ry="2.4" fill="#ffffff" opacity="0.9" transform="rotate(-14 27.5 15)"/>
+<ellipse cx="44" cy="33" rx="1.1" ry="3.2" fill="url(#flameGlass)" opacity="0.55" transform="rotate(14 44 33)"/>
+<circle cx="41" cy="44" r="1.4" fill="#fff6d8" opacity="0.75"/>
+<path d="M32 57 C 21 57, 13 49, 13 39 C 13 32, 17 26, 21 19 C 24 13, 25 8, 25 4 C 28 10, 33 15, 35 21" fill="none" stroke="url(#flameRim)" stroke-width="1.6" stroke-linecap="round"/>
+</g>
 </svg>` +
             '<span class="theater-ball-timer" aria-hidden="true"></span>';
 
@@ -700,7 +709,6 @@ function createFloatingBall() {
             '-webkit-user-select:none !important',
             'user-select:none !important',
             'pointer-events:auto !important',
-            'filter:drop-shadow(0 3px 6px oklch(28% 0.03 50 / 0.32))',
         ].join(';'));
 
         let isDragging = false;
