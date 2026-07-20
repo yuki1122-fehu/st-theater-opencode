@@ -345,7 +345,15 @@
     text-align: left;
 }
 
-/* Main title — engraved, prominent, left-aligned */
+/* Main title — 金红 ember 渐变文字（仅默认皮肤） */
+.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-popup-header .theater-title {
+    background: linear-gradient(105deg, oklch(45% 0.13 48), oklch(58% 0.15 58) 55%, oklch(72% 0.15 66));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: none;
+}
+
 .theater-popup-header .theater-title {
     font-family: var(--t-font-serif);
     font-size: clamp(2.2rem, 5.5vw, 2.8rem);
@@ -533,6 +541,16 @@
         inset 0 1px 0 oklch(99% 0.005 90 / 0.8),
         inset 0 -1px 0 oklch(80% 0.02 80 / 0.2);
     position: relative;
+    /* 悬浮微高亮：只动 box-shadow/border（不动 transform，避免 backdrop-filter 重合成闪） */
+    transition: box-shadow var(--t-dur-base) var(--t-ease), border-color var(--t-dur-base) var(--t-ease);
+}
+
+.theater-section:hover {
+    border-color: oklch(99% 0.005 90 / 0.85);
+    box-shadow:
+        0 8px 26px oklch(45% 0.1 50 / 0.14),
+        inset 0 1px 0 oklch(99% 0.005 90 / 0.9),
+        inset 0 -1px 0 oklch(80% 0.02 80 / 0.2);
 }
 
 .theater-section:last-child {
@@ -791,36 +809,76 @@
     pointer-events: none;
 }
 
-/* CTA — generate button: same embossed brass, slightly wider */
+/* CTA — generate button: 英雄化金红 ember 主按钮 */
 .theater-btn.generate {
-    padding: var(--t-space-2) var(--t-space-6);
-    min-height: 38px;
+    position: relative;
+    overflow: hidden;
+    padding: var(--t-space-2) var(--t-space-7);
+    min-height: 42px;
     font-size: var(--t-text-sm);
-    font-weight: 600;
-    color: var(--t-on-accent);
-    background: linear-gradient(180deg, oklch(66% 0.14 60), oklch(55% 0.145 50));
-    border: 1px solid oklch(45% 0.12 46);
-    text-shadow: 0 1px 1px oklch(30% 0.06 45 / 0.35);
-    width: auto;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: oklch(99% 0.01 90);
+    /* 金红 ember 渐变 */
+    background: linear-gradient(135deg, oklch(74% 0.17 68), oklch(58% 0.19 48) 45%, oklch(48% 0.2 35));
+    border: 1px solid oklch(85% 0.12 78 / 0.55);
+    text-shadow: 0 1px 2px oklch(28% 0.08 40 / 0.5);
     box-shadow:
-        inset 0 1px 0 oklch(99% 0.005 90 / 0.4),
-        inset 0 -1px 1px oklch(30% 0.06 45 / 0.3),
-        0 2px 6px oklch(50% 0.12 50 / 0.3);
+        inset 0 1px 0 oklch(99% 0.01 90 / 0.5),
+        inset 0 -2px 5px oklch(30% 0.1 40 / 0.4),
+        0 4px 14px oklch(55% 0.18 40 / 0.42);
+    animation: theater-cta-glow 3.2s ease-in-out infinite;
+    isolation: isolate;
+}
+
+/* 流光扫过 */
+.theater-btn.generate::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 30%, oklch(99% 0.01 90 / 0.55) 50%, transparent 70%);
+    transform: translateX(-130%);
+    animation: theater-cta-shimmer 3.4s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.theater-btn.generate > * {
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes theater-cta-glow {
+    0%, 100% {
+        box-shadow:
+            inset 0 1px 0 oklch(99% 0.01 90 / 0.5),
+            inset 0 -2px 5px oklch(30% 0.1 40 / 0.4),
+            0 4px 14px oklch(55% 0.18 40 / 0.42);
+    }
+    50% {
+        box-shadow:
+            inset 0 1px 0 oklch(99% 0.01 90 / 0.6),
+            inset 0 -2px 5px oklch(30% 0.1 40 / 0.4),
+            0 4px 16px oklch(55% 0.18 40 / 0.42),
+            0 0 22px 2px oklch(64% 0.2 46 / 0.5);
+    }
+}
+
+@keyframes theater-cta-shimmer {
+    0%   { transform: translateX(-130%); }
+    55%, 100% { transform: translateX(130%); }
 }
 
 .theater-btn.generate:hover {
-    background: linear-gradient(180deg, oklch(69% 0.14 62), oklch(58% 0.145 52));
-    transform: none;
-    box-shadow:
-        inset 0 1px 0 oklch(99% 0.005 90 / 0.45),
-        inset 0 -1px 1px oklch(30% 0.06 45 / 0.28),
-        0 4px 12px oklch(50% 0.12 50 / 0.35);
+    background: linear-gradient(135deg, oklch(78% 0.17 70), oklch(62% 0.19 50) 45%, oklch(52% 0.2 37));
+    border-color: oklch(88% 0.12 80 / 0.7);
+    animation-duration: 1.8s;
 }
 
 .theater-btn.generate:active {
-    transform: scale(0.98);
+    transform: scale(0.97);
     box-shadow:
-        inset 0 2px 4px oklch(28% 0.05 45 / 0.35);
+        inset 0 2px 6px oklch(28% 0.05 45 / 0.45);
 }
 
 .theater-btn.generate i {
@@ -2029,26 +2087,32 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     border-radius: inherit;
 }
 
-/* Scrollbars */
+/* Scrollbars — 悬浮才出现、半透明圆角胶囊 */
 .theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) {
-    scrollbar-width: thin; scrollbar-color: var(--t-border-strong) transparent;
+    scrollbar-width: thin; scrollbar-color: oklch(58% 0.02 55 / 0.45) transparent;
 }
 
 .theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) ::-webkit-scrollbar {
-    width: 8px; height: 8px;
+    width: 10px; height: 10px;
 }
 
 .theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) ::-webkit-scrollbar-track {
     background: transparent;
+    margin: var(--t-space-2) 0;
 }
 
 .theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) ::-webkit-scrollbar-thumb {
-    background: var(--t-border-strong);
-    border-radius: 4px;
+    background: oklch(58% 0.02 55 / 0.35);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    transition: background-color var(--t-dur-fast) var(--t-ease);
 }
 
 .theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) ::-webkit-scrollbar-thumb:hover {
-    background: var(--t-ink-muted);
+    background: oklch(50% 0.03 55 / 0.6);
+    border: 3px solid transparent;
+    background-clip: padding-box;
 }
 
 .theater-popup .theater-tabs { scrollbar-width: none !important; }
@@ -2081,7 +2145,7 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     .theater-section { margin-bottom: var(--t-space-4); padding: var(--t-space-4); }
     .theater-textarea { min-height: 120px; }
     .theater-btn { min-height: 38px; }
-    .theater-btn.generate { min-height: 38px; }
+    .theater-btn.generate { min-height: 40px; }
     .theater-btn-row { gap: var(--t-space-2); }
     .theater-iframe { height: 60vh; }
     .theater-stream-pre { max-height: 40vh; }

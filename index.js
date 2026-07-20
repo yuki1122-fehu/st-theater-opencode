@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '4.12.1';
+const VERSION = '4.13.0';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -870,7 +870,7 @@ function buildPopupHTML() {
             <span class="theater-hint-inline">生成可交互的小剧场</span>
         </div>
         <div class="theater-btn-row">
-            <div id="theater-generate-btn" class="theater-btn primary"><i class="fa-solid fa-hammer"></i><span>生成小剧场</span></div>
+            <div id="theater-generate-btn" class="theater-btn primary generate"><i class="fa-solid fa-hammer"></i><span>生成小剧场</span></div>
             <div id="theater-stop-btn" class="theater-btn danger" style="display:none;"><i class="fa-solid fa-stop"></i><span>停止生成</span></div>
             <div id="theater-random-btn" class="theater-btn" style="${settings.randomEnabled ? '' : 'display:none;'}"><i class="fa-solid fa-dice"></i><span>随机抽取</span></div>
             <div id="theater-save-instruction-btn" class="theater-btn"><i class="fa-solid fa-bookmark"></i><span>存为模板</span></div>
