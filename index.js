@@ -1,5 +1,5 @@
 // 拾光锻匣 · 小剧场生成器 v3.0.0 — by 禾禾 & 麓克
-// Icon: "magic-lamp" by Lorc, game-icons.net, CC BY 3.0 — https://game-icons.net/1x1/lorc/magic-lamp.html
+// Icon: 火焰（与弹窗头部 logo、悬浮球统一的锻炉火焰主题）
 
 import { theaterError as notifyTheaterError } from './notify.js';
 import { playSoundFile } from './notification-sound.js';
@@ -25,7 +25,7 @@ const SOUND_PRESETS = [
     { id: 'pop',    label: '萌·啵',   file: 'universfield-bubble-pop-06-351337.mp3' },
 ];
 
-const LAMP_SVG_HTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="theater-lamp-icon" aria-hidden="true"><path d="M203.72 87.938c-2.082.017-4.18.31-6.282.874-13.45 3.608-21.412 17.53-17.782 31.094 1.384 5.172 4.235 9.52 8 12.75-31.85 15.446-53.498 45.172-59.28 78.72l-22.532 7.593c-11.235-2.877-21.416-4.2-30.53-4.095-14.696.167-26.65 4.02-35.908 10.97-18.518 13.896-23.316 38.02-19.53 60.655 3.784 22.636 15.81 45.127 34.343 59.344 18.532 14.216 44.715 18.96 71.03 4.875 4.43-2.373 8.776-4.81 12.813-6.97 2.993 10.772 14.018 17.16 24.75 14.28 10.253-2.75 16.547-12.963 14.656-23.31 16.984 10.05 34.495 15.674 52.186 17.405-14.094 20.893-32.316 39.57-53.97 54.78 27.754 27.726 224.764-24.853 229.626-61.592-26.89-2.484-52.525-9.935-75.562-21.563 67.995-43.983 128.655-133.27 160.656-234.563l-42.47 14.344c-44.11 67.313-122.214 103.81-167.155 28a107.922 107.922 0 0 0-53-9.593c1.656-4.69 1.95-9.913.564-15.093-3.063-11.443-13.392-18.998-24.625-18.906zM76.062 233.53c5.11-.027 10.865.51 17.312 1.75 18.656 36.728 39.31 63.938 61.188 82.845-.767.113-1.546.263-2.313.47-.146.038-.293.08-.438.124-2.846.324-5.588 1.044-8.218 1.936-9.64 3.27-18.73 9.084-27.156 13.594-20.655 11.056-36.95 7.41-50.844-3.25-13.895-10.66-24.256-29.5-27.28-47.594-3.027-18.094.948-34.097 12.31-42.625 5.683-4.263 13.943-7.186 25.438-7.25z"/></svg>';
+const FLAME_SVG_HTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" class="theater-lamp-icon" aria-hidden="true"><path fill="currentColor" d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z"/><path fill="currentColor" opacity="0.5" d="M16 12 C17.6 15 20 16.6 20 20 A4 4 0 1 1 12 20 C12 17.4 14 16.4 15 14 C15.5 16 16 16.2 16.5 15 C16.3 13.5 16 12.4 16 12 Z"/><circle cx="16" cy="21.5" r="2.2" fill="currentColor" opacity="0.85"/></svg>';
 
 // ============================================================
 // Default system prompt — 月见轻量 by 染染, adapted for theater
@@ -359,7 +359,7 @@ async function init() {
 
     const addWand = () => {
         if ($('#theater-wand-btn').length) return;
-        const $btn = $(`<div id="theater-wand-btn" class="list-group-item flex-container flexGap5"><div class="extensionsMenuExtensionButton">${LAMP_SVG_HTML}</div>拾光锻匣</div>`);
+        const $btn = $(`<div id="theater-wand-btn" class="list-group-item flex-container flexGap5"><div class="extensionsMenuExtensionButton">${FLAME_SVG_HTML}</div>拾光锻匣</div>`);
         $('#extensionsMenu').append($btn);
         $btn.on('click', e => { e.stopPropagation(); $(document).trigger('click'); setTimeout(openTheaterPopup, 150); });
         refreshUpdateBadges();
@@ -897,7 +897,7 @@ function buildPopupHTML() {
                 <pre id="theater-stream-text" class="theater-stream-pre" style="display:none;"></pre>
                 <div id="theater-output-container"><iframe id="theater-output-frame" sandbox="allow-scripts allow-same-origin allow-modals" class="theater-iframe"></iframe></div>
                 <div class="theater-output-skeleton" aria-hidden="true">
-                    <div class="theater-skeleton-ember"></div>
+                    <div class="theater-skeleton-ember"><svg viewBox="0 0 32 32" class="theater-skeleton-flame" aria-hidden="true"><path fill="currentColor" d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z"/><path fill="currentColor" opacity="0.5" d="M16 12 C17.6 15 20 16.6 20 20 A4 4 0 1 1 12 20 C12 17.4 14 16.4 15 14 C15.5 16 16 16.2 16.5 15 C16.3 13.5 16 12.4 16 12 Z"/><circle cx="16" cy="21.5" r="2.2" fill="currentColor" opacity="0.85"/></svg></div>
                     <div class="theater-skeleton-lines"><span></span><span></span><span></span><span></span><span></span></div>
                     <p class="theater-skeleton-tip">锻炉正在熔炼你的小剧场…</p>
                 </div>
