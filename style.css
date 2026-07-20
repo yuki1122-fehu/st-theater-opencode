@@ -1610,6 +1610,180 @@
     border-radius: var(--t-radius-md);
     overflow: hidden;
     box-shadow: var(--t-elev-1);
+    position: relative;
+    z-index: 2;
+}
+
+/* Output stage — relative wrapper hosting the skeleton overlay */
+.theater-output-stage {
+    position: relative;
+}
+
+/* ===== 生成中骨架屏：熔炉微光占位 ===== */
+.theater-output-skeleton {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--t-space-4);
+    padding: var(--t-space-6);
+    border-radius: var(--t-radius-md);
+    background:
+        radial-gradient(ellipse 70% 60% at 50% 42%, oklch(65% 0.16 60 / 0.20), transparent 70%),
+        linear-gradient(160deg, oklch(99% 0.004 90 / 0.42), oklch(96% 0.01 88 / 0.30));
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity var(--t-dur-base) var(--t-ease), visibility var(--t-dur-base);
+}
+#theater-output-section.is-generating .theater-output-skeleton {
+    opacity: 1;
+    visibility: visible;
+}
+#theater-output-stage.has-content .theater-output-skeleton {
+    opacity: 0;
+    visibility: hidden;
+}
+.theater-skeleton-ember {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 38%, oklch(86% 0.16 80), oklch(58% 0.17 45) 58%, transparent 72%);
+    filter: blur(2px);
+    box-shadow: 0 0 26px oklch(64% 0.18 50 / 0.55);
+    animation: theater-ember-pulse 1.8s ease-in-out infinite;
+}
+@keyframes theater-ember-pulse {
+    0%, 100% { transform: scale(0.9); opacity: 0.7; }
+    50%      { transform: scale(1.1); opacity: 1; }
+}
+.theater-skeleton-lines {
+    width: min(320px, 78%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.theater-skeleton-lines span {
+    height: 12px;
+    border-radius: 6px;
+    background: linear-gradient(90deg,
+        oklch(76% 0.02 82 / 0.55) 25%,
+        oklch(94% 0.02 88 / 0.95) 50%,
+        oklch(76% 0.02 82 / 0.55) 75%);
+    background-size: 220% 100%;
+    animation: theater-shimmer 1.4s linear infinite;
+}
+.theater-skeleton-lines span:nth-child(1) { width: 92%; }
+.theater-skeleton-lines span:nth-child(2) { width: 100%; }
+.theater-skeleton-lines span:nth-child(3) { width: 78%; }
+.theater-skeleton-lines span:nth-child(4) { width: 96%; }
+.theater-skeleton-lines span:nth-child(5) { width: 62%; }
+@keyframes theater-shimmer {
+    0%   { background-position: 220% 0; }
+    100% { background-position: -220% 0; }
+}
+.theater-skeleton-tip {
+    margin: 0;
+    font-size: var(--t-text-xs);
+    color: var(--t-ink-muted);
+    letter-spacing: 0.05em;
+}
+
+/* ===== 悬浮球大小滑块 ===== */
+.theater-range-block { margin-bottom: 12px; }
+.theater-range-row {
+    display: flex;
+    align-items: center;
+    gap: var(--t-space-3);
+}
+.theater-range-row input[type="range"] {
+    flex: 1;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: linear-gradient(90deg, var(--t-brass-mid), var(--t-brass-low));
+    border-radius: var(--t-radius-pill);
+    outline: none;
+    cursor: pointer;
+}
+.theater-range-row input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--t-brass-grad);
+    border: 2px solid oklch(99% 0.005 90 / 0.9);
+    box-shadow: var(--t-metal-bevel);
+    transition: transform var(--t-dur-fast) var(--t-ease);
+}
+.theater-range-row input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.12); }
+.theater-range-row input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--t-brass-grad);
+    border: 2px solid oklch(99% 0.005 90 / 0.9);
+    box-shadow: var(--t-metal-bevel);
+    cursor: pointer;
+}
+.theater-range-row input[type="range"]:focus-visible { outline: 2px solid var(--t-accent); outline-offset: 3px; }
+.theater-range-val {
+    font-family: var(--t-font-mono);
+    font-size: var(--t-text-xs);
+    color: var(--t-ink-muted);
+    min-width: 44px;
+    text-align: right;
+    letter-spacing: 0.03em;
+}
+
+/* ===== 空状态美化：统一插画卡片 ===== */
+.theater-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--t-space-3);
+    margin: var(--t-space-2) 0;
+    padding: var(--t-space-8) var(--t-space-6);
+    text-align: center;
+    font-family: var(--t-font-sans);
+    font-size: var(--t-text-sm);
+    color: var(--t-ink-faint);
+    border: 1px dashed var(--t-border-strong);
+    border-radius: var(--t-radius-md);
+    background: var(--t-surface-hover);
+}
+.theater-empty::before {
+    content: "";
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 40%, var(--t-accent-soft), transparent 70%);
+    box-shadow:
+        inset 0 0 0 1px var(--t-border-strong),
+        0 0 14px oklch(64% 0.17 50 / 0.25);
+}
+
+/* ===== 键盘焦点可见性 ===== */
+.theater-popup :focus-visible {
+    outline: 2px solid var(--t-accent);
+    outline-offset: 2px;
+    border-radius: var(--t-radius-sm);
+}
+.theater-popup .theater-btn:focus-visible,
+.theater-popup .theater-input:focus-visible,
+.theater-popup .theater-select:focus-visible,
+.theater-popup .theater-textarea:focus-visible,
+.theater-popup .theater-tab:focus-visible,
+.theater-popup .theater-wb-action-link:focus-visible {
+    outline: 2px solid var(--t-accent);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px var(--t-accent-soft);
 }
 
 /* Output section — amber hearth glow on frosted glass */
@@ -2390,4 +2564,18 @@ html body #theater-floating-ball.theater-ball-generating {
     word-break: break-word;
     max-height: 340px;
     overflow: auto;
+}
+
+/* ============================================================
+   Tab 栏边缘渐隐 — 窄屏横向滚动时的可滚动提示
+   ============================================================ */
+@media (max-width: 768px) {
+    .theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-tabs,
+    .theater-popup[data-skin="theater"] .theater-tabs,
+    .theater-popup[data-skin="custom"] .theater-tabs {
+        -webkit-mask-image: linear-gradient(90deg,
+            transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
+        mask-image: linear-gradient(90deg,
+            transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
+    }
 }

@@ -155,6 +155,7 @@ const defaultSettings = Object.freeze({
     followUserPersona: false,   // 生成时自动读取当前 user 人设
     floatingBall: false,
     floatingBallTuck: true,
+    ballSize: 64,               // 悬浮球直径（px），40–120 可调
     ballIntroDone: false,       // 悬浮球首次引导脉冲是否已播放
     soundEnabled: true,
     soundPreset: 'chime',
@@ -584,12 +585,15 @@ function createFloatingBall() {
         document.querySelectorAll('#theater-floating-ball').forEach(el => el.remove());
         if (!settings.floatingBall) return;
 
+        // 悬浮球尺寸：读设置并夹在 40–120px，所有位置偏移都按它推导
+        const size = Math.max(40, Math.min(120, parseInt(settings.ballSize, 10) || 64));
+
         const ball = document.createElement('div');
         ball.id = 'theater-floating-ball';
         ball.title = '打开拾光锻匣';
         // 液态玻璃火焰 SVG + 内嵌计时标签（生成时随球移动，不再用独立浮层）
         // 三层结构：外层深红火苗轮廓（多舌）→ 中层金橙 → 内核亮金，叠加玻璃高光与边缘描光
-        ball.innerHTML = `<svg viewBox="0 0 64 64" aria-hidden="true" class="theater-ball-svg" style="width:64px;height:64px;display:block;overflow:visible;">
+        ball.innerHTML = `<svg viewBox="0 0 64 64" aria-hidden="true" class="theater-ball-svg" style="width:${size}px;height:${size}px;display:block;overflow:visible;">
 <defs>
 <linearGradient id="flameOuter" x1="0" y1="0" x2="0" y2="1">
 <stop offset="0" stop-color="#ffb03a"/>
@@ -631,8 +635,8 @@ function createFloatingBall() {
 </svg>` +
             '<span class="theater-ball-timer" aria-hidden="true"></span>';
 
-        const initLeft = window.innerWidth - 84;
-        const initTop = window.innerHeight - 146;
+        const initLeft = window.innerWidth - (size + 20);
+        const initTop = window.innerHeight - (size + 82);
 
         // 贴边收纳：拖完吸附到最近的左/右边，闲置一会儿缩进边里半个身子
         const BASE_TRANSITION = 'transform 0.18s cubic-bezier(.2,.8,.2,1), opacity 0.18s, box-shadow 0.18s';
@@ -649,10 +653,10 @@ function createFloatingBall() {
             ball.style.opacity = '0.92';
         }
         function untuckedLeft(side) {
-            return side === 'left' ? 6 : window.innerWidth - 74;
+            return side === 'left' ? 6 : window.innerWidth - (size + 10);
         }
         function tuckedLeft(side) {
-            return side === 'left' ? -32 : window.innerWidth - 36;
+            return side === 'left' ? -(size * 0.5) : window.innerWidth - (size * 0.5);
         }
         function scheduleTuck() {
             cancelTuck();
@@ -669,7 +673,7 @@ function createFloatingBall() {
         function snapToEdge() {
             const w = window.innerWidth;
             const cur = parseInt(ball.style.left) || 0;
-            const onLeft = cur + 34 < w / 2;
+            const onLeft = cur + size / 2 < w / 2;
             ball.dataset.side = onLeft ? 'left' : 'right';
             ball.dataset.tucked = 'false';
             ball.style.transition = SNAP_TRANSITION;
@@ -889,8 +893,15 @@ function buildPopupHTML() {
                     <div id="theater-zen-btn" class="theater-btn" title="全屏沉浸阅读（Esc 退出）">沉浸阅读</div>
                 </div>
             </div>
-            <pre id="theater-stream-text" class="theater-stream-pre" style="display:none;"></pre>
-            <div id="theater-output-container"><iframe id="theater-output-frame" sandbox="allow-scripts allow-same-origin allow-modals" class="theater-iframe"></iframe></div>
+            <div id="theater-output-stage" class="theater-output-stage">
+                <pre id="theater-stream-text" class="theater-stream-pre" style="display:none;"></pre>
+                <div id="theater-output-container"><iframe id="theater-output-frame" sandbox="allow-scripts allow-same-origin allow-modals" class="theater-iframe"></iframe></div>
+                <div class="theater-output-skeleton" aria-hidden="true">
+                    <div class="theater-skeleton-ember"></div>
+                    <div class="theater-skeleton-lines"><span></span><span></span><span></span><span></span><span></span></div>
+                    <p class="theater-skeleton-tip">锻炉正在熔炼你的小剧场…</p>
+                </div>
+            </div>
             <div class="theater-btn-row theater-output-actions" style="display:none;">
                 <div id="theater-save-history-btn" class="theater-btn"><i class="fa-solid fa-bookmark"></i><span>保存</span></div>
                 <div id="theater-copy-html-btn" class="theater-btn"><i class="fa-solid fa-copy"></i><span>复制HTML</span></div>
@@ -1233,6 +1244,14 @@ function buildPopupHTML() {
             </div>
             <div class="theater-toggle-row" style="margin-bottom:10px;">
                 <label class="theater-toggle-label"><input type="checkbox" id="theater-floating-ball-tuck-toggle" ${settings.floatingBallTuck !== false ? 'checked' : ''}><span>悬浮球贴边收纳</span></label>
+            </div>
+            <div class="theater-range-block">
+                <label class="theater-label" for="theater-ball-size"><i class="fa-solid fa-up-right-and-down-left-from-center"></i> 悬浮球大小</label>
+                <div class="theater-range-row">
+                    <input type="range" id="theater-ball-size" min="40" max="120" step="2" value="${settings.ballSize || 64}" aria-label="悬浮球大小">
+                    <span class="theater-range-val" id="theater-ball-size-val">${settings.ballSize || 64}px</span>
+                </div>
+                <p class="theater-hint" style="margin-top:6px;">拖动调整悬浮球直径（40–120px），松手即实时预览。</p>
             </div>
             ${hasRemoteUpdate() ? `
             <div class="theater-update-notice">
@@ -2260,6 +2279,13 @@ function bindEvents() {
     });
     $d.off('change.tfbt').on('change.tfbt', '#theater-floating-ball-tuck-toggle', function () {
         settings.floatingBallTuck = $(this).is(':checked'); save(); createFloatingBall();
+    });
+    $d.off('input.tbs').on('input.tbs', '#theater-ball-size', function () {
+        const v = Math.max(40, Math.min(120, parseInt($(this).val(), 10) || 64));
+        settings.ballSize = v;
+        $('#theater-ball-size-val').text(v + 'px');
+        save();
+        createFloatingBall();
     });
 
     // ---- Sound ----
@@ -3648,7 +3674,8 @@ async function runGeneration(instruction, isAuto) {
     // UI（面板可能在生成过程中被关掉，所以用函数判断面板是否还在）
     const popupAlive = () => $('#theater-generate-btn').length > 0;
 
-    $('#theater-output-section').show();
+    $('#theater-output-section').show().addClass('is-generating');
+    $('#theater-output-stage').removeClass('has-content');
     $('#theater-stream-text').show().text('').addClass('stream-visible');
     $('#theater-output-container').hide();
     $('.theater-output-actions').hide();
@@ -3667,6 +3694,10 @@ async function runGeneration(instruction, isAuto) {
     };
     const onChunk = (text) => {
         bgStreamText = text;
+        // 首块到达即视为有内容，淡出骨架屏、露出实时文本
+        if (!$('#theater-output-stage').hasClass('has-content')) {
+            $('#theater-output-stage').addClass('has-content');
+        }
         if (!chunkThrottle) {
             chunkThrottle = setTimeout(() => { chunkThrottle = null; flushStream(); }, 100);
         }
@@ -3740,12 +3771,14 @@ async function runGeneration(instruction, isAuto) {
         if (popupAlive()) {
             showInIframe(lastGeneratedHtml);
            // 更新右侧 meta 信息
-           let metaText = '';
+            let metaText = '';
             if (settings.lastGenModel) metaText = settings.lastGenModel + ' · ' + settings.lastGenDuration;
             $('#theater-gen-meta').text(metaText);
             $('#theater-stream-text').hide().removeClass('stream-visible');
             $('#theater-output-container').show();
             $('.theater-output-actions').show();
+            $('#theater-output-stage').addClass('has-content');
+            $('#theater-output-section').removeClass('is-generating');
             updateRecentNav();
         }
         toastr.success(isAuto ? '自动小剧场生成完成！打开面板查看' : '小剧场生成完成！点击打开面板查看', '', { timeOut: 6000 });
@@ -3759,6 +3792,7 @@ async function runGeneration(instruction, isAuto) {
     } finally {
         isGenerating = false;
         stopGenTimer();
+        $('#theater-output-section').removeClass('is-generating');
         if (chunkThrottle) { clearTimeout(chunkThrottle); chunkThrottle = null; }
         flushStream();
         if (!isAuto && !contCtx) {
