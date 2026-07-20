@@ -573,6 +573,14 @@ function renderErrorLog() {
 
 function createFloatingBall() {
     try {
+        // 引入 Orbitron 字体（计时器数字用，离线时自动回退等宽字体）
+        if (!document.getElementById('theater-orbitron-font')) {
+            const _of = document.createElement('link');
+            _of.id = 'theater-orbitron-font';
+            _of.rel = 'stylesheet';
+            _of.href = 'https://fonts.googleapis.com/css2?family=Orbitron:wght@800;900&display=swap';
+            document.head.appendChild(_of);
+        }
         document.querySelectorAll('#theater-floating-ball').forEach(el => el.remove());
         if (!settings.floatingBall) return;
 

@@ -2094,11 +2094,11 @@ html body #theater-floating-ball.theater-ball-generating {
     bottom: -15px;
     left: 50%;
     transform: translateX(-50%);
-    font-family: var(--t-font-mono);
-    font-size: 0.625rem;
-    font-weight: 700;
+    font-family: 'Orbitron', var(--t-font-mono);
+    font-size: 0.7rem;
+    font-weight: 800;
     line-height: 1;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.04em;
     background: linear-gradient(180deg,
         #b9823a 0%,
         #f3d28c 32%,
