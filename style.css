@@ -509,15 +509,12 @@
     padding: var(--t-space-8) var(--t-space-10);
 }
 
+/* 瞬时切换，不做任何动画：
+   panel 内含 backdrop-filter 玻璃卡片，对其做 transform/opacity 动画
+   会让这些卡片实时模糊重新合成 → 切到规则/提示词等卡片多的 tab 时闪动。
+   动效统一交给标签页滑块指示器承载。 */
 .theater-panel.active {
     display: block;
-    /* 仅位移、不改 opacity，杜绝 display 切换时的首帧满亮闪 + backdrop-filter 重绘闪 */
-    animation: panelRise var(--t-dur-base) var(--t-ease);
-}
-
-@keyframes panelRise {
-    from { transform: translateY(6px); }
-    to   { transform: translateY(0); }
 }
 
 /* ============================================================
