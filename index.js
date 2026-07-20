@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '4.5.1';
+const VERSION = '4.6.0';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -607,7 +607,7 @@ function createFloatingBall() {
 <stop offset="1" stop-color="#e6bd75"/>
 </linearGradient>
 <radialGradient id="flameGlow" cx="0.5" cy="0.55" r="0.55">
-<stop offset="0" stop-color="#ff7a1f" stop-opacity="0.34"/>
+<stop offset="0" stop-color="#ff7a1f" stop-opacity="0.36"/>
 <stop offset="0.55" stop-color="#ff5a1a" stop-opacity="0.1"/>
 <stop offset="1" stop-color="#ff5a1a" stop-opacity="0"/>
 </radialGradient>
@@ -616,20 +616,15 @@ function createFloatingBall() {
 <stop offset="0.5" stop-color="#fff4d6" stop-opacity="0.25"/>
 <stop offset="1" stop-color="#fff4d6" stop-opacity="0"/>
 </linearGradient>
-<radialGradient id="flameSheen" cx="0.35" cy="0.32" r="0.4">
-<stop offset="0" stop-color="#ffffff" stop-opacity="0.45"/>
-<stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
-</radialGradient>
 </defs>
 <ellipse cx="32" cy="36" rx="30" ry="30" fill="url(#flameGlow)"/>
-<path d="M18 54 C 12 48, 14 38, 18 30 C 20 26, 22 24, 24 22 C 25 26, 24 32, 27 38 C 28.5 30, 30 22, 31 16 C 31.5 12, 34.5 12, 35 16 C 35.5 24, 36 28, 36.5 26 C 37 20, 38 14, 40 12 C 41 16, 42 22, 43 28 C 45 38, 47 48, 42 54 C 38 58, 22 58, 18 54 Z" fill="url(#flameOuter)" opacity="0.88" stroke="#ffe1b0" stroke-opacity="0.5" stroke-width="0.8"/>
-<path d="M32 52 C 26 52, 22 48, 24 42 C 25 38, 27 34, 28 30 C 29 26, 30 23, 31 20 C 31.5 17, 33 17, 33.5 20 C 34 25, 35 28, 36 26 C 37 22, 38 18, 39 21 C 40 26, 40 34, 39 36 C 38 44, 38 50, 32 52 Z" fill="url(#flameInner)"/>
-<path d="M32 48 C 28 48, 26 44, 27 40 C 28 36, 30 32, 31 29 C 31.5 27, 32.5 27, 33 29 C 33.5 34, 34 38, 34 42 C 35 46, 35 47, 32 48 Z" fill="url(#flameCore)"/>
-<ellipse cx="26" cy="26" rx="5" ry="9" fill="url(#flameSheen)" transform="rotate(-18 26 26)"/>
-<ellipse cx="28" cy="24" rx="1.4" ry="3.6" fill="#ffffff" opacity="0.8" transform="rotate(-22 28 24)"/>
-<ellipse cx="30" cy="17" rx="0.9" ry="1.7" fill="#ffffff" opacity="0.9" transform="rotate(-16 30 17)"/>
-<circle cx="40" cy="34" r="1.2" fill="#fff6d8" opacity="0.7"/>
-<path d="M18 54 C 12 48, 14 38, 18 30 C 20 26, 22 24, 24 22 C 25 26, 24 32, 27 38 C 28.5 30, 30 22, 31 16 C 31.5 12, 34.5 12, 35 16" fill="none" stroke="url(#flameRim)" stroke-width="1.5" stroke-linecap="round"/>
+<path d="M32 57 C 24 57, 19 52, 19 44 C 19 37, 22 30, 24 22 C 25 18, 27 14, 29 12 C 28 17, 28 23, 30 26 C 31 24, 33 22, 36 20 C 38 22, 39 26, 42 32 C 45 42, 46 50, 42 54 C 38 58, 24 58, 32 57 Z" fill="url(#flameOuter)" opacity="0.88" stroke="#ffe1b0" stroke-opacity="0.5" stroke-width="0.8"/>
+<path d="M32 53 C 27 53, 23 49, 24 43 C 25 39, 27 35, 28 31 C 29 27, 30 23, 31 20 C 32 23, 33 29, 34 31 C 35 30, 35.5 29, 36 30 C 36.5 34, 37 38, 37 42 C 38 46, 38 51, 32 53 Z" fill="url(#flameInner)"/>
+<path d="M32 50 C 29 50, 27 46, 28 42 C 29 38, 31 34, 32 31 C 33 34, 35 38, 36 42 C 37 46, 35 50, 32 50 Z" fill="url(#flameCore)"/>
+<ellipse cx="27" cy="26" rx="1.6" ry="4.5" fill="#ffffff" opacity="0.78" transform="rotate(-22 27 26)"/>
+<ellipse cx="29" cy="19" rx="0.9" ry="1.8" fill="#ffffff" opacity="0.88" transform="rotate(-16 29 19)"/>
+<circle cx="40" cy="36" r="1.3" fill="#fff6d8" opacity="0.7"/>
+<path d="M32 57 C 24 57, 19 52, 19 44 C 19 37, 22 30, 24 22 C 25 18, 27 14, 29 12 C 28 17, 28 23, 30 26" fill="none" stroke="url(#flameRim)" stroke-width="1.5" stroke-linecap="round"/>
 </svg>` +
             '<span class="theater-ball-timer" aria-hidden="true"></span>';
 
