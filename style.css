@@ -134,7 +134,7 @@
     --t-font-sans: 'Instrument Sans', -apple-system, 'PingFang SC', 'Noto Sans SC', sans-serif;
     --t-font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
-    min-height: 380px;
+    min-height: 0;
     padding: 0;
     box-sizing: border-box;
     color: var(--t-ink);
@@ -151,11 +151,12 @@
     box-shadow:
         var(--t-shadow-popup),
         inset 0 1px 0 oklch(99% 0.005 90 / 0.7);
-    /* 手机式固定视口高度：内容少不少都保持同一高度，内部滚动 */
+    /* 高度完全由外层 dialog 控制，自身只负责 flex 填充 */
     display: flex;
     flex-direction: column;
-    height: clamp(560px, 86vh, 880px);
-    max-height: 86vh;
+    height: 100%;
+    max-height: 100%;
+    min-height: 0;
     overflow: hidden;
 }
 
@@ -1925,25 +1926,29 @@ body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="
     outline: none !important;
     box-shadow: none !important;
 
-    /* 圆角 + 裁切：mask 强制所有子层都按此圆角裁切（修复移动端滚动方角） */
-    --t-popup-r: var(--t-radius-xl);
-    border-radius: var(--t-popup-r) !important;
+    /* ★ 关键：固定高度 + flex 列布局（popup-controls 是 popup-body 的兄弟） */
+    display: flex !important;
+    flex-direction: column !important;
+    height: 86vh !important;
+    max-height: 86vh !important;
+    min-height: 540px !important;
+
+    /* 圆角 + 裁切：mask 强制所有子层都按此圆角裁切 */
+    border-radius: var(--t-radius-xl) !important;
     overflow: hidden !important;
     -webkit-mask-image: -webkit-radial-gradient(white, white);
     mask-image: radial-gradient(white, white);
 
-    /* 高度跟随内部固定高度的 popup */
-    max-height: 90vh !important;
-    height: auto !important;
     padding: 0 !important;
     margin: 0 !important;
 }
 
-/* popup-body 是 theater-popup 和 popup-controls 的直接父级 */
+/* popup-body — 占据 controls 以上的所有空间 */
 body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])) .popup-body {
     background: transparent !important; padding: 0 !important;
     display: flex !important;
     flex-direction: column !important;
+    /* flex:1 填充剩余空间（controls 在下面占固定高度） */
     flex: 1 1 auto !important;
     min-height: 0 !important;
     overflow: hidden !important;
@@ -1958,6 +1963,7 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     border-top: var(--t-rule-thin);
     padding: var(--t-space-3) var(--t-space-6);
     flex-shrink: 0;
+    flex-grow: 0;
 }
 
 body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])) .popup-button-close,
@@ -2026,7 +2032,12 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     .theater-tab { padding: var(--t-space-2) var(--t-space-3); font-size: var(--t-text-xs); }
     .theater-panel { padding: var(--t-space-4); }
     .theater-panels-wrapper { max-height: none; min-height: 0; }
-    .theater-popup { height: 92vh; max-height: 92vh; }
+    /* 移动端：外层更高占比 */
+    body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])),
+    body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])) {
+        height: 92vh !important;
+        max-height: 92vh !important;
+    }
     .theater-section { margin-bottom: var(--t-space-4); padding: var(--t-space-4); }
     .theater-textarea { min-height: 120px; }
     .theater-btn { min-height: 38px; }
