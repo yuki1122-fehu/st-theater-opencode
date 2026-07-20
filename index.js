@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '4.2.8';
+const VERSION = '4.2.9';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -588,63 +588,48 @@ function createFloatingBall() {
         ball.id = 'theater-floating-ball';
         ball.title = '打开拾光锻匣';
         // 纯火焰 SVG + 内嵌计时标签（生成时随球移动，不再用独立浮层）
-        ball.innerHTML = `<svg viewBox="0 0 32 32" aria-hidden="true" class="theater-ball-svg" style="width:44px;height:44px;display:block;overflow:visible;">
+        ball.innerHTML = `<svg viewBox="0 0 64 64" aria-hidden="true" class="theater-ball-svg" style="width:64px;height:64px;display:block;overflow:visible;">
 <defs>
-<radialGradient id="tGlassBody" cx="50%" cy="62%" r="62%">
-<stop offset="0%" stop-color="#ffffff" stop-opacity="0.92"/>
-<stop offset="42%" stop-color="#ffe9c7" stop-opacity="0.78"/>
-<stop offset="78%" stop-color="#ffb06a" stop-opacity="0.55"/>
-<stop offset="100%" stop-color="#f3813d" stop-opacity="0.32"/>
-</radialGradient>
-<radialGradient id="tGlassCore" cx="50%" cy="68%" r="40%">
-<stop offset="0%" stop-color="#fff6e2" stop-opacity="0.95"/>
-<stop offset="60%" stop-color="#ffd29a" stop-opacity="0.35"/>
-<stop offset="100%" stop-color="#ff8a3d" stop-opacity="0"/>
-</radialGradient>
-<radialGradient id="tGlassSpec" cx="38%" cy="26%" r="34%">
-<stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
-<stop offset="55%" stop-color="#ffffff" stop-opacity="0.32"/>
-<stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
-</radialGradient>
-<radialGradient id="tGlassInner" cx="50%" cy="72%" r="60%">
-<stop offset="0%" stop-color="#fff6dc" stop-opacity="1"/>
-<stop offset="42%" stop-color="#ffc472" stop-opacity="0.96"/>
-<stop offset="100%" stop-color="#ff7a2e" stop-opacity="0.82"/>
-</radialGradient>
-<radialGradient id="tGlassRefract" cx="63%" cy="37%" r="58%">
-<stop offset="0%" stop-color="#cfe8ff" stop-opacity="0.20"/>
-<stop offset="48%" stop-color="#a9d2f2" stop-opacity="0.07"/>
-<stop offset="100%" stop-color="#7fb8e8" stop-opacity="0"/>
-</radialGradient>
-<linearGradient id="tGlassRim" x1="50%" y1="2%" x2="50%" y2="100%">
-<stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
-<stop offset="36%" stop-color="#ffffff" stop-opacity="0.34"/>
-<stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+<linearGradient id="flameOuter" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#ffb347"/>
+<stop offset="0.35" stop-color="#ff7a1f"/>
+<stop offset="0.7" stop-color="#ef451c"/>
+<stop offset="1" stop-color="#b81b0e"/>
 </linearGradient>
-<linearGradient id="tGlassShade" x1="50%" y1="42%" x2="50%" y2="100%">
-<stop offset="0%" stop-color="#3a3326" stop-opacity="0"/>
-<stop offset="100%" stop-color="#2b2519" stop-opacity="0.16"/>
+<linearGradient id="flameInner" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#ffe07a"/>
+<stop offset="0.5" stop-color="#ffae33"/>
+<stop offset="1" stop-color="#f0521c"/>
 </linearGradient>
-<filter id="tGlassGoo" x="-30%" y="-30%" width="160%" height="160%">
-<feGaussianBlur in="SourceGraphic" stdDeviation="0.55" result="blur"/>
-<feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1.1 0"/>
-</filter>
+<linearGradient id="flameCore" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#fffdf2"/>
+<stop offset="0.55" stop-color="#fff0ad"/>
+<stop offset="1" stop-color="#ffc24d"/>
+</linearGradient>
+<radialGradient id="flameGlow" cx="0.5" cy="0.55" r="0.55">
+<stop offset="0" stop-color="#ff7a1f" stop-opacity="0.42"/>
+<stop offset="0.55" stop-color="#ff5a1a" stop-opacity="0.12"/>
+<stop offset="1" stop-color="#ff5a1a" stop-opacity="0"/>
+</radialGradient>
+<linearGradient id="flameRim" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#fff4d6" stop-opacity="0.95"/>
+<stop offset="0.5" stop-color="#fff4d6" stop-opacity="0.25"/>
+<stop offset="1" stop-color="#fff4d6" stop-opacity="0"/>
+</linearGradient>
 </defs>
-<path d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z" fill="url(#tGlassBody)" stroke="#fff3e0" stroke-opacity="0.9" stroke-width="0.6"/>
-<path d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z" fill="url(#tGlassRefract)"/>
-<path d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z" fill="url(#tGlassShade)"/>
-<path d="M16 12 C17.6 15 20 16.6 20 20 A4 4 0 1 1 12 20 C12 17.4 14 16.4 15 14 C15.5 16 16 16.2 16.5 15 C16.3 13.5 16 12.4 16 12 Z" fill="url(#tGlassCore)"/>
-<path d="M16 14 C16.9 16.3 18.4 17.7 18.4 19.5 A2.5 2.5 0 1 1 13.4 19.5 C13.4 17.6 14.7 16.6 15.6 15 C15.9 16.2 16.1 16.2 16.4 15.4 C16.2 14.9 16 14.4 16 14 Z" fill="url(#tGlassInner)" stroke="#ffe7c4" stroke-opacity="0.6" stroke-width="0.4"/>
-<path d="M16 4.5 C18.2 8.8 22.4 11 22.4 17 C22.4 17.9 22.2 18.8 21.9 19.6 C20.6 16.4 18.5 14.8 16.8 11.6 C16.4 11.8 16 11.6 15.8 11.2 C15.6 8.8 15.4 6.4 16 4.5 Z" fill="url(#tGlassSpec)"/>
-<ellipse cx="13.2" cy="19.5" rx="1.1" ry="2.6" fill="#ffffff" opacity="0.7" transform="rotate(-22 13.2 19.5)"/>
-<ellipse cx="18.4" cy="17.2" rx="0.6" ry="1.3" fill="#ffffff" opacity="0.5" transform="rotate(18 18.4 17.2)"/>
-<path d="M16 3 C19 9 25 11 25 18 A9 9 0 1 1 7 18 C7 13 11 12 13 8 C14 11 15 11 16 9.5 C15 6.5 14.5 4.5 16 3 Z" fill="none" stroke="url(#tGlassRim)" stroke-width="0.5" stroke-opacity="0.95" transform="translate(16 16) scale(0.9) translate(-16 -16)"/>
-<ellipse cx="16" cy="5.1" rx="0.8" ry="1.5" fill="#ffffff" opacity="0.82" transform="rotate(-8 16 5.1)"/>
+<ellipse cx="32" cy="36" rx="30" ry="30" fill="url(#flameGlow)"/>
+<path d="M18 57 C 14 49, 17 41, 22 35 C 25 31, 24 26, 28 21 C 30 18, 30 12, 33 6 C 35 12, 38 17, 40 23 C 43 30, 45 37, 46 44 C 47 49, 49 52, 46 57 C 41 62, 23 62, 18 57 Z" fill="url(#flameOuter)" opacity="0.9" stroke="#ffe1b0" stroke-opacity="0.55" stroke-width="0.8"/>
+<path d="M26 53 C 23 47, 25 41, 29 35 C 31 31, 31 26, 33 20 C 35 26, 37 31, 39 36 C 41 42, 40 48, 37 52 C 34 56, 29 56, 26 53 Z" fill="url(#flameInner)"/>
+<path d="M30 50 C 28 45, 29 40, 31 35 C 32 32, 32 30, 33 26 C 34 30, 35 34, 36 38 C 37 43, 36 47, 34 50 C 33 52, 31 52, 30 50 Z" fill="url(#flameCore)"/>
+<ellipse cx="25.5" cy="23" rx="2" ry="5.2" fill="#ffffff" opacity="0.84" transform="rotate(-22 25.5 23)"/>
+<ellipse cx="28.5" cy="17" rx="1" ry="2.1" fill="#ffffff" opacity="0.92" transform="rotate(-16 28.5 17)"/>
+<circle cx="39.5" cy="34" r="1.4" fill="#fff6d8" opacity="0.75"/>
+<path d="M18 57 C 14 49, 17 41, 22 35 C 25 31, 24 26, 28 21 C 30 18, 30 12, 33 6" fill="none" stroke="url(#flameRim)" stroke-width="1.5" stroke-linecap="round"/>
 </svg>` +
             '<span class="theater-ball-timer" aria-hidden="true"></span>';
 
-        const initLeft = window.innerWidth - 66;
-        const initTop = window.innerHeight - 126;
+        const initLeft = window.innerWidth - 84;
+        const initTop = window.innerHeight - 146;
 
         // 贴边收纳：拖完吸附到最近的左/右边，闲置一会儿缩进边里半个身子
         const BASE_TRANSITION = 'transform 0.18s cubic-bezier(.2,.8,.2,1), opacity 0.18s, box-shadow 0.18s';
@@ -661,10 +646,10 @@ function createFloatingBall() {
             ball.style.opacity = '0.92';
         }
         function untuckedLeft(side) {
-            return side === 'left' ? 6 : window.innerWidth - 54;
+            return side === 'left' ? 6 : window.innerWidth - 74;
         }
         function tuckedLeft(side) {
-            return side === 'left' ? -22 : window.innerWidth - 26;
+            return side === 'left' ? -32 : window.innerWidth - 36;
         }
         function scheduleTuck() {
             cancelTuck();
@@ -681,7 +666,7 @@ function createFloatingBall() {
         function snapToEdge() {
             const w = window.innerWidth;
             const cur = parseInt(ball.style.left) || 0;
-            const onLeft = cur + 24 < w / 2;
+            const onLeft = cur + 34 < w / 2;
             ball.dataset.side = onLeft ? 'left' : 'right';
             ball.dataset.tucked = 'false';
             ball.style.transition = SNAP_TRANSITION;

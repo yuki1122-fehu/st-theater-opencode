@@ -1870,7 +1870,7 @@
 #theater-wand-btn .theater-lamp-icon { transform: scale(1.5) rotate(8deg); }
 #theater-open-btn .theater-lamp-icon { width: 1.2em; height: 1.2em; }
 
-/* 异形悬浮球 — 液态玻璃质感 */
+/* 异形悬浮球 — 金红液态玻璃火焰 */
 #theater-floating-ball { pointer-events: auto !important; }
 
 #theater-floating-ball .theater-ball-svg {
@@ -1885,8 +1885,8 @@
 }
 
 #theater-floating-ball .theater-ball-dot {
-    position: absolute; top: 1px; right: 1px;
-    width: 11px; height: 11px; border-radius: 50%;
+    position: absolute; top: 2px; right: 2px;
+    width: 12px; height: 12px; border-radius: 50%;
     background: var(--t-error);
 }
 
@@ -2011,17 +2011,17 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
 #theater-floating-ball.theater-ball-generating::after {
     content: '';
     position: absolute;
-    inset: -6px;
+    inset: -10px;
     border-radius: 50%;
     pointer-events: none;
     animation: theater-ball-ripple 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
 }
 #theater-floating-ball.theater-ball-generating::before {
-    border: 2.5px solid oklch(88% 0.03 80 / 0.55);
-    box-shadow: 0 0 8px oklch(90% 0.02 80 / 0.30), inset 0 0 6px oklch(92% 0.02 80 / 0.20);
+    border: 3.5px solid oklch(88% 0.03 80 / 0.55);
+    box-shadow: 0 0 12px oklch(90% 0.02 80 / 0.30), inset 0 0 8px oklch(92% 0.02 80 / 0.20);
 }
 #theater-floating-ball.theater-ball-generating::after {
-    border: 2px solid oklch(90% 0.02 80 / 0.40);
+    border: 3px solid oklch(90% 0.02 80 / 0.40);
     animation-delay: 0.8s;
 }
 
@@ -2091,7 +2091,7 @@ html body #theater-floating-ball.theater-ball-generating {
    ============================================================ */
 #theater-floating-ball .theater-ball-timer {
     position: absolute;
-    bottom: -15px;
+    bottom: -18px;
     left: 50%;
     transform: translateX(-50%);
     font-family: 'Orbitron', var(--t-font-mono);
