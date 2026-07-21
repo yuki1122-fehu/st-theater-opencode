@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '4.15.0';
+const VERSION = '4.16.0';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -866,6 +866,13 @@ function buildPopupHTML() {
             <label class="theater-label">小剧场指令</label>
             <textarea id="theater-instruction" class="theater-textarea" rows="4" placeholder="描述你想看的番外故事…&#10;&#10;例如：角色们在初雪的夜晚围炉夜话，窗外飘着细雪，屋内暖意融融。">${esc(settings.lastInstruction || '')}</textarea>
             <div class="theater-hint-inline" style="margin-top:var(--t-space-2);">像写一封信那样描述你想要的场景</div>
+            <div class="theater-inst-quick-row">
+                <i class="fa-solid fa-bookmark theater-inst-quick-icon"></i>
+                <select id="theater-inst-quick-select" class="theater-select theater-inst-quick-select" ${(settings.instructionTemplates || []).length ? '' : 'disabled'}>
+                    <option value="">${(settings.instructionTemplates || []).length ? '📥 载入已保存的指令模板…' : '模板库为空 · 去「规则」页添加'}</option>
+                    ${renderInstQuickOptions()}
+                </select>
+            </div>
         </div>
         <div class="theater-toggle-row">
             <label class="theater-toggle-label"><input type="checkbox" id="theater-interactive-toggle" ${settings.interactiveMode ? 'checked' : ''}><span>交互模式</span></label>
@@ -1423,6 +1430,43 @@ function renderGroupFilterOptions() {
         opts.push(`<option value="__none__" ${filter === '__none__' ? 'selected' : ''}>📂 未分组（${ungrouped}）</option>`);
     }
     return opts.join('');
+}
+
+// 生成页「快速载入模板」下拉的选项：按分组用 optgroup 组织，value = 模板在全局数组中的索引
+function renderInstQuickOptions() {
+    const templates = settings.instructionTemplates || [];
+    if (!templates.length) return '';
+    const groups = settings.instructionGroups || [];
+    const byGroup = new Map();
+    const ungrouped = [];
+    templates.forEach((t, i) => {
+        const g = templateGroup(t);
+        if (g) {
+            if (!byGroup.has(g)) byGroup.set(g, []);
+            byGroup.get(g).push({ t, i });
+        } else {
+            ungrouped.push({ t, i });
+        }
+    });
+    const optOf = ({ t, i }) => `<option value="${i}">${esc(t.name || '未命名')}</option>`;
+    const grpOf = (label, arr) => `<optgroup label="${esc(label)}">${arr.map(optOf).join('')}</optgroup>`;
+    const out = [];
+    // 先按用户定义的分组顺序输出
+    groups.forEach(g => { const arr = byGroup.get(g); if (arr && arr.length) out.push(grpOf(g, arr)); });
+    // 兜底：模板上出现、但不在 instructionGroups 里的分组
+    byGroup.forEach((arr, g) => { if (!groups.includes(g) && arr.length) out.push(grpOf(g, arr)); });
+    if (ungrouped.length) out.push(grpOf('未分组', ungrouped));
+    return out.join('');
+}
+
+// 模板库变动后，实时刷新生成页的「快速载入模板」下拉
+function refreshInstQuickSelect() {
+    const $sel = $('#theater-inst-quick-select');
+    if (!$sel.length) return;
+    const has = (settings.instructionTemplates || []).length > 0;
+    const ph = has ? '📥 载入已保存的指令模板…' : '模板库为空 · 去「规则」页添加';
+    $sel.prop('disabled', !has)
+        .html(`<option value="">${ph}</option>` + renderInstQuickOptions());
 }
 
 // 临时状态：当前选中索引 + 搜索关键词，仅本次会话有效
@@ -2003,6 +2047,20 @@ function bindEvents() {
             toastr.info('已加载指令');
         }
     });
+    // 生成页「快速载入模板」下拉：选中即把模板内容填入指令框
+    $d.off('change.tiq').on('change.tiq', '#theater-inst-quick-select', function () {
+        const raw = $(this).val();
+        if (raw === '' || raw == null) return;
+        const t = (settings.instructionTemplates || [])[parseInt(raw, 10)];
+        if (t) {
+            $('#theater-instruction').val(t.content);
+            settings.lastInstruction = t.content;
+            clearContinueMode({ silent: true });
+            save();
+            toastr.info(`已载入：${t.name || '未命名'}`, '', { timeOut: 2500 });
+        }
+        $(this).val(''); // 归位到占位项，方便再次选同一个模板
+    });
     $d.off('click.tie').on('click.tie', '.theater-inst-edit', async function () {
         const idx = $(this).data('index');
         const tpl = settings.instructionTemplates[idx];
@@ -2369,6 +2427,7 @@ function refreshInstUI() {
     $('#theater-instruction-list').html(renderInstList(inst));
     $('#theater-inst-count').text(inst.length);
     $('#theater-inst-drawer').toggleClass('empty', !inst.length);
+    refreshInstQuickSelect();
     updateBulkBar();
 }
 
