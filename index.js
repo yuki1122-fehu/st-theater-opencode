@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '4.16.0';
+const VERSION = '4.17.0';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -851,7 +851,6 @@ function buildPopupHTML() {
         <div class="theater-tabs-indicator" aria-hidden="true"></div>
         <div class="theater-tab active" data-tab="generate"><i class="fa-solid fa-wand-sparkles"></i><span>生成</span></div>
         <div class="theater-tab" data-tab="setting"><i class="fa-solid fa-sliders"></i><span>设定</span></div>
-        <div class="theater-tab" data-tab="dialogue"><i class="fa-solid fa-comments"></i><span>对话</span></div>
         <div class="theater-tab" data-tab="rules"><i class="fa-solid fa-scroll"></i><span>规则</span></div>
         <div class="theater-tab" data-tab="history"><i class="fa-solid fa-clock-rotate-left"></i><span>历史</span></div>
         <div class="theater-tab" data-tab="prompt"><i class="fa-solid fa-list-ol"></i><span>提示词</span></div>
@@ -866,17 +865,15 @@ function buildPopupHTML() {
             <label class="theater-label">小剧场指令</label>
             <textarea id="theater-instruction" class="theater-textarea" rows="4" placeholder="描述你想看的番外故事…&#10;&#10;例如：角色们在初雪的夜晚围炉夜话，窗外飘着细雪，屋内暖意融融。">${esc(settings.lastInstruction || '')}</textarea>
             <div class="theater-hint-inline" style="margin-top:var(--t-space-2);">像写一封信那样描述你想要的场景</div>
-            <div class="theater-inst-quick-row">
-                <i class="fa-solid fa-bookmark theater-inst-quick-icon"></i>
-                <select id="theater-inst-quick-select" class="theater-select theater-inst-quick-select" ${(settings.instructionTemplates || []).length ? '' : 'disabled'}>
-                    <option value="">${(settings.instructionTemplates || []).length ? '📥 载入已保存的指令模板…' : '模板库为空 · 去「规则」页添加'}</option>
-                    ${renderInstQuickOptions()}
-                </select>
-            </div>
         </div>
-        <div class="theater-toggle-row">
+        <div class="theater-toggle-row theater-inst-quick-wrap">
             <label class="theater-toggle-label"><input type="checkbox" id="theater-interactive-toggle" ${settings.interactiveMode ? 'checked' : ''}><span>交互模式</span></label>
-            <span class="theater-hint-inline">生成可交互的小剧场</span>
+            <div id="theater-inst-quick-btn" class="theater-inst-quick-btn" title="载入已保存的指令模板"><i class="fa-solid fa-bookmark"></i></div>
+            <div class="theater-inst-pop" id="theater-inst-pop" style="display:none;">
+                <input type="text" class="theater-input theater-inst-pop-search" id="theater-inst-pop-search" placeholder="搜索模板…">
+                <div class="theater-inst-pop-list" id="theater-inst-pop-list"></div>
+                <div class="theater-inst-pop-foot"><span class="theater-hint-inline">去「规则」页管理模板库</span></div>
+            </div>
         </div>
         <div class="theater-btn-row">
             <div id="theater-generate-btn" class="theater-btn primary generate"><i class="fa-solid fa-hammer"></i><span>生成小剧场</span></div>
@@ -981,11 +978,8 @@ function buildPopupHTML() {
                 </div>
             </details>
         </div>
-    </div>
 
-    <!-- ===== 3. 对话 ===== -->
-    <div class="theater-panel" data-panel="dialogue">
-        <!-- User Persona -->
+        <!-- User Persona (原「对话」页) -->
         <div class="theater-section">
             <label class="theater-label"><i class="fa-solid fa-user"></i> User 人设</label>
             <div class="theater-toggle-row" style="margin-bottom:8px;">
@@ -996,7 +990,7 @@ function buildPopupHTML() {
             <div class="theater-btn-row"><div id="theater-save-persona-btn" class="theater-btn primary"><i class="fa-solid fa-floppy-disk"></i><span>保存</span></div></div>
         </div>
 
-        <!-- Context Range -->
+        <!-- Context Range (原「对话」页) -->
         <div class="theater-section">
             <label class="theater-label"><i class="fa-solid fa-layer-group"></i> 上下文消息数量 · <span id="theater-range-val">${settings.contextRange}</span> 条</label>
             <input id="theater-context-range" type="range" min="5" max="100" value="${settings.contextRange}" class="theater-slider">
@@ -1433,40 +1427,49 @@ function renderGroupFilterOptions() {
 }
 
 // 生成页「快速载入模板」下拉的选项：按分组用 optgroup 组织，value = 模板在全局数组中的索引
-function renderInstQuickOptions() {
+// 生成页「载入模板」浮层：按分组渲染可点击列表（搜索词用独立状态，不与规则页冲突）
+let instQuickSearch = '';
+function renderInstPopList() {
     const templates = settings.instructionTemplates || [];
-    if (!templates.length) return '';
+    if (!templates.length) return '<p class="theater-empty">模板库是空的</p>';
+    const q = (instQuickSearch || '').toLowerCase().trim();
+    const arr = templates.map((t, i) => ({ t, i })).filter(({ t }) => !q || (t.name || '').toLowerCase().includes(q));
+    if (!arr.length) return `<p class="theater-empty">没找到包含「${esc(instQuickSearch)}」的模板</p>`;
     const groups = settings.instructionGroups || [];
     const byGroup = new Map();
     const ungrouped = [];
-    templates.forEach((t, i) => {
+    arr.forEach(({ t, i }) => {
         const g = templateGroup(t);
-        if (g) {
-            if (!byGroup.has(g)) byGroup.set(g, []);
-            byGroup.get(g).push({ t, i });
-        } else {
-            ungrouped.push({ t, i });
-        }
+        if (g) { if (!byGroup.has(g)) byGroup.set(g, []); byGroup.get(g).push({ t, i }); }
+        else ungrouped.push({ t, i });
     });
-    const optOf = ({ t, i }) => `<option value="${i}">${esc(t.name || '未命名')}</option>`;
-    const grpOf = (label, arr) => `<optgroup label="${esc(label)}">${arr.map(optOf).join('')}</optgroup>`;
+    const itemOf = ({ t, i }) => `<div class="theater-inst-pop-item" data-index="${i}"><span class="theater-inst-pop-name">${esc(t.name || '未命名')}</span>${templateGroup(t) ? `<span class="theater-inst-pop-g">${esc(templateGroup(t))}</span>` : ''}</div>`;
     const out = [];
-    // 先按用户定义的分组顺序输出
-    groups.forEach(g => { const arr = byGroup.get(g); if (arr && arr.length) out.push(grpOf(g, arr)); });
-    // 兜底：模板上出现、但不在 instructionGroups 里的分组
-    byGroup.forEach((arr, g) => { if (!groups.includes(g) && arr.length) out.push(grpOf(g, arr)); });
-    if (ungrouped.length) out.push(grpOf('未分组', ungrouped));
+    groups.forEach(g => { const a = byGroup.get(g); if (a && a.length) { out.push(`<div class="theater-inst-pop-group">${esc(g)}</div>`); out.push(a.map(itemOf).join('')); } });
+    byGroup.forEach((a, g) => { if (!groups.includes(g) && a.length) { out.push(`<div class="theater-inst-pop-group">${esc(g)}</div>`); out.push(a.map(itemOf).join('')); } });
+    if (ungrouped.length) { out.push(`<div class="theater-inst-pop-group">未分组</div>`); out.push(ungrouped.map(itemOf).join('')); }
     return out.join('');
 }
 
-// 模板库变动后，实时刷新生成页的「快速载入模板」下拉
-function refreshInstQuickSelect() {
-    const $sel = $('#theater-inst-quick-select');
-    if (!$sel.length) return;
-    const has = (settings.instructionTemplates || []).length > 0;
-    const ph = has ? '📥 载入已保存的指令模板…' : '模板库为空 · 去「规则」页添加';
-    $sel.prop('disabled', !has)
-        .html(`<option value="">${ph}</option>` + renderInstQuickOptions());
+let instPopOpen = false;
+function openInstPop() {
+    instQuickSearch = '';
+    const $pop = $('#theater-inst-pop');
+    $pop.find('.theater-inst-pop-search').val('');
+    $pop.find('#theater-inst-pop-list').html(renderInstPopList());
+    $pop.show();
+    instPopOpen = true;
+    $('#theater-inst-quick-btn').addClass('active');
+    setTimeout(() => $pop.find('.theater-inst-pop-search').focus(), 0);
+}
+function closeInstPop() {
+    $('#theater-inst-pop').hide();
+    instPopOpen = false;
+    $('#theater-inst-quick-btn').removeClass('active');
+}
+// 模板库变动且浮层打开时，实时刷新列表
+function refreshInstPopIfOpen() {
+    if (instPopOpen) $('#theater-inst-pop-list').html(renderInstPopList());
 }
 
 // 临时状态：当前选中索引 + 搜索关键词，仅本次会话有效
@@ -2047,11 +2050,19 @@ function bindEvents() {
             toastr.info('已加载指令');
         }
     });
-    // 生成页「快速载入模板」下拉：选中即把模板内容填入指令框
-    $d.off('change.tiq').on('change.tiq', '#theater-inst-quick-select', function () {
-        const raw = $(this).val();
-        if (raw === '' || raw == null) return;
-        const t = (settings.instructionTemplates || [])[parseInt(raw, 10)];
+    // 生成页「载入模板」图标按钮：点击展开/收起浮层
+    $d.off('click.tiqb').on('click.tiqb', '#theater-inst-quick-btn', function (e) {
+        e.stopPropagation();
+        if (instPopOpen) closeInstPop(); else openInstPop();
+    });
+    // 浮层内搜索
+    $d.off('input.tiqs').on('input.tiqs', '#theater-inst-pop-search', function () {
+        instQuickSearch = $(this).val() || '';
+        $('#theater-inst-pop-list').html(renderInstPopList());
+    });
+    // 浮层内点击模板：填入指令框并收起
+    $d.off('click.tiqi').on('click.tiqi', '.theater-inst-pop-item', function () {
+        const t = (settings.instructionTemplates || [])[parseInt($(this).data('index'), 10)];
         if (t) {
             $('#theater-instruction').val(t.content);
             settings.lastInstruction = t.content;
@@ -2059,8 +2070,13 @@ function bindEvents() {
             save();
             toastr.info(`已载入：${t.name || '未命名'}`, '', { timeOut: 2500 });
         }
-        $(this).val(''); // 归位到占位项，方便再次选同一个模板
+        closeInstPop();
     });
+    // 点击浮层外部 / 按 Esc 收起
+    $(document).off('click.tiqd').on('click.tiqd', function (e) {
+        if (instPopOpen && !$(e.target).closest('#theater-inst-pop, #theater-inst-quick-btn').length) closeInstPop();
+    });
+    $(document).off('keydown.tiqe').on('keydown.tiqe', function (e) { if (e.key === 'Escape' && instPopOpen) closeInstPop(); });
     $d.off('click.tie').on('click.tie', '.theater-inst-edit', async function () {
         const idx = $(this).data('index');
         const tpl = settings.instructionTemplates[idx];
@@ -2427,7 +2443,7 @@ function refreshInstUI() {
     $('#theater-instruction-list').html(renderInstList(inst));
     $('#theater-inst-count').text(inst.length);
     $('#theater-inst-drawer').toggleClass('empty', !inst.length);
-    refreshInstQuickSelect();
+    refreshInstPopIfOpen();
     updateBulkBar();
 }
 

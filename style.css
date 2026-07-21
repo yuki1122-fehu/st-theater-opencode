@@ -731,6 +731,92 @@
     min-width: 0;
 }
 
+/* 生成页：交互模式右侧的「载入模板」图标按钮 + 弹出浮层 */
+.theater-inst-quick-btn {
+    flex: 0 0 auto;
+    margin-left: auto;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--t-surface-card);
+    border: 1px solid var(--t-border);
+    color: var(--t-accent);
+    cursor: pointer;
+    transition: background var(--t-dur-fast) var(--t-ease), box-shadow var(--t-dur-fast) var(--t-ease), transform var(--t-dur-fast) var(--t-ease);
+}
+.theater-inst-quick-btn:hover {
+    box-shadow: 0 0 0 3px var(--t-accent-soft);
+}
+.theater-inst-quick-btn.active,
+.theater-inst-quick-btn:active {
+    transform: scale(0.94);
+    box-shadow: 0 0 0 3px var(--t-accent-soft), 0 0 10px var(--t-accent-soft);
+}
+.theater-inst-pop {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 264px;
+    max-width: calc(100vw - 24px);
+    z-index: 60;
+    padding: 8px;
+    background: var(--t-surface-card);
+    border: 1px solid var(--t-border);
+    border-radius: var(--t-radius-lg);
+    box-shadow: 0 12px 32px oklch(35% 0.03 55 / 0.18);
+}
+.theater-inst-pop-search {
+    width: 100%;
+    margin-bottom: 6px;
+}
+.theater-inst-pop-list {
+    max-height: 232px;
+    overflow-y: auto;
+    margin: 0 -2px;
+    padding: 0 2px;
+}
+.theater-inst-pop-group {
+    font-size: 0.72em;
+    color: var(--t-ink-muted);
+    padding: 8px 6px 2px;
+    letter-spacing: 0.02em;
+}
+.theater-inst-pop-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: var(--t-radius-md);
+    cursor: pointer;
+    transition: background var(--t-dur-fast) var(--t-ease);
+}
+.theater-inst-pop-item:hover {
+    background: var(--t-surface-hover);
+}
+.theater-inst-pop-name {
+    font-size: var(--t-text-sm);
+    color: var(--t-ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.theater-inst-pop-g {
+    flex: 0 0 auto;
+    font-size: 0.7em;
+    color: var(--t-ink-muted);
+    opacity: 0.75;
+}
+.theater-inst-pop-foot {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--t-border);
+    text-align: center;
+}
+
 /* Default button — frosted glass plate */
 .theater-btn {
     display: inline-flex;
@@ -917,6 +1003,7 @@
     gap: var(--t-space-6);
     flex-wrap: wrap;
     margin-bottom: var(--t-space-3);
+    position: relative;
 }
 
 .theater-toggle-label {
