@@ -202,9 +202,9 @@
         linear-gradient(180deg, oklch(99% 0.005 90 / 0.5), transparent 40%);
 }
 
-/* Rivets — two brass dots on header corners (default skin only) */
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-popup-header::before,
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-popup-header::after {
+/* Rivets — two brass dots on header corners */
+.theater-popup .theater-popup-header::before,
+.theater-popup .theater-popup-header::after {
     content: '';
     position: absolute;
     top: var(--t-space-4);
@@ -216,8 +216,8 @@
         inset 0 -1px 2px oklch(25% 0.03 45 / 0.4),
         0 1px 1px oklch(99% 0.005 90 / 0.5);
 }
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-popup-header::before { left: var(--t-space-4); }
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-popup-header::after { right: var(--t-space-4); }
+.theater-popup .theater-popup-header::before { left: var(--t-space-4); }
+.theater-popup .theater-popup-header::after { right: var(--t-space-4); }
 
 .theater-popup-header .theater-brand {
     display: flex;
@@ -272,7 +272,7 @@
 }
 
 /* Main title — 金红 ember 渐变文字（仅默认皮肤） */
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-popup-header .theater-title {
+.theater-popup .theater-popup-header .theater-title {
     background: linear-gradient(105deg, oklch(45% 0.13 48), oklch(58% 0.15 58) 55%, oklch(72% 0.15 66));
     -webkit-background-clip: text;
     background-clip: text;
@@ -914,7 +914,7 @@
 }
 
 /* Switch — frosted recessed track + polished knob */
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-toggle-label input[type="checkbox"] {
+.theater-popup .theater-toggle-label input[type="checkbox"] {
     -webkit-appearance: none;
     appearance: none;
     width: 40px !important;
@@ -932,13 +932,13 @@
         inset 0 -1px 0 oklch(99% 0.005 90 / 0.5);
 }
 
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-toggle-label input[type="checkbox"]::before,
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-toggle-label input[type="checkbox"]::after {
+.theater-popup .theater-toggle-label input[type="checkbox"]::before,
+.theater-popup .theater-toggle-label input[type="checkbox"]::after {
     content: none !important;
 }
 
 /* Knob */
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-toggle-label input[type="checkbox"]::after {
+.theater-popup .theater-toggle-label input[type="checkbox"]::after {
     content: '' !important;
     position: absolute;
     top: 2px;
@@ -954,19 +954,19 @@
         inset 0 1px 1px oklch(99% 0.005 90 / 0.9);
 }
 
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-toggle-label input[type="checkbox"]:checked {
+.theater-popup .theater-toggle-label input[type="checkbox"]:checked {
     background: linear-gradient(180deg, oklch(62% 0.14 58), oklch(52% 0.145 50));
     border-color: oklch(45% 0.12 46);
 }
 
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-toggle-label input[type="checkbox"]:checked::after {
+.theater-popup .theater-toggle-label input[type="checkbox"]:checked::after {
     transform: translateX(18px);
     background: radial-gradient(circle at 30% 25%, oklch(99.5% 0.002 90), oklch(88% 0.02 80) 75%);
 }
 
 /* Entry checkboxes */
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-wb-entry-header input[type="checkbox"],
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-preset-entry-header input[type="checkbox"] {
+.theater-popup .theater-wb-entry-header input[type="checkbox"],
+.theater-popup .theater-preset-entry-header input[type="checkbox"] {
     -webkit-appearance: none;
     appearance: none;
     width: 17px !important;
@@ -981,19 +981,19 @@
     transition: all var(--t-dur-fast) var(--t-ease);
 }
 
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-wb-entry-header input[type="checkbox"]::before,
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-preset-entry-header input[type="checkbox"]::before {
+.theater-popup .theater-wb-entry-header input[type="checkbox"]::before,
+.theater-popup .theater-preset-entry-header input[type="checkbox"]::before {
     content: none !important;
 }
 
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-wb-entry-header input[type="checkbox"]:checked,
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-preset-entry-header input[type="checkbox"]:checked {
+.theater-popup .theater-wb-entry-header input[type="checkbox"]:checked,
+.theater-popup .theater-preset-entry-header input[type="checkbox"]:checked {
     background: var(--t-brass-grad);
     border-color: oklch(42% 0.11 45) !important;
 }
 
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-wb-entry-header input[type="checkbox"]:checked::after,
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-preset-entry-header input[type="checkbox"]:checked::after {
+.theater-popup .theater-wb-entry-header input[type="checkbox"]:checked::after,
+.theater-popup .theater-preset-entry-header input[type="checkbox"]:checked::after {
     content: '' !important;
     display: block;
     width: 5px;
@@ -1005,7 +1005,7 @@
 }
 
 /* Instruction list checkboxes */
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-inst-checkbox {
+.theater-popup .theater-inst-checkbox {
     -webkit-appearance: none;
     appearance: none;
     width: 17px !important;
@@ -1018,16 +1018,16 @@
     transition: all var(--t-dur-fast) var(--t-ease);
 }
 
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-inst-checkbox::before {
+.theater-popup .theater-inst-checkbox::before {
     content: none !important;
 }
 
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-inst-checkbox:checked {
+.theater-popup .theater-inst-checkbox:checked {
     background: var(--t-brass-grad);
     border-color: oklch(42% 0.11 45) !important;
 }
 
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-inst-checkbox:checked::after {
+.theater-popup .theater-inst-checkbox:checked::after {
     content: '' !important;
     display: block;
     width: 4px;
@@ -2106,8 +2106,8 @@
 }
 
 /* ST outer container overrides — 彻底接管 SillyTavern dialog 外壳 */
-body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])),
-body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])) {
+body .popup:has(.theater-popup),
+body dialog.popup:has(.theater-popup) {
     /* 去黑框：无边框、无轮廓、无默认背景 */
     background: transparent !important;
     color: var(--t-ink) !important;
@@ -2133,7 +2133,7 @@ body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="
 }
 
 /* popup-body — 占据 controls 以上的所有空间 */
-body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])) .popup-body {
+body .popup:has(.theater-popup) .popup-body {
     background: transparent !important; padding: 0 !important;
     display: flex !important;
     flex-direction: column !important;
@@ -2147,7 +2147,7 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     mask-image: radial-gradient(white, white);
 }
 
-body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])) .popup-controls {
+body .popup:has(.theater-popup) .popup-controls {
     background: transparent !important;
     border-top: var(--t-rule-thin);
     padding: var(--t-space-3) var(--t-space-6);
@@ -2155,44 +2155,44 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     flex-grow: 0;
 }
 
-body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])) .popup-button-close,
-body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])) .popup-button-ok,
-body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])) .popup-button-cancel {
+body .popup:has(.theater-popup) .popup-button-close,
+body .popup:has(.theater-popup) .popup-button-ok,
+body .popup:has(.theater-popup) .popup-button-cancel {
     font-family: var(--t-font-sans); font-size: var(--t-text-sm);
     letter-spacing: 0.01em; border-radius: var(--t-radius-pill); border: var(--t-rule-thin);
 }
 
-body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]))::backdrop {
+body .popup:has(.theater-popup)::backdrop {
     background: oklch(0% 0 0 / 0.45); backdrop-filter: blur(4px);
 }
 
 /* theater-popup 自身也要确保裁切不漏 — mask 强制圆角裁切 */
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) {
+.theater-popup {
     border-radius: var(--t-radius-xl) !important;
     -webkit-mask-image: -webkit-radial-gradient(white, white);
     mask-image: radial-gradient(white, white);
 }
 
 /* panels-wrapper 滚动容器：mask 防止子内容突破圆角 */
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-panels-wrapper {
+.theater-popup .theater-panels-wrapper {
     border-radius: inherit;
 }
 
 /* Scrollbars — 悬浮才出现、半透明圆角胶囊 */
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) {
+.theater-popup {
     scrollbar-width: thin; scrollbar-color: oklch(58% 0.02 55 / 0.45) transparent;
 }
 
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) ::-webkit-scrollbar {
+.theater-popup ::-webkit-scrollbar {
     width: 10px; height: 10px;
 }
 
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) ::-webkit-scrollbar-track {
+.theater-popup ::-webkit-scrollbar-track {
     background: transparent;
     margin: var(--t-space-2) 0;
 }
 
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) ::-webkit-scrollbar-thumb {
+.theater-popup ::-webkit-scrollbar-thumb {
     background: oklch(58% 0.02 55 / 0.35);
     border-radius: 999px;
     border: 3px solid transparent;
@@ -2200,7 +2200,7 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     transition: background-color var(--t-dur-fast) var(--t-ease);
 }
 
-.theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) ::-webkit-scrollbar-thumb:hover {
+.theater-popup ::-webkit-scrollbar-thumb:hover {
     background: oklch(50% 0.03 55 / 0.6);
     border: 3px solid transparent;
     background-clip: padding-box;
@@ -2221,15 +2221,15 @@ body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom
     .theater-popup-header .theater-title { font-size: var(--t-text-xl); }
     .theater-popup-header .theater-subtitle { font-size: var(--t-text-xs); }
     /* hide rivets on small screens — they crowd the narrow header */
-    .theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-popup-header::before,
-    .theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-popup-header::after { display: none; }
+    .theater-popup .theater-popup-header::before,
+    .theater-popup .theater-popup-header::after { display: none; }
     .theater-tabs { padding: var(--t-space-2) var(--t-space-3); }
     .theater-tab { padding: var(--t-space-2) var(--t-space-3); font-size: var(--t-text-xs); }
     .theater-panel { padding: var(--t-space-4); }
     .theater-panels-wrapper { max-height: none; min-height: 0; }
     /* 移动端：外层更高占比 */
-    body .popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])),
-    body dialog.popup:has(.theater-popup:not([data-skin="theater"]):not([data-skin="custom"])) {
+    body .popup:has(.theater-popup),
+    body dialog.popup:has(.theater-popup) {
         height: 92vh !important;
         max-height: 92vh !important;
     }
@@ -2487,7 +2487,7 @@ html body #theater-floating-ball.theater-ball-generating {
    Tab 栏边缘渐隐 — 窄屏横向滚动时的可滚动提示
    ============================================================ */
 @media (max-width: 768px) {
-    .theater-popup:not([data-skin="theater"]):not([data-skin="custom"]) .theater-tabs {
+    .theater-popup .theater-tabs {
         -webkit-mask-image: linear-gradient(90deg,
             transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
         mask-image: linear-gradient(90deg,
