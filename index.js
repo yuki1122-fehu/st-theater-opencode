@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '4.13.0';
+const VERSION = '4.15.0';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -1237,6 +1237,16 @@ function buildPopupHTML() {
         </div>
         <div class="theater-section">
             <label class="theater-label"><i class="fa-solid fa-arrows-rotate"></i> 扩展管理</label>
+            <div style="margin-bottom:10px;">
+                <label class="theater-label" for="theater-skin-select" style="margin-bottom:6px;"><i class="fa-solid fa-palette"></i> 面板皮肤</label>
+                <select id="theater-skin-select" class="theater-select">
+                    <option value="default" ${skin === 'default' ? 'selected' : ''}>拾光锻匣（默认 · 金属拟物）</option>
+                    <option value="hearth" ${skin === 'hearth' ? 'selected' : ''}>壁炉 · 晨（浅色 · 移动端优化）</option>
+                    <option value="theater" ${skin === 'theater' ? 'selected' : ''}>跟随酒馆主题</option>
+                    <option value="custom" ${skin === 'custom' ? 'selected' : ''}>自定义 CSS 接管</option>
+                </select>
+                <p class="theater-hint" style="margin-top:6px;">切换后即时生效并自动保存。「壁炉 · 晨」为手机端做了紧凑布局与大触控优化。</p>
+            </div>
             <div class="theater-toggle-row" style="margin-bottom:10px;">
                 <label class="theater-toggle-label"><input type="checkbox" id="theater-floating-ball-toggle" ${settings.floatingBall ? 'checked' : ''}><span>悬浮球</span></label>
             </div>
@@ -1750,6 +1760,13 @@ function bindEvents() {
     $d.off('click.tstop').on('click.tstop', '#theater-stop-btn', stopGeneration);
     $d.off('change.ti').on('change.ti', '#theater-interactive-toggle', function () { settings.interactiveMode = $(this).is(':checked'); save(); });
     $d.off('input.tii').on('input.tii', '#theater-instruction', function () { settings.lastInstruction = $(this).val(); save(); });
+
+    // ---- Skin switcher（面板皮肤：default / hearth / theater / custom）----
+    $d.off('change.tskin').on('change.tskin', '#theater-skin-select', function () {
+        settings.skinMode = $(this).val() || 'default';
+        save();
+        $d.find('.theater-popup').attr('data-skin', settings.skinMode);
+    });
 
     // ---- Material: Preset ----
     $d.off('input.tpsq').on('input.tpsq', '#theater-preset-search', function () {
