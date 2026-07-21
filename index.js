@@ -7,7 +7,7 @@ import { bindPersonaFollowRefresh, syncPersonaToSettings } from './persona-follo
 import { compareVersion, fetchLatestRemoteVersion, formatVersionCheckError } from './version-check.js';
 
 const MODULE_NAME = 'theater_generator';
-const VERSION = '4.17.0';
+const VERSION = '4.18.0';
 // 动态推导本插件所在文件夹名（兼容安装目录改名，如 st-theater / st-theater-opencode）
 const EXT_FOLDER = (new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()) || 'st-theater-opencode';
 let latestRemoteVersion = null;
@@ -134,8 +134,6 @@ const defaultSettings = Object.freeze({
     history: [],
     interactiveMode: false,
     interactiveRenderRules: '',   // 自定义交互模式渲染规则；留空则使用内置 INTERACTIVE_PROMPT
-    customCSS: '',
-    skinMode: 'default',  // 'default' (内置粉彩) | 'theater' (跟随酒馆) | 'custom' (用户CSS接管)
     uiFontSize: 13.5,
    apiMode: 'custom',  // 'custom' 独立 API | 'main' 酒馆主 API（实验）
    apiUrl: '', apiKey: '', apiModel: '',
@@ -383,7 +381,6 @@ async function init() {
     }
 
     ensureBuiltinTemplates();
-    applyCustomCSS();
     // 悬浮球延迟创建，避免干扰其他插件初始化
     setTimeout(() => { try { createFloatingBall(); } catch (e) { console.warn('[Theater] Floating ball error:', e); } }, 2000);
     // 后台检查 github 上的最新版本，只挂入口红点，不弹窗打扰主界面
@@ -424,73 +421,7 @@ function refreshUpdateBadges() {
     $('.theater-tab[data-tab="config"]').append(updateBadgeHTML('theater-tab-new-badge'));
 }
 
-// 把用户 CSS 限定在 .theater-popup 容器内，避免污染酒馆主界面。
-// 用浏览器原生 CSSOM 解析，遍历每条规则改写选择器；解析失败则不注入。
 const THEATER_SCOPE = '.theater-popup';
-
-function scopeSelector(selectorText, scope) {
-    return selectorText.split(',').map(raw => {
-        const sel = raw.trim();
-        if (!sel) return '';
-        // body / html / :root 这种代表整个文档的选择器，等价于 scope 本身
-        if (/^(body|html|:root)$/i.test(sel)) return scope;
-        // 形如 "body.foo" / "html[data-x]" —— 把开头的 body/html 摘掉，剩下的限定到 scope 上
-        const stripDocRoot = sel.replace(/^(?:body|html|:root)(?=[.\[#:])/i, '');
-        if (stripDocRoot !== sel) return `${scope}${stripDocRoot}`;
-        // 已经以 scope 开头（含 .theater-popup-* BEM 命名），不重复加
-        if (sel === scope || sel.startsWith(scope)) return sel;
-        return `${scope} ${sel}`;
-    }).filter(Boolean).join(', ');
-}
-
-function scopeRules(rules, scope) {
-    const out = [];
-    for (const rule of rules) {
-        // CSSRule.STYLE_RULE = 1
-        if (rule.type === 1) {
-            const sel = scopeSelector(rule.selectorText, scope);
-            if (sel) out.push(`${sel} { ${rule.style.cssText} }`);
-        // MEDIA_RULE = 4
-        } else if (rule.type === 4) {
-            out.push(`@media ${rule.conditionText || rule.media.mediaText} {\n${scopeRules(rule.cssRules, scope)}\n}`);
-        // SUPPORTS_RULE = 12
-        } else if (rule.type === 12) {
-            out.push(`@supports ${rule.conditionText} {\n${scopeRules(rule.cssRules, scope)}\n}`);
-        // KEYFRAMES_RULE = 7 / FONT_FACE_RULE = 5 / IMPORT_RULE = 3 等都不需要 scope
-        } else {
-            out.push(rule.cssText || '');
-        }
-    }
-    return out.join('\n');
-}
-
-function scopeCSS(cssText, scope) {
-    if (!cssText?.trim()) return '';
-    const probe = document.createElement('style');
-    probe.media = 'not all'; // 解析但不让它生效
-    probe.textContent = cssText;
-    document.head.appendChild(probe);
-    try {
-        const rules = probe.sheet?.cssRules;
-        if (!rules) return '';
-        return scopeRules(rules, scope);
-    } finally {
-        probe.remove();
-    }
-}
-
-function applyCustomCSS() {
-    $('#theater-custom-css-inject').remove();
-    const raw = settings.customCSS;
-    if (!raw?.trim()) return;
-    try {
-        const scoped = scopeCSS(raw, THEATER_SCOPE);
-        if (scoped) $('head').append(`<style id="theater-custom-css-inject">${scoped}</style>`);
-    } catch (e) {
-        console.warn('[Theater] custom CSS scope failed:', e);
-        toastr?.warning('自定义 CSS 解析失败，已跳过应用。请检查语法。');
-    }
-}
 
 function normalizeUIFontSize(value) {
     const n = Number(value);
@@ -829,9 +760,8 @@ function buildPopupHTML() {
     const hist = historyCache;
     const selRender = settings.selectedRenderIndex || '__default__';
 
-    const skin = settings.skinMode || 'default';
     return `
-<div class="theater-popup" data-skin="${skin}">
+<div class="theater-popup" data-skin="default">
     <div class="theater-popup-header">
         <div class="theater-brand">
             <div class="theater-logo" aria-label="拾光锻匣">
@@ -1238,16 +1168,6 @@ function buildPopupHTML() {
         </div>
         <div class="theater-section">
             <label class="theater-label"><i class="fa-solid fa-arrows-rotate"></i> 扩展管理</label>
-            <div style="margin-bottom:10px;">
-                <label class="theater-label" for="theater-skin-select" style="margin-bottom:6px;"><i class="fa-solid fa-palette"></i> 面板皮肤</label>
-                <select id="theater-skin-select" class="theater-select">
-                    <option value="default" ${skin === 'default' ? 'selected' : ''}>拾光锻匣（默认 · 金属拟物）</option>
-                    <option value="hearth" ${skin === 'hearth' ? 'selected' : ''}>壁炉 · 晨（浅色 · 移动端优化）</option>
-                    <option value="theater" ${skin === 'theater' ? 'selected' : ''}>跟随酒馆主题</option>
-                    <option value="custom" ${skin === 'custom' ? 'selected' : ''}>自定义 CSS 接管</option>
-                </select>
-                <p class="theater-hint" style="margin-top:6px;">切换后即时生效并自动保存。「壁炉 · 晨」为手机端做了紧凑布局与大触控优化。</p>
-            </div>
             <div class="theater-toggle-row" style="margin-bottom:10px;">
                 <label class="theater-toggle-label"><input type="checkbox" id="theater-floating-ball-toggle" ${settings.floatingBall ? 'checked' : ''}><span>悬浮球</span></label>
             </div>
@@ -1460,7 +1380,6 @@ function openInstPop() {
     $pop.show();
     instPopOpen = true;
     $('#theater-inst-quick-btn').addClass('active');
-    setTimeout(() => $pop.find('.theater-inst-pop-search').focus(), 0);
 }
 function closeInstPop() {
     $('#theater-inst-pop').hide();
@@ -1807,13 +1726,6 @@ function bindEvents() {
     $d.off('click.tstop').on('click.tstop', '#theater-stop-btn', stopGeneration);
     $d.off('change.ti').on('change.ti', '#theater-interactive-toggle', function () { settings.interactiveMode = $(this).is(':checked'); save(); });
     $d.off('input.tii').on('input.tii', '#theater-instruction', function () { settings.lastInstruction = $(this).val(); save(); });
-
-    // ---- Skin switcher（面板皮肤：default / hearth / theater / custom）----
-    $d.off('change.tskin').on('change.tskin', '#theater-skin-select', function () {
-        settings.skinMode = $(this).val() || 'default';
-        save();
-        $d.find('.theater-popup').attr('data-skin', settings.skinMode);
-    });
 
     // ---- Material: Preset ----
     $d.off('input.tpsq').on('input.tpsq', '#theater-preset-search', function () {
@@ -2968,7 +2880,7 @@ async function manageInstructionGroups() {
         </div>`;
     }).join('');
     const html = `
-    <div class="theater-popup" data-skin="${settings.skinMode || 'default'}">
+    <div class="theater-popup" data-skin="default">
         <div class="theater-popup-header"><p class="theater-title">管理分组</p><p class="theater-subtitle">改名 / 删除（删除后该组模板回到未分组）</p></div>
         <div class="theater-section">${rows}</div>
     </div>`;
@@ -3034,7 +2946,7 @@ async function moveInstructionTemplate(idx) {
     });
     rows.push(`<div class="theater-group-pick-row theater-group-pick-new" data-target="__new__"><i class="fa-solid fa-folder-plus"></i> 新建分组…</div>`);
     const html = `
-    <div class="theater-popup" data-skin="${settings.skinMode || 'default'}">
+    <div class="theater-popup" data-skin="default">
         <div class="theater-popup-header"><p class="theater-title">移动到分组</p><p class="theater-subtitle">${esc(t.name)}</p></div>
         <div class="theater-section">${rows.join('')}</div>
     </div>`;
@@ -3076,7 +2988,7 @@ async function bulkMoveSelected() {
     });
     rows.push(`<div class="theater-group-pick-row theater-group-pick-new" data-target="__new__"><i class="fa-solid fa-folder-plus"></i> 新建分组…</div>`);
     const html = `
-    <div class="theater-popup" data-skin="${settings.skinMode || 'default'}">
+    <div class="theater-popup" data-skin="default">
         <div class="theater-popup-header"><p class="theater-title">批量移动</p><p class="theater-subtitle">${instSelected.size} 个模板</p></div>
         <div class="theater-section">${rows.join('')}</div>
     </div>`;
